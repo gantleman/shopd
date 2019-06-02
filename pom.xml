@@ -59,35 +59,59 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 		</dependency>
-		   <!--jsp支持-->
-		<!-- servlet 依赖. -->
+		<!--jsp-->
+		<!-- servlet -->
 		<dependency>
-		<groupId>javax.servlet</groupId>
-		<artifactId>javax.servlet-api</artifactId>
-		<scope>provided</scope>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		<groupId>javax.servlet</groupId>
-		<artifactId>jstl</artifactId>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
 		</dependency>
-		<!-- tomcat 的支持.-->
+		<!-- tomcat-->
 		<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-tomcat</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
 		</dependency>
 		<dependency>
-		<groupId>org.apache.tomcat.embed</groupId>
-		<artifactId>tomcat-embed-jasper</artifactId>
-		<scope>provided</scope>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-		<groupId>org.eclipse.jdt.core.compiler</groupId>
-		<artifactId>ecj</artifactId>
-		<version>4.6.1</version>
-		<scope>provided</scope>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>4.6.1</version>
+			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+		<!-- redis -->
+		<dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-data-redis</artifactId>
+          <exclusions>
+              <exclusion>
+                  <groupId>io.lettuce</groupId>
+                  <artifactId>lettuce-core</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.data</groupId>
+          <artifactId>spring-data-commons</artifactId>
+      </dependency>
+       <dependency>
+          <groupId>redis.clients</groupId>
+          <artifactId>jedis</artifactId>
+	   </dependency>
+		<!-- Berkeley Database Java Edition-->
+       <dependency>
+            <groupId>com.sleepycat</groupId>
+            <artifactId>je</artifactId>
+            <version>18.3.1</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
