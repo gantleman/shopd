@@ -1,6 +1,12 @@
 package com.github.gantleman.shopd.entity;
 
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+
+@Entity
 public class Activity {
+
+    @PrimaryKey(sequence = "ID")
     private Integer activityid;
 
     private String activityname;

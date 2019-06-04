@@ -1,12 +1,21 @@
 package com.github.gantleman.shopd.entity;
 
 import java.util.Date;
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
+@Entity
 public class Comment {
+
+    @PrimaryKey(sequence = "ID")
     private Integer commentid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer userid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer goodsid;
 
     private Integer point;

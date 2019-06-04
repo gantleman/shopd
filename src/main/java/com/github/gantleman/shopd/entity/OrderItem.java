@@ -1,10 +1,19 @@
 package com.github.gantleman.shopd.entity;
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
+@Entity
 public class OrderItem {
+
+    @PrimaryKey(sequence = "ID")
     private Integer itemid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer orderid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer goodsid;
 
     private Integer num;

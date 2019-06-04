@@ -2,8 +2,15 @@ package com.github.gantleman.shopd.entity;
 
 import java.util.Date;
 import java.util.List;
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
+@Entity
 public class Goods {
+
+    @PrimaryKey(sequence = "ID")
     private Integer goodsid;
 
     private String goodsname;
@@ -14,10 +21,12 @@ public class Goods {
 
     private Date uptime;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer category;
 
     private String detailcate;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer activityid;
 
     private String description;

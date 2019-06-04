@@ -2,12 +2,21 @@ package com.github.gantleman.shopd.entity;
 
 import java.util.Date;
 import java.util.List;
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
+@Entity
 public class Order {
+
+    @PrimaryKey(sequence = "ID")
     private Integer orderid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer userid;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Date ordertime;
 
     private Float oldprice;
@@ -22,6 +31,7 @@ public class Order {
 
     private Boolean iscomplete;
 
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer addressid;
 
     private List<Goods> goodsInfo;
