@@ -104,253 +104,453 @@ public class CacheExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
-        public Criteria andNameIsNull() {
-            addCriterion("name is null");
+        public Criteria andCIdIsNull() {
+            addCriterion("c_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andNameIsNotNull() {
-            addCriterion("name is not null");
+        public Criteria andCIdIsNotNull() {
+            addCriterion("c_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNameEqualTo(String value) {
-            addCriterion("name =", value, "name");
+        public Criteria andCIdEqualTo(Integer value) {
+            addCriterion("c_id =", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameNotEqualTo(String value) {
-            addCriterion("name <>", value, "name");
+        public Criteria andCIdNotEqualTo(Integer value) {
+            addCriterion("c_id <>", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameGreaterThan(String value) {
-            addCriterion("name >", value, "name");
+        public Criteria andCIdGreaterThan(Integer value) {
+            addCriterion("c_id >", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameGreaterThanOrEqualTo(String value) {
-            addCriterion("name >=", value, "name");
+        public Criteria andCIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("c_id >=", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameLessThan(String value) {
-            addCriterion("name <", value, "name");
+        public Criteria andCIdLessThan(Integer value) {
+            addCriterion("c_id <", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameLessThanOrEqualTo(String value) {
-            addCriterion("name <=", value, "name");
+        public Criteria andCIdLessThanOrEqualTo(Integer value) {
+            addCriterion("c_id <=", value, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameLike(String value) {
-            addCriterion("name like", value, "name");
+        public Criteria andCIdIn(List<Integer> values) {
+            addCriterion("c_id in", values, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameNotLike(String value) {
-            addCriterion("name not like", value, "name");
+        public Criteria andCIdNotIn(List<Integer> values) {
+            addCriterion("c_id not in", values, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameIn(List<String> values) {
-            addCriterion("name in", values, "name");
+        public Criteria andCIdBetween(Integer value1, Integer value2) {
+            addCriterion("c_id between", value1, value2, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameNotIn(List<String> values) {
-            addCriterion("name not in", values, "name");
+        public Criteria andCIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("c_id not between", value1, value2, "cId");
             return (Criteria) this;
         }
 
-        public Criteria andNameBetween(String value1, String value2) {
-            addCriterion("name between", value1, value2, "name");
+        public Criteria andCNameIsNull() {
+            addCriterion("c_name is null");
             return (Criteria) this;
         }
 
-        public Criteria andNameNotBetween(String value1, String value2) {
-            addCriterion("name not between", value1, value2, "name");
+        public Criteria andCNameIsNotNull() {
+            addCriterion("c_name is not null");
             return (Criteria) this;
         }
 
-        public Criteria andIndexIsNull() {
-            addCriterion("index is null");
+        public Criteria andCNameEqualTo(String value) {
+            addCriterion("c_name =", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexIsNotNull() {
-            addCriterion("index is not null");
+        public Criteria andCNameNotEqualTo(String value) {
+            addCriterion("c_name <>", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexEqualTo(Long value) {
-            addCriterion("index =", value, "index");
+        public Criteria andCNameGreaterThan(String value) {
+            addCriterion("c_name >", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexNotEqualTo(Long value) {
-            addCriterion("index <>", value, "index");
+        public Criteria andCNameGreaterThanOrEqualTo(String value) {
+            addCriterion("c_name >=", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexGreaterThan(Long value) {
-            addCriterion("index >", value, "index");
+        public Criteria andCNameLessThan(String value) {
+            addCriterion("c_name <", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexGreaterThanOrEqualTo(Long value) {
-            addCriterion("index >=", value, "index");
+        public Criteria andCNameLessThanOrEqualTo(String value) {
+            addCriterion("c_name <=", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexLessThan(Long value) {
-            addCriterion("index <", value, "index");
+        public Criteria andCNameLike(String value) {
+            addCriterion("c_name like", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexLessThanOrEqualTo(Long value) {
-            addCriterion("index <=", value, "index");
+        public Criteria andCNameNotLike(String value) {
+            addCriterion("c_name not like", value, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexIn(List<Long> values) {
-            addCriterion("index in", values, "index");
+        public Criteria andCNameIn(List<String> values) {
+            addCriterion("c_name in", values, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexNotIn(List<Long> values) {
-            addCriterion("index not in", values, "index");
+        public Criteria andCNameNotIn(List<String> values) {
+            addCriterion("c_name not in", values, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexBetween(Long value1, Long value2) {
-            addCriterion("index between", value1, value2, "index");
+        public Criteria andCNameBetween(String value1, String value2) {
+            addCriterion("c_name between", value1, value2, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andIndexNotBetween(Long value1, Long value2) {
-            addCriterion("index not between", value1, value2, "index");
+        public Criteria andCNameNotBetween(String value1, String value2) {
+            addCriterion("c_name not between", value1, value2, "cName");
             return (Criteria) this;
         }
 
-        public Criteria andPortIsNull() {
-            addCriterion("port is null");
+        public Criteria andCIndexIsNull() {
+            addCriterion("c_index is null");
             return (Criteria) this;
         }
 
-        public Criteria andPortIsNotNull() {
-            addCriterion("port is not null");
+        public Criteria andCIndexIsNotNull() {
+            addCriterion("c_index is not null");
             return (Criteria) this;
         }
 
-        public Criteria andPortEqualTo(Integer value) {
-            addCriterion("port =", value, "port");
+        public Criteria andCIndexEqualTo(Long value) {
+            addCriterion("c_index =", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortNotEqualTo(Integer value) {
-            addCriterion("port <>", value, "port");
+        public Criteria andCIndexNotEqualTo(Long value) {
+            addCriterion("c_index <>", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortGreaterThan(Integer value) {
-            addCriterion("port >", value, "port");
+        public Criteria andCIndexGreaterThan(Long value) {
+            addCriterion("c_index >", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortGreaterThanOrEqualTo(Integer value) {
-            addCriterion("port >=", value, "port");
+        public Criteria andCIndexGreaterThanOrEqualTo(Long value) {
+            addCriterion("c_index >=", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortLessThan(Integer value) {
-            addCriterion("port <", value, "port");
+        public Criteria andCIndexLessThan(Long value) {
+            addCriterion("c_index <", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortLessThanOrEqualTo(Integer value) {
-            addCriterion("port <=", value, "port");
+        public Criteria andCIndexLessThanOrEqualTo(Long value) {
+            addCriterion("c_index <=", value, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortIn(List<Integer> values) {
-            addCriterion("port in", values, "port");
+        public Criteria andCIndexIn(List<Long> values) {
+            addCriterion("c_index in", values, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortNotIn(List<Integer> values) {
-            addCriterion("port not in", values, "port");
+        public Criteria andCIndexNotIn(List<Long> values) {
+            addCriterion("c_index not in", values, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortBetween(Integer value1, Integer value2) {
-            addCriterion("port between", value1, value2, "port");
+        public Criteria andCIndexBetween(Long value1, Long value2) {
+            addCriterion("c_index between", value1, value2, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andPortNotBetween(Integer value1, Integer value2) {
-            addCriterion("port not between", value1, value2, "port");
+        public Criteria andCIndexNotBetween(Long value1, Long value2) {
+            addCriterion("c_index not between", value1, value2, "cIndex");
             return (Criteria) this;
         }
 
-        public Criteria andStampIsNull() {
-            addCriterion("stamp is null");
+        public Criteria andCHostIsNull() {
+            addCriterion("c_host is null");
             return (Criteria) this;
         }
 
-        public Criteria andStampIsNotNull() {
-            addCriterion("stamp is not null");
+        public Criteria andCHostIsNotNull() {
+            addCriterion("c_host is not null");
             return (Criteria) this;
         }
 
-        public Criteria andStampEqualTo(Long value) {
-            addCriterion("stamp =", value, "stamp");
+        public Criteria andCHostEqualTo(String value) {
+            addCriterion("c_host =", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampNotEqualTo(Long value) {
-            addCriterion("stamp <>", value, "stamp");
+        public Criteria andCHostNotEqualTo(String value) {
+            addCriterion("c_host <>", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampGreaterThan(Long value) {
-            addCriterion("stamp >", value, "stamp");
+        public Criteria andCHostGreaterThan(String value) {
+            addCriterion("c_host >", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampGreaterThanOrEqualTo(Long value) {
-            addCriterion("stamp >=", value, "stamp");
+        public Criteria andCHostGreaterThanOrEqualTo(String value) {
+            addCriterion("c_host >=", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampLessThan(Long value) {
-            addCriterion("stamp <", value, "stamp");
+        public Criteria andCHostLessThan(String value) {
+            addCriterion("c_host <", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampLessThanOrEqualTo(Long value) {
-            addCriterion("stamp <=", value, "stamp");
+        public Criteria andCHostLessThanOrEqualTo(String value) {
+            addCriterion("c_host <=", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampIn(List<Long> values) {
-            addCriterion("stamp in", values, "stamp");
+        public Criteria andCHostLike(String value) {
+            addCriterion("c_host like", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampNotIn(List<Long> values) {
-            addCriterion("stamp not in", values, "stamp");
+        public Criteria andCHostNotLike(String value) {
+            addCriterion("c_host not like", value, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampBetween(Long value1, Long value2) {
-            addCriterion("stamp between", value1, value2, "stamp");
+        public Criteria andCHostIn(List<String> values) {
+            addCriterion("c_host in", values, "cHost");
             return (Criteria) this;
         }
 
-        public Criteria andStampNotBetween(Long value1, Long value2) {
-            addCriterion("stamp not between", value1, value2, "stamp");
+        public Criteria andCHostNotIn(List<String> values) {
+            addCriterion("c_host not in", values, "cHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHostBetween(String value1, String value2) {
+            addCriterion("c_host between", value1, value2, "cHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHostNotBetween(String value1, String value2) {
+            addCriterion("c_host not between", value1, value2, "cHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2IsNull() {
+            addCriterion("c_host2 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2IsNotNull() {
+            addCriterion("c_host2 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2EqualTo(String value) {
+            addCriterion("c_host2 =", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2NotEqualTo(String value) {
+            addCriterion("c_host2 <>", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2GreaterThan(String value) {
+            addCriterion("c_host2 >", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2GreaterThanOrEqualTo(String value) {
+            addCriterion("c_host2 >=", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2LessThan(String value) {
+            addCriterion("c_host2 <", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2LessThanOrEqualTo(String value) {
+            addCriterion("c_host2 <=", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2Like(String value) {
+            addCriterion("c_host2 like", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2NotLike(String value) {
+            addCriterion("c_host2 not like", value, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2In(List<String> values) {
+            addCriterion("c_host2 in", values, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2NotIn(List<String> values) {
+            addCriterion("c_host2 not in", values, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2Between(String value1, String value2) {
+            addCriterion("c_host2 between", value1, value2, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCHost2NotBetween(String value1, String value2) {
+            addCriterion("c_host2 not between", value1, value2, "cHost2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampIsNull() {
+            addCriterion("c_stamp is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampIsNotNull() {
+            addCriterion("c_stamp is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampEqualTo(Long value) {
+            addCriterion("c_stamp =", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampNotEqualTo(Long value) {
+            addCriterion("c_stamp <>", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampGreaterThan(Long value) {
+            addCriterion("c_stamp >", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampGreaterThanOrEqualTo(Long value) {
+            addCriterion("c_stamp >=", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampLessThan(Long value) {
+            addCriterion("c_stamp <", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampLessThanOrEqualTo(Long value) {
+            addCriterion("c_stamp <=", value, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampIn(List<Long> values) {
+            addCriterion("c_stamp in", values, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampNotIn(List<Long> values) {
+            addCriterion("c_stamp not in", values, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampBetween(Long value1, Long value2) {
+            addCriterion("c_stamp between", value1, value2, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStampNotBetween(Long value1, Long value2) {
+            addCriterion("c_stamp not between", value1, value2, "cStamp");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2IsNull() {
+            addCriterion("c_stamp2 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2IsNotNull() {
+            addCriterion("c_stamp2 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2EqualTo(Long value) {
+            addCriterion("c_stamp2 =", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2NotEqualTo(Long value) {
+            addCriterion("c_stamp2 <>", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2GreaterThan(Long value) {
+            addCriterion("c_stamp2 >", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2GreaterThanOrEqualTo(Long value) {
+            addCriterion("c_stamp2 >=", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2LessThan(Long value) {
+            addCriterion("c_stamp2 <", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2LessThanOrEqualTo(Long value) {
+            addCriterion("c_stamp2 <=", value, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2In(List<Long> values) {
+            addCriterion("c_stamp2 in", values, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2NotIn(List<Long> values) {
+            addCriterion("c_stamp2 not in", values, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2Between(Long value1, Long value2) {
+            addCriterion("c_stamp2 between", value1, value2, "cStamp2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCStamp2NotBetween(Long value1, Long value2) {
+            addCriterion("c_stamp2 not between", value1, value2, "cStamp2");
             return (Criteria) this;
         }
     }

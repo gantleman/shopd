@@ -13,12 +13,16 @@ import com.sleepycat.persist.StoreExistsException;
 import com.sleepycat.persist.StoreNotFoundException;
 import com.sleepycat.persist.evolve.IncompatibleClassException;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Berkeley Database Java Edition 环境管理器
  * 
  * https://blog.csdn.net/hadues/article/details/80854288
  * @author fairy
  */
+
+@Component
 public class BDBEnvironmentManager {
 	private static volatile BDBEnvironmentManager bdbEnvironmentManager = null;
 
@@ -94,7 +98,6 @@ public class BDBEnvironmentManager {
 					myEnvConfig.setTransactional(!readOnly);
 					//存储环境是否支持事务
 					myStoreConfig.setTransactional(!readOnly);
-   
 
 					// 如果文件不存在则创建
 					if (!envHome.exists()) {
@@ -112,27 +115,39 @@ public class BDBEnvironmentManager {
 							myEnvironment = new Environment(envHome, myEnvConfig);
 							myEntityStore = new EntityStore(myEnvironment, "EntityStore", myStoreConfig);
 						} catch (EnvironmentNotFoundException e) {
+							e.printStackTrace();
 							// TODO Auto-generated catch block
 						} catch (EnvironmentLockedException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (VersionMismatchException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (StoreExistsException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (StoreNotFoundException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (IncompatibleClassException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (DatabaseException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}
 			}
 		}
 		return bdbEnvironmentManager;
+	}
+
+	public static BDBEnvironmentManager getInstance(){
+		return getInstance(new File("bdb"), false);
 	}
 
 	// Close the store and environment.
@@ -158,4 +173,10 @@ public class BDBEnvironmentManager {
 			}
 		}
 	}
+
+	@Override
+	protected void finalize() throws Throwable{
+		super.finalize();
+		close();
+ 	}
 }

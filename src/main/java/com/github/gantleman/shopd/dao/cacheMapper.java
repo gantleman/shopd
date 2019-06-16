@@ -10,27 +10,21 @@ public interface CacheMapper {
 
     int deleteByExample(CacheExample example);
 
-    int deleteByPrimaryKey(String name);
+    int deleteByPrimaryKey(Integer cId);
 
     int insert(Cache record);
 
     int insertSelective(Cache record);
 
-    List<Cache> selectByExampleWithBLOBs(CacheExample example);
-
     List<Cache> selectByExample(CacheExample example);
 
-    Cache selectByPrimaryKey(String name);
+    Cache selectByPrimaryKey(Integer cId);
 
     int updateByExampleSelective(@Param("record") Cache record, @Param("example") CacheExample example);
-
-    int updateByExampleWithBLOBs(@Param("record") Cache record, @Param("example") CacheExample example);
 
     int updateByExample(@Param("record") Cache record, @Param("example") CacheExample example);
 
     int updateByPrimaryKeySelective(Cache record);
-
-    int updateByPrimaryKeyWithBLOBs(Cache record);
 
     int updateByPrimaryKey(Cache record);
 }

@@ -26,8 +26,7 @@ public class DemoApplicationTests {
 		// TODO Auto-generated method stub
 		
 		//打开数据库和存储环境
-		BDBEnvironmentManager.getInstance(new File("bdb"),false);
-		
+		BDBEnvironmentManager.getInstance();
 		UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 		
 		userDA.saveUser(new User((int) 1L, "A", "root1"));
@@ -59,8 +58,6 @@ public class DemoApplicationTests {
 
 
 		BDBEnvironmentManager.getMyEnvironment().sync();
-		
-		BDBEnvironmentManager.close();
 	}
 	
 	private static void printAllData(UserDA userDA) {

@@ -3,60 +3,82 @@ package com.github.gantleman.shopd.entity;
 import java.io.Serializable;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
 public class Cache implements Serializable {
-    
     @PrimaryKey(sequence = "ID")
-    private String name;
+    private Integer cId;
 
-    private Long index;
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
+    private String cName;
 
-    private Integer port;
+    private Long cIndex;
 
-    private Long stamp;
+    private String cHost;
 
-    private String host;
+    private String cHost2;
+
+    private Long cStamp;
+
+    private Long cStamp2;
 
     private static final long serialVersionUID = 1L;
 
-    public String getName() {
-        return name;
+    public Integer getcId() {
+        return cId;
     }
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+    public void setcId(Integer cId) {
+        this.cId = cId;
     }
 
-    public Long getIndex() {
-        return index;
+    public String getcName() {
+        return cName;
     }
 
-    public void setIndex(Long index) {
-        this.index = index;
+    public void setcName(String cName) {
+        this.cName = cName == null ? null : cName.trim();
     }
 
-    public Integer getPort() {
-        return port;
+    public Long getcIndex() {
+        return cIndex;
     }
 
-    public void setPort(Integer port) {
-        this.port = port;
+    public void setcIndex(Long cIndex) {
+        this.cIndex = cIndex;
     }
 
-    public Long getStamp() {
-        return stamp;
+    public String getcHost() {
+        return cHost;
     }
 
-    public void setStamp(Long stamp) {
-        this.stamp = stamp;
+    public void setcHost(String cHost) {
+        this.cHost = cHost == null ? null : cHost.trim();
     }
 
-    public String getHost() {
-        return host;
+    public String getcHost2() {
+        return cHost2;
     }
 
-    public void setHost(String host) {
-        this.host = host == null ? null : host.trim();
+    public void setcHost2(String cHost2) {
+        this.cHost2 = cHost2 == null ? null : cHost2.trim();
+    }
+
+    public Long getcStamp() {
+        return cStamp;
+    }
+
+    public void setcStamp(Long cStamp) {
+        this.cStamp = cStamp;
+    }
+
+    public Long getcStamp2() {
+        return cStamp2;
+    }
+
+    public void setcStamp2(Long cStamp2) {
+        this.cStamp2 = cStamp2;
     }
 }

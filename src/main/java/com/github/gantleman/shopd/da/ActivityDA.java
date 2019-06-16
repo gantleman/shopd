@@ -26,6 +26,12 @@ public class ActivityDA {
 		pIdx.put(activity);
 	}
 
+	public void saveListActivity(List<Activity> activity) {
+		for (Activity ac : activity) {
+			pIdx.put(ac);
+		}
+	}
+
 	/**
 	 * 根据用户Id删除一个activity
 	 **/
