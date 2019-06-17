@@ -58,5 +58,10 @@ public class CacheServiceImpl implements CacheService {
     public void timeTask(String tablename) {
         // read BDB clear out time recorde
     }
+
+    @Override
+    public void Archive(String tablename) {
+
+    }
 }
 

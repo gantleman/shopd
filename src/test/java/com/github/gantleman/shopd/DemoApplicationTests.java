@@ -1,20 +1,31 @@
 package com.github.gantleman.shopd;
 
-import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import com.github.gantleman.shopd.da.UserDA;
 import com.github.gantleman.shopd.entity.User;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
+import com.github.gantleman.shopd.util.RedisUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import junit.framework.Assert;
+
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DemoApplicationTests {
+
+	@Autowired
+	RedisUtil ru;
 
 	@Test
 	public void contextLoads() {
@@ -82,5 +93,22 @@ public class DemoApplicationTests {
 				System.out.println(user.getPassword());
 		}
 		System.out.println("------end--------");
+	}
+
+	@Test
+	public void redis() {
+
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		java.util.Date time=null;
+
+		try {
+			time = sdf.parse(sdf.format(new Date()));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Assert.assertNotNull(ru);
+		ru.set("testRedis", time.toString());
 	}
 }

@@ -115,7 +115,7 @@ public class AdminDA {
 			//遍历游标
 			for (Admin admin : entityCursorList) {
 
-				if( admin.getPassword() == passwrod ) {
+				if( admin.getPassword().equals(passwrod)) {
 					adminList.add(admin);
 				}
 			}

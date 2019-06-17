@@ -6,4 +6,6 @@ public interface CacheService {
     public void eventAdd(String tablename);
 
     public void timeTask(String tablename);
+
+    public void Archive(String tablename);
 }
