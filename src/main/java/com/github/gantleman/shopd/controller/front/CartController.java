@@ -70,9 +70,7 @@ public class CartController {
         }
 
         //获取当前用户的购物车信息
-        ShopCartExample shopCartExample = new ShopCartExample();
-        shopCartExample.or().andUseridEqualTo(user.getUserid());
-        List<ShopCart> shopCart = shopCartService.selectByExample(shopCartExample);
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
 
         //获取购物车中的商品信息
         List<Goods> goodsAndImage = new ArrayList<Goods>();

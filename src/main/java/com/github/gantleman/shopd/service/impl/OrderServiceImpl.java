@@ -39,8 +39,24 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.selectByExample(orderExample);
     }
 
+    public List<Order> selectOrderByIUserID(Integer ID) {
+
+        OrderExample orderExample=new OrderExample();
+        orderExample.or().andUseridEqualTo(ID);
+
+        return orderMapper.selectByExample(orderExample);
+    }
+
     @Override
     public List<OrderItem> getOrderItemByExample(OrderItemExample orderItemExample) {
+        return orderItemMapper.selectByExample(orderItemExample);
+    }
+
+    public List<OrderItem> getOrderItemByID(Integer id) {
+
+        OrderItemExample orderItemExample=new OrderItemExample();
+        orderItemExample.or().andOrderidEqualTo(id);
+
         return orderItemMapper.selectByExample(orderItemExample);
     }
 

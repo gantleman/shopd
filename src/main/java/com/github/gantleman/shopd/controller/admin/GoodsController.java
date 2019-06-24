@@ -43,13 +43,11 @@ public class GoodsController {
         //一页显示几个数据
         PageHelper.startPage(pn, 10);
 
-        List<Goods> employees = goodsService.selectByExample(new GoodsExample());
+        List<Goods> employees = goodsService.selectByAll();
 
         //显示几个页号
         PageInfo page = new PageInfo(employees, 5);
-
         model.addAttribute("pageInfo", page);
-
         return Msg.success("查询成功!").add("pageInfo", page);
     }
 
@@ -59,13 +57,7 @@ public class GoodsController {
         if (admin == null) {
             return "redirect:/admin/login";
         }
-        /*//一页显示几个数据
-        PageHelper.startPage(pn, 10);
-        List<Goods> employees = goodsService.selectByExample(new GoodsExample());
-        //显示几个页号
-        PageInfo page = new PageInfo(employees,5);
-        model.addAttribute("pageInfo", page);*/
-        List<Category> categoryList = cateService.selectByExample(new CategoryExample());
+        List<Category> categoryList = cateService.selectByAll();
         model.addAttribute("categoryList",categoryList);
 
         return "adminAllGoods";
@@ -82,10 +74,8 @@ public class GoodsController {
             model.addAttribute("msg", msg);
         }
 
-        List<Category> categoryList = cateService.selectByExample(new CategoryExample());
+        List<Category> categoryList = cateService.selectByAll();
         model.addAttribute("categoryList",categoryList);
-
-
 
         //还需要查询分类传给addGoods页面
         return "addGoods";
@@ -126,16 +116,9 @@ public class GoodsController {
             if (multipartFile != null){
 
                 String realPath = request.getSession().getServletContext().getRealPath("/");
-//                    String realPath = request.getContextPath();
-//                System.out.println(realPath);
                 //图片路径=项目在本地磁盘的路径\shop\target\shop\shopimage
                 String imageName = UUID.randomUUID().toString().replace("-", "") + multipartFile.getOriginalFilename();
                 String imagePath = realPath.substring(0,realPath.indexOf("shop")) + "shopimage" + File.separatorChar + imageName;
-//                String imagePath = realPath + "shopimage\\" + imageName;
-
-                //负载均衡时使用的图片路径
-//                String imagePath = "D:\\Code\\Apache-Tomcat-v8.0\\webapps\\shopimage\\" + imageName;
-//                String imagePath = UUID.randomUUID().toString().replace("-", "") + multipartFile.getOriginalFilename();
                 //把图片路径存入数据库中
                 goodsService.addImagePath(new ImagePath(null, goods.getGoodsid(),imageName));
                 //存图片
@@ -154,10 +137,9 @@ public class GoodsController {
         if (admin == null) {
             return "redirect:/admin/login";
         }
-        CategoryExample categoryExample = new CategoryExample();
-        categoryExample.or();
+
         List<Category> categoryList;
-        categoryList = cateService.selectByExample(categoryExample);
+        categoryList = cateService.selectByAll();
         model.addAttribute("categoryList", categoryList);
         if (!msg.equals("")) {
             model.addAttribute("msg", msg);
@@ -171,9 +153,7 @@ public class GoodsController {
     @RequestMapping("/addCategoryResult")
     public String addCategoryResult(Category category,Model addCategoryResult,RedirectAttributes redirectAttributes){
         List<Category> categoryList=new ArrayList<Category>();
-        CategoryExample categoryExample=new CategoryExample();
-        categoryExample.or().andCatenameEqualTo(category.getCatename());
-        categoryList=cateService.selectByExample(categoryExample);
+        categoryList=cateService.selectByName(category.getCatename());
         if (!categoryList.isEmpty())
         {
             redirectAttributes.addAttribute("succeseMsg","分类已存在");
@@ -189,9 +169,7 @@ public class GoodsController {
     @RequestMapping("/saveCate")
     @ResponseBody
     public Msg saveCate(Category category){
-        CategoryExample categoryExample=new CategoryExample();
-        categoryExample.or().andCatenameEqualTo(category.getCatename());
-        List<Category> categoryList=cateService.selectByExample(categoryExample);
+        List<Category> categoryList=cateService.selectByName(category.getCatename());
         if (categoryList.isEmpty())
         {
             cateService.updateByPrimaryKeySelective(category);

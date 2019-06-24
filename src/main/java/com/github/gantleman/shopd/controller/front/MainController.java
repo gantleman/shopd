@@ -57,23 +57,19 @@ public class MainController {
 
     public List<Goods> getCateGoods(String cate, Integer userid) {
         //查询分类
-        CategoryExample digCategoryExample = new CategoryExample();
-        digCategoryExample.or().andCatenameLike(cate);
-        List<Category> digCategoryList = cateService.selectByExample(digCategoryExample);
+        List<Category> digCategoryList = cateService.selectByName(cate);
 
         if (digCategoryList.size() == 0) {
             return null;
         }
 
         //查询属于刚查到的分类的商品
-        GoodsExample digGoodsExample = new GoodsExample();
         List<Integer> digCateId = new ArrayList<Integer>();
         for (Category tmp:digCategoryList) {
             digCateId.add(tmp.getCateid());
         }
-        digGoodsExample.or().andCategoryIn(digCateId);
 
-        List<Goods> goodsList = goodsService.selectByExampleLimit(digGoodsExample);
+        List<Goods> goodsList = goodsService.selectByExampleLimit(digCateId);
 
         List<Goods> goodsAndImage = new ArrayList<Goods>();
         //获取每个商品的图片

@@ -1,14 +1,16 @@
 package com.github.gantleman.shopd.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
+import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
-public class User {
+public class User implements Serializable{
 
     @PrimaryKey(sequence = "ID")
     private Integer userid;
@@ -24,14 +26,36 @@ public class User {
 
     private String telephone;
 
+    private long stamp;
+
     public User() {
-		super();
+        super();
+        this.stamp = TimeUtils.getTimeWhitLong();
 	}
 	
-	public User(String userName, String password) {
+	/**
+     * @return the stamp
+     */
+    public long getStamp() {
+        return stamp;
+    }
+
+    /**
+     * @param stamp the stamp to set
+     */
+    public void setStamp(long stamp) {
+        this.stamp = stamp;
+    }
+
+    void MakeStamp() {
+        stamp = TimeUtils.getTimeWhitLong();
+    }
+
+    public User(String userName, String password) {
 		super();
 		this.username = userName;
-		this.password = password;
+        this.password = password;
+        this.stamp = TimeUtils.getTimeWhitLong();
 	}
 
 
@@ -39,7 +63,8 @@ public class User {
 		super();
 		this.userid = userId;
 		this.username = userName;
-		this.password = password;
+        this.password = password;
+        this.stamp = TimeUtils.getTimeWhitLong();
 	}
 
     public Integer getUserid() {

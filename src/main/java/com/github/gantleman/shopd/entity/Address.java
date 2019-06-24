@@ -1,5 +1,6 @@
 package com.github.gantleman.shopd.entity;
 
+import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
@@ -25,6 +26,12 @@ public class Address {
     private String conname;
 
     private String contel;
+
+    long stamp;
+
+    public void MakeStamp() {
+        stamp = TimeUtils.getTimeWhitLong();
+    }
 
     public Integer getAddressid() {
         return addressid;

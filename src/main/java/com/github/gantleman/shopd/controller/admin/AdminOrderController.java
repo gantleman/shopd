@@ -63,9 +63,6 @@ public class AdminOrderController {
             }
 
             //根据goodsid查询商品
-            /*GoodsExample goodsExample = new GoodsExample();
-            goodsExample.or().andGoodsidIn(goodsIdList);
-            List<Goods> goodsList = goodsService.selectByExample(goodsExample);*/
             order.setGoodsInfo(goodsList);
 
             //查询地址
@@ -124,15 +121,11 @@ public class AdminOrderController {
 */
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-//                goodsIdList.add(orderItem.getGoodsid());
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
             //根据goodsid查询商品
-           /* GoodsExample goodsExample = new GoodsExample();
-            goodsExample.or().andGoodsidIn(goodsIdList);
-            List<Goods> goodsList = goodsService.selectByExample(goodsExample);*/
             order.setGoodsInfo(goodsList);
 
             //查询地址
@@ -172,22 +165,15 @@ public class AdminOrderController {
             orderItemExample.or().andOrderidEqualTo(order.getOrderid());
             List<OrderItem> orderItemList = orderService.getOrderItemByExample(orderItemExample);
             List<Integer> goodsIdList = new ArrayList<Integer>();
-            /*for (OrderItem orderItem : orderItemList) {
-                goodsIdList.add(orderItem.getGoodsid());
-            }*/
 
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-//                goodsIdList.add(orderItem.getGoodsid());
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
 
             //根据goodsid查询商品
-            /*GoodsExample goodsExample = new GoodsExample();
-            goodsExample.or().andGoodsidIn(goodsIdList);
-            List<Goods> goodsList = goodsService.selectByExample(goodsExample);*/
             order.setGoodsInfo(goodsList);
 
             //查询地址

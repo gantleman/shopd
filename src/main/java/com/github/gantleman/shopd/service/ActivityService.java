@@ -1,21 +1,17 @@
 package com.github.gantleman.shopd.service;
 
 import com.github.gantleman.shopd.entity.*;
-
-
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/27.
- */
 public interface ActivityService {
-    List<Activity> getAllActivity(ActivityExample activityExample);
 
-    void insertActivitySelective(Activity activity);
-
+    //only read
+    List<Activity> getAllActivity();
+    
     Activity selectByKey(Integer activityid);
 
-    void deleteByActivityId(Integer activityid);
+    ///have write
+    void insertActivitySelective(Activity activity);
 
-//    void updateGoodsActSelective(Goods goods);
+    void deleteByActivityId(Integer activityid);
 }

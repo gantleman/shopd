@@ -161,5 +161,29 @@ public class UserDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<User> findAllUserWhitStamp(long stamp) {
+		List<User> userList = new ArrayList<User>();
+		// 打开游标
+		EntityCursor<User> userCursorList = null;
+		try {
+			//获取游标
+			userCursorList = pIdx.entities();
+			// 遍历游标
+			for (User user : userCursorList) {
+				if(user.getStamp() >= stamp) {
+					userList.add(user);
+				}
+			}
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+		} finally {
+			if (userCursorList != null) {
+				// 关闭游标
+				userCursorList.close();
+			}
+		}
+		return userList;
+	}
 }

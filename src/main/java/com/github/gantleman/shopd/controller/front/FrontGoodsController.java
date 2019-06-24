@@ -17,9 +17,6 @@ import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by 文辉 on 2017/7/24.
- */
 @Controller
 public class FrontGoodsController {
 
@@ -81,12 +78,9 @@ public class FrontGoodsController {
         goodsInfo.put("cate", category);
         goodsInfo.put("image", imagePath);
         model.addAttribute("goodsInfo",goodsInfo);
-//        model.addAllAttributes(goodsInfo);
 
         //评论信息
-        CommentExample commentExample=new CommentExample();
-        commentExample.or().andGoodsidEqualTo(goods.getGoodsid());
-        List<Comment> commentList=commentService.selectByExample(commentExample);
+        List<Comment> commentList=commentService.selectByExample(goods.getGoodsid());
         for (Integer i=0;i<commentList.size();i++)
         {
             Comment comment=commentList.get(i);
@@ -107,9 +101,7 @@ public class FrontGoodsController {
         PageHelper.startPage(pn, 16);
 
         //查询数据
-        GoodsExample goodsExample = new GoodsExample();
-        goodsExample.or().andGoodsnameLike("%" + keyword + "%");
-        List<Goods> goodsList = goodsService.selectByExample(goodsExample);
+        List<Goods> goodsList = goodsService.selectByName(keyword);
 
         //获取图片地址
         for (int i = 0; i < goodsList.size(); i++) {
@@ -185,9 +177,7 @@ public class FrontGoodsController {
         PageHelper.startPage(pn, 16);
 
         //查询分类id
-        CategoryExample categoryExample = new CategoryExample();
-        categoryExample.or().andCatenameLike(cate);
-        List<Category> categoryList = cateService.selectByExample(categoryExample);
+        List<Category> categoryList = cateService.selectByNameForRead(cate);
 
         //获取查出的类别id
         List<Integer> cateId = new ArrayList<Integer>();
@@ -196,12 +186,7 @@ public class FrontGoodsController {
         }
 
         //查询数据
-        GoodsExample goodsExample = new GoodsExample();
-        goodsExample.or().andDetailcateLike("%" + cate + "%");
-        if (!cateId.isEmpty()) {
-            goodsExample.or().andCategoryIn(cateId);
-        }
-        List<Goods> goodsList = goodsService.selectByExample(goodsExample);
+        List<Goods> goodsList = goodsService.selectByDetailcateAndID(cate, cateId);
 
         //获取图片地址
         for (int i = 0; i < goodsList.size(); i++) {

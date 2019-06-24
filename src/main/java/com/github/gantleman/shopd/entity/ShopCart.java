@@ -1,6 +1,8 @@
 package com.github.gantleman.shopd.entity;
 
 import java.util.Date;
+
+import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
@@ -17,6 +19,12 @@ public class ShopCart extends ShopCartKey {
 
     @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer goodsid;
+
+    long stamp;
+
+    public void MakeStamp() {
+        stamp = TimeUtils.getTimeWhitLong();
+    }
 
     public Date getCatedate() {
         return catedate;

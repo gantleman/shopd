@@ -28,6 +28,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> selectByName(String name) {
+        UserExample userExample=new UserExample();
+        userExample.or().andUsernameLike(name);
+
+        return userMapper.selectByExample(userExample);
+    }
+
+    @Override
+    public List<User> selectByInList(List<Integer> user) {
+
+        UserExample userExample = new UserExample();
+        userExample.or().andUseridIn(user);
+
+        return userMapper.selectByExample(userExample);
+    }
+
+    @Override
+    public List<User> selectByNameAndPasswrod(String name, String Passwrod) {
+        UserExample userExample=new UserExample();
+        userExample.or().andUsernameEqualTo(name).andPasswordEqualTo(Passwrod);
+
+        return userMapper.selectByExample(userExample);
+    }
+
+    @Override
     public void insertSelective(User user) {
         userMapper.insertSelective(user);
     }

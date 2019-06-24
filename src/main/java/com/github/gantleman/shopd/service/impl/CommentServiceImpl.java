@@ -23,7 +23,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> selectByExample(CommentExample commentExample) {
+    public List<Comment> selectByExample(Integer goodsid) {
+
+        CommentExample commentExample=new CommentExample();
+        commentExample.or().andGoodsidEqualTo(goodsid);
+
         return commentMapper.selectByExample(commentExample);
     }
 

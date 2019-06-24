@@ -1,8 +1,9 @@
 package com.github.gantleman.shopd.service.impl;
 
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.dao.CategoryMapper;
+import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.CategoryExample;
+import com.github.gantleman.shopd.service.CateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +19,33 @@ public class CateServiceImpl implements CateService {
     CategoryMapper categoryMapper;
 
     @Override
-    public List<Category> selectByExample(CategoryExample example) {
-        return categoryMapper.selectByExample(example);
+    public List<Category> selectByAll() {
+        return categoryMapper.selectByExample(new CategoryExample());
+    }
+
+    @Override
+    public List<Category> selectByName(String cate) {
+
+        CategoryExample digCategoryExample = new CategoryExample();
+        digCategoryExample.or().andCatenameLike(cate);
+
+        return categoryMapper.selectByExample(digCategoryExample);
+    }
+
+    @Override
+    public List<Category> selectByNameForRead(String cate) {
+
+        CategoryExample digCategoryExample = new CategoryExample();
+        digCategoryExample.or().andCatenameLike(cate);
+
+        return categoryMapper.selectByExample(digCategoryExample);
     }
 
     @Override
     public void insertSelective(Category category) {
         categoryMapper.insertSelective(category);
     }
-
-    @Override
-    public List<Category> selectByExampleLimit(CategoryExample digCategoryExample) {
-        return categoryMapper.selectByExampleLimit(digCategoryExample);
-    }
-
+    
     @Override
     public Category selectById(Integer category) {
         return categoryMapper.selectByPrimaryKey(category);

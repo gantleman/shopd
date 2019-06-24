@@ -1,12 +1,15 @@
 package com.github.gantleman.shopd.entity;
 
+import java.io.Serializable;
+
+import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
-public class Admin {
+public class Admin implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer adminid;
 
@@ -14,6 +17,26 @@ public class Admin {
     private String adminname;
 
     private String password;
+
+    private long stamp;
+
+    public void MakeStamp() {
+        setStamp(TimeUtils.getTimeWhitLong());
+    }
+
+    /**
+     * @return the stamp
+     */
+    public long getStamp() {
+        return stamp;
+    }
+
+    /**
+     * @param stamp the stamp to set
+     */
+    public void setStamp(long stamp) {
+        this.stamp = stamp;
+    }
 
     public Admin(Integer adminid, String adminname, String password) {
         this.adminid = adminid;

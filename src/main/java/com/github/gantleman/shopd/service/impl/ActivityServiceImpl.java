@@ -1,24 +1,27 @@
 package com.github.gantleman.shopd.service.impl;
 
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.dao.ActivityMapper;
+import com.github.gantleman.shopd.entity.Activity;
+import com.github.gantleman.shopd.entity.ActivityExample;
+import com.github.gantleman.shopd.service.ActivityService;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/27.
- */
 @Service("activityService")
-public class ActivityServiceImpl implements ActivityService {
+public class ActivityServiceImpl implements ActivityService,Job {
 
     @Autowired(required = false)
     ActivityMapper activityMapper;
 
-    public List<Activity> getAllActivity(ActivityExample activityExample) {
-        return activityMapper.selectByExample(activityExample);
+    @Override
+    public List<Activity> getAllActivity() {
+        return activityMapper.selectByExample(new ActivityExample());
     }
 
     @Override
@@ -36,8 +39,8 @@ public class ActivityServiceImpl implements ActivityService {
         activityMapper.deleteByPrimaryKey(activityid);
     }
 
-    /*@Override
-    public void updateGoodsActSelective(Goods goods) {
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
-    }*/
+    }
 }

@@ -23,7 +23,10 @@ public class ShopCartServiceImpl implements ShopCartService {
     }
 
     @Override
-    public List<ShopCart> selectByExample(ShopCartExample shopCartExample) {
+    public List<ShopCart> selectByID(Integer id) {
+
+        ShopCartExample shopCartExample = new ShopCartExample();
+        shopCartExample.or().andUseridEqualTo(id);
 
         return shopCartMapper.selectByExample(shopCartExample);
     }

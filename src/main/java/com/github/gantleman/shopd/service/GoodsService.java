@@ -1,18 +1,34 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.FavoriteKey;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/19.
- */
-
 public interface GoodsService {
+
+    //only read
+    public List<Goods> selectByAll();
+    
+    public List<Goods> selectByID(List<Integer> id);
+    
+    public List<Goods> selectByName(String name);
+    
+    public List<Goods> selectByDetailcateAndID(String cat, List<Integer> cateId);
+
+    public Goods selectById(Integer goodsid);
+
+    public List<Goods> selectByExampleLimit(List<Integer> digCateId);
+
+    public Favorite selectFavByKey(FavoriteKey favoriteKey);
+
+    public List<Favorite> selectFavByExample(Integer userid);
+
+    //have write
     public Integer addGoods(Goods goods);
 
     public void addImagePath(ImagePath imagePath);
-
-    public List<Goods> selectByExample(GoodsExample example);
 
     public void deleteGoodsById(Integer goodsid);
 
@@ -20,15 +36,7 @@ public interface GoodsService {
 
     public List<ImagePath> findImagePath(Integer goodsid);
 
-    public Goods selectById(Integer goodsid);
-
-    public List<Goods> selectByExampleLimit(GoodsExample digGoodsExample);
-
     public void addFavorite(Favorite favorite);
 
-    public Favorite selectFavByKey(FavoriteKey favoriteKey);
-
     public void deleteFavByKey(FavoriteKey favoriteKey);
-
-    public List<Favorite> selectFavByExample(FavoriteExample favoriteExample);
 }

@@ -1,14 +1,18 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Chat;
 
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/26.
- */
 public interface ChatService {
-    public void insertChatSelective(Chat chat);
 
-    public List<Chat> selectChatByExample(ChatExample chatExample);
+    //only read
+    public List<Chat> selectChatBySend(Integer Send);
+    
+    public List<Chat> selectChatByReceive(Integer Receive);
+    
+    public List<Chat> selectChatBySendAndReceive(Integer Send, Integer Receive);
+
+    //have write
+    public void insertChatSelective(Chat chat);
 }

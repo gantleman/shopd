@@ -23,7 +23,30 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<Chat> selectChatByExample(ChatExample chatExample) {
+    public List<Chat> selectChatBySend(Integer Send) {
+
+        ChatExample chatExample = new ChatExample();
+        chatExample.or().andSenduserEqualTo(Send);
+
+        return chatMapper.selectByExample(chatExample);
+    }
+
+    @Override
+    public List<Chat> selectChatByReceive(Integer Receive) {
+
+        ChatExample chatExample = new ChatExample();
+        chatExample.or().andReceiveuserEqualTo(Receive);
+
+        return chatMapper.selectByExample(chatExample);
+    }
+
+    @Override
+    public List<Chat> selectChatBySendAndReceive(Integer Send, Integer Receive) {
+        ChatExample chatExample = new ChatExample();
+        chatExample.or().andReceiveuserEqualTo(Send).andSenduserEqualTo(Receive);
+        chatExample.or().andSenduserEqualTo(Send).andReceiveuserEqualTo(Receive);
+        chatExample.setOrderByClause("MsgTime asc");
+
         return chatMapper.selectByExample(chatExample);
     }
 }

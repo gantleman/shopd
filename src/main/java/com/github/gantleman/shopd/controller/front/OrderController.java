@@ -47,17 +47,13 @@ public class OrderController {
         }
 
         //查询当前用户的收货地址
-        AddressExample addressExample = new AddressExample();
-        addressExample.or().andUseridEqualTo(user.getUserid());
-        List<Address> addressList = addressService.getAllAddressByExample(addressExample);
+        List<Address> addressList = addressService.getAllAddressByExample(user.getUserid());
 
         model.addAttribute("address", addressList);
 
         //订单信息
         //获取当前用户的购物车信息
-        ShopCartExample shopCartExample = new ShopCartExample();
-        shopCartExample.or().andUseridEqualTo(user.getUserid());
-        List<ShopCart> shopCart = shopCartService.selectByExample(shopCartExample);
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
 
         //获取购物车中的商品信息
         List<Goods> goodsAndImage = new ArrayList<Goods>();
@@ -105,9 +101,7 @@ public class OrderController {
         User user = (User) session.getAttribute("user");
 
         //获取订单信息
-        ShopCartExample shopCartExample = new ShopCartExample();
-        shopCartExample.or().andUseridEqualTo(user.getUserid());
-        List<ShopCart> shopCart = shopCartService.selectByExample(shopCartExample);
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
 
         //删除购物车
         for (ShopCart cart : shopCart) {
@@ -117,6 +111,7 @@ public class OrderController {
         //把订单信息写入数据库
         Order order = new Order(null, user.getUserid(), new Date(), oldPrice, newPrice, isPay, false, false, false, addressid,null,null);
         orderService.insertOrder(order);
+        
         //插入的订单号
         Integer orderId = order.getOrderid();
 

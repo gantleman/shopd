@@ -42,9 +42,7 @@ public class CustomerController {
     @RequestMapping("/registerresult")
     public String registerResult(User user,Model registerResult){
         List<User> userList=new ArrayList<User>();
-        UserExample userExample=new UserExample();
-        userExample.or().andUsernameLike(user.getUsername());
-        userList=userService.selectByExample(userExample);
+        userList=userService.selectByName(user.getUsername());
         if (!userList.isEmpty())
         {
             registerResult.addAttribute("errorMsg","用户名被占用");
@@ -70,9 +68,7 @@ public class CustomerController {
 
         }
         List<User> userList=new ArrayList<User>();
-        UserExample userExample=new UserExample();
-        userExample.or().andUsernameEqualTo(user.getUsername()).andPasswordEqualTo(user.getPassword());
-        userList=userService.selectByExample(userExample);
+        userList=userService.selectByNameAndPasswrod(user.getUsername(), user.getPassword());
         if (!userList.isEmpty())
         {
             session.setAttribute("user",userList.get(0));
@@ -104,14 +100,12 @@ public class CustomerController {
     @ResponseBody
     public Msg saveInfo(String name, String email, String telephone,HttpServletRequest request){
         HttpSession session=request.getSession();
-        UserExample userExample=new UserExample();
         User user,updateUser=new User();
         List<User> userList=new ArrayList<User>();
         Integer userid;
         user=(User)session.getAttribute("user");
         userid= user.getUserid();
-        userExample.or().andUsernameEqualTo(name);
-        userList=userService.selectByExample(userExample);
+        userList=userService.selectByName(name);
         if (userList.isEmpty())
         {
             updateUser.setUserid(userid);
@@ -135,9 +129,7 @@ public class CustomerController {
         {
             return "redirect:/login";
         }
-        AddressExample addressExample=new AddressExample();
-        addressExample.or().andUseridEqualTo(user.getUserid());
-        List<Address> addressList=addressService.getAllAddressByExample(addressExample);
+        List<Address> addressList=addressService.getAllAddressByExample(user.getUserid());
         addressModel.addAttribute("addressList",addressList);
         return "address";
     }
@@ -186,21 +178,16 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        OrderExample orderExample=new OrderExample();
-       orderExample.or().andUseridEqualTo(user.getUserid());
-        List<Order> orderList=orderService.selectOrderByExample(orderExample);
+        List<Order> orderList=orderService.selectOrderByIUserID(user.getUserid());
         orderModel.addAttribute("orderList",orderList);
         Order order;
         OrderItem orderItem;
         List<OrderItem> orderItemList=new ArrayList<OrderItem>();
-        Goods goods;
         Address address;
        for (Integer i=0;i<orderList.size();i++)
        {
            order=orderList.get(i);
-           OrderItemExample orderItemExample=new OrderItemExample();
-           orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-           orderItemList=orderService.getOrderItemByExample(orderItemExample);
+           orderItemList=orderService.getOrderItemByID(order.getOrderid());
            List<Goods> goodsList=new ArrayList<Goods>();
            List<Integer> goodsIdList=new ArrayList<Integer>();
            for (Integer j=0;j<orderItemList.size();j++)
@@ -208,90 +195,20 @@ public class CustomerController {
                orderItem=orderItemList.get(j);
                goodsIdList.add(orderItem.getGoodsid());
            }
-           GoodsExample goodsExample=new GoodsExample();
-           goodsExample.or().andGoodsidIn(goodsIdList);
-           goodsList=goodsService.selectByExample(goodsExample);
+           goodsList=goodsService.selectByID(goodsIdList);
+
            order.setGoodsInfo(goodsList);
            address=addressService.selectByPrimaryKey(order.getAddressid());
            order.setAddress(address);
            orderList.set(i,order);
        }
 
-
-
        orderModel.addAttribute("orderList",orderList);
 
         return "list";
     }
 
-   /* @RequestMapping("/info/list")
-    public String list(HttpServletRequest request,Model orderModel,
-                       @RequestParam(value = "pageIssend",defaultValue = "1") Integer pnIssend,
-                       @RequestParam(value = "pageIsrecive",defaultValue = "1") Integer pnIsrecive,
-                       @RequestParam(value = "pageIscompelete",defaultValue = "1") Integer pnIscompelete
-
-    ){
-        //一页显示几个数据
-        PageHelper.startPage(pnIssend, 3);
-        PageHelper.startPage(pnIsrecive, 3);
-        PageHelper.startPage(pnIscompelete, 3);
-        HttpSession session=request.getSession();
-        User user;
-        user=(User)session.getAttribute("user");
-
-        if (user==null)
-        {
-            return "redirect:/login";
-        }
-
-        OrderExample orderExample=new OrderExample();
-        orderExample.or().andUseridEqualTo(user.getUserid());
-        List<Order> orderList=orderService.selectOrderByExample(orderExample);
-       *//* orderModel.addAttribute("orderList",orderList);*//*
-        Order order;
-        OrderItem orderItem;
-        List<OrderItem> orderItemList=new ArrayList<>();
-        Goods goods;
-        Address address;
-        for (Integer i=0;i<orderList.size();i++)
-        {
-            order=orderList.get(i);
-            OrderItemExample orderItemExample=new OrderItemExample();
-            orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            orderItemList=orderService.getOrderItemByExample(orderItemExample);
-            List<Goods> goodsList=new ArrayList<>();
-            List<Integer> goodsIdList=new ArrayList<>();
-            for (Integer j=0;j<orderItemList.size();j++)
-            {
-                orderItem=orderItemList.get(j);
-                goodsIdList.add(orderItem.getGoodsid());
-            }
-            GoodsExample goodsExample=new GoodsExample();
-            goodsExample.or().andGoodsidIn(goodsIdList);
-            goodsList=goodsService.selectByExample(goodsExample);
-            order.setGoodsInfo(goodsList);
-            address=addressService.selectByPrimaryKey(order.getAddressid());
-            order.setAddress(address);
-            orderList.set(i,order);
-        }
-
-
-
-        //显示几个页号
-        PageInfo pageIssend = new PageInfo(orderList,2);
-
-        PageInfo pageIsrecive = new PageInfo(orderList,2);
-
-        PageInfo pageIscompelete = new PageInfo(orderList,2);
-
-        orderModel.addAttribute("pageInfoIssend", pageIssend);
-
-        orderModel.addAttribute("pageInfoIsrecive", pageIsrecive);
-
-        orderModel.addAttribute("pageInfoIscompelete", pageIscompelete);
-
-        return "list";
-    }*/
+   
 
     @RequestMapping("/deleteList")
     @ResponseBody
@@ -311,21 +228,16 @@ public class CustomerController {
 
         //一页显示几个数据
         PageHelper.startPage(pn, 16);
-
-        FavoriteExample favoriteExample = new FavoriteExample();
-        favoriteExample.or().andUseridEqualTo(user.getUserid());
-        List<Favorite> favoriteList = goodsService.selectFavByExample(favoriteExample);
+        List<Favorite> favoriteList = goodsService.selectFavByExample(user.getUserid());
 
         List<Integer> goodsIdList = new ArrayList<Integer>();
         for (Favorite tmp:favoriteList) {
             goodsIdList.add(tmp.getGoodsid());
         }
-
-        GoodsExample goodsExample = new GoodsExample();
+        
         List<Goods> goodsList = new ArrayList<Goods>();
         if (!goodsIdList.isEmpty()) {
-            goodsExample.or().andGoodsidIn(goodsIdList);
-            goodsList = goodsService.selectByExample(goodsExample);
+            goodsList = goodsService.selectByID(goodsIdList);
         }
 
         //获取图片地址

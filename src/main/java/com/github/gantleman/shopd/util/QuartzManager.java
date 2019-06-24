@@ -11,6 +11,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 //https://www.cnblogs.com/yipiaoganlu/p/9229874.html
 
@@ -19,6 +20,9 @@ public class QuartzManager {
 
     @Autowired
     private Scheduler scheduler;
+
+    @Value("${srping.quartz.cron}")
+    String cron;
 
     public Scheduler getScheduler() {
         return scheduler;
@@ -39,6 +43,9 @@ public class QuartzManager {
      */
     public void addJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName, Class jobClass, String cron,Object...objects) {
         try {
+            if( cron == null) {
+                cron = this.cron;
+            }
             // 任务名，任务组，任务执行类
             JobDetail jobDetail= JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
             // 触发器

@@ -1,22 +1,29 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderExample;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.OrderItemExample;
+import com.github.gantleman.shopd.entity.Address;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/25.
- */
 public interface OrderService {
+
+    //only read
+    public List<Order> selectOrderByExample(OrderExample orderExample);
+    
+    public List<Order> selectOrderByIUserID(Integer ID);  
+
+    public List<OrderItem> getOrderItemByExample(OrderItemExample orderItemExample);    
+
+    public List<OrderItem> getOrderItemByID(Integer id);
+    
+    public Address getAddressByKey(Integer addressid);
+
+    //have write
     public void insertOrder(Order order);
 
     public void deleteById(Integer orderid);
-
-
-    public List<Order> selectOrderByExample(OrderExample orderExample);
-
-    public List<OrderItem> getOrderItemByExample(OrderItemExample orderItemExample);
-
-    public Address getAddressByKey(Integer addressid);
 
     public void updateOrderByKey(Order order);
 

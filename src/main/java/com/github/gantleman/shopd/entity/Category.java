@@ -1,5 +1,6 @@
 package com.github.gantleman.shopd.entity;
 
+import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
@@ -10,6 +11,12 @@ public class Category {
     private Integer cateid;
 
     private String catename;
+
+    long stamp;
+
+    public void MakeStamp() {
+        stamp = TimeUtils.getTimeWhitLong();
+    }
 
     public Integer getCateid() {
         return cateid;

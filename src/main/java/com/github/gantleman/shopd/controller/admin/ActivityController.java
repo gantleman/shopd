@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/27.
- */
 @Controller
 @RequestMapping("/admin/activity")
 public class ActivityController {
@@ -39,10 +36,7 @@ public class ActivityController {
         //一页显示几个数据
         PageHelper.startPage(pn, 10);
 
-        ActivityExample activityExample = new ActivityExample();
-        activityExample.or();
-
-        List<Activity> activityList = activityService.getAllActivity(activityExample);
+        List<Activity> activityList = activityService.getAllActivity();
 
         //显示几个页号
         PageInfo page = new PageInfo(activityList,5);
@@ -59,11 +53,8 @@ public class ActivityController {
         if (admin == null) {
             return Msg.fail("请先登录");
         }
-
-        ActivityExample activityExample = new ActivityExample();
-        activityExample.or();
-
-        List<Activity> activityList = activityService.getAllActivity(activityExample);
+        
+        List<Activity> activityList = activityService.getAllActivity();
 
         return Msg.success("获取活动信息成功").add("activity",activityList);
     }
