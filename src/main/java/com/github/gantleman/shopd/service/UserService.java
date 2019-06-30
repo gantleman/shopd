@@ -8,7 +8,7 @@ public interface UserService {
     //only read
     public User selectByPrimaryKey(int userId);
     
-    public List<User> selectByExample(UserExample userExample);
+    public List<User> selectByAll();
     
     public List<User> selectByInList(List<Integer> user);
 

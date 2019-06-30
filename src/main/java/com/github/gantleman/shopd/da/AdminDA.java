@@ -30,7 +30,6 @@ public class AdminDA {
 	 * 添加一个Admin
 	 */
 	public void saveAdmin(Admin admin) {
-		admin.MakeStamp();
 		pIdx.put(admin);
 	}
 

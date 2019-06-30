@@ -9,7 +9,7 @@ import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
-public class Admin implements Serializable {
+public class Admin implements Serializable{
     @PrimaryKey(sequence = "ID")
     private Integer adminid;
 

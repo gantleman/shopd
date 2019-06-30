@@ -1,7 +1,16 @@
 package com.github.gantleman.shopd.controller.front;
 
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.FavoriteKey;
+import com.github.gantleman.shopd.service.CateService;
+import com.github.gantleman.shopd.service.FavoriteService;
+import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.ImagePathService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,13 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Created by 文辉 on 2017/7/18.
- */
 @Controller
 public class MainController {
 
@@ -24,6 +28,12 @@ public class MainController {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private FavoriteService favoriteService;
+
+    @Autowired
+    private ImagePathService imagePathService;
 
     @RequestMapping("/main")
     public String showAllGoods(Model model, HttpSession session) {
@@ -78,7 +88,7 @@ public class MainController {
             if (userid == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = goodsService.selectFavByKey(new FavoriteKey(userid, goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(userid, goods.getGoodsid()));
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -86,7 +96,7 @@ public class MainController {
                 }
             }
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
             goods.setImagePaths(imagePathList);
             goodsAndImage.add(goods);
         }

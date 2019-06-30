@@ -15,4 +15,6 @@ public interface ChatService {
 
     //have write
     public void insertChatSelective(Chat chat);
+
+    public void TickBack();
 }

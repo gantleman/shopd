@@ -6,5 +6,5 @@ public interface AdminService {
     ///have write
     public Admin selectByName(Admin admin);
 
-    public void SaveBack();
+    public void TickBack();
 }

@@ -37,7 +37,9 @@ public final class RedisUtil {
         try {
             if (time > 0) {
                 redisTemplate.expire(key, time, TimeUnit.SECONDS);
-            }
+            }else if (this.iexprie > 0) {
+                redisTemplate.expire(key, this.iexprie, TimeUnit.SECONDS);
+            } 
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -291,6 +293,15 @@ public final class RedisUtil {
     public double hdecr(String key, String item, double by) {
         return redisTemplate.opsForHash().increment(key, item, -by);
     }
+
+      /**
+     * hash表中的size
+     * @param key 键不能为null
+     */
+
+    public void hszie(String key) {
+        redisTemplate.opsForHash().size(key);
+    }
     // ============================set=============================
     /**
      * 根据key获取Set中的所有值
@@ -326,7 +337,7 @@ public final class RedisUtil {
      * @param values 值 可以是多个
      * @return 成功个数
      */
-    public long sSet(String key, Object... values) {
+    public long sAdd(String key, Object... values) {
         try {
             return redisTemplate.opsForSet().add(key, values);
         } catch (Exception e) {
@@ -342,7 +353,7 @@ public final class RedisUtil {
      * @param values 值 可以是多个
      * @return 成功个数
      */
-    public long sSetAndTime(String key, long time, Object... values) {
+    public long sAddAndTime(String key, long time, Object... values) {
         try {
             Long count = redisTemplate.opsForSet().add(key, values);
             if (time > 0) {

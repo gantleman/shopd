@@ -1,28 +1,37 @@
 package com.github.gantleman.shopd.controller.front;
 
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.ShopCart;
+import com.github.gantleman.shopd.entity.Address;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.ShopCartKey;
+import com.github.gantleman.shopd.entity.Activity;
+import com.github.gantleman.shopd.service.ActivityService;
+import com.github.gantleman.shopd.service.AddressService;
+import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.ImagePathService;
+import com.github.gantleman.shopd.service.OrderItemService;
+import com.github.gantleman.shopd.service.OrderService;
+import com.github.gantleman.shopd.service.ShopCartService;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/25.
- */
 @Controller
 public class OrderController {
 
-    /*@Value("#{addressService}")*/
     @Autowired
     private AddressService addressService;
 
@@ -38,6 +47,12 @@ public class OrderController {
     @Autowired
     private ActivityService activityService;
 
+    @Autowired
+    private ImagePathService imagePathService;
+
+    @Autowired
+    private OrderItemService orderItemService;
+
     @RequestMapping("/order")
     public String showOrder(HttpSession session, Model model) {
 
@@ -47,7 +62,7 @@ public class OrderController {
         }
 
         //查询当前用户的收货地址
-        List<Address> addressList = addressService.getAllAddressByExample(user.getUserid());
+        List<Address> addressList = addressService.getAllAddressByUserID(user.getUserid());
 
         model.addAttribute("address", addressList);
 
@@ -64,7 +79,7 @@ public class OrderController {
         for (ShopCart cart:shopCart) {
             Goods goods = goodsService.selectById(cart.getGoodsid());
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
             goods.setImagePaths(imagePathList);
             goods.setNum(cart.getGoodsnum());
 
@@ -117,7 +132,7 @@ public class OrderController {
 
         //把订单项写入orderitem表中
         for (ShopCart cart : shopCart) {
-            orderService.insertOrderItem(new OrderItem(null, orderId, cart.getGoodsid(), cart.getGoodsnum()));
+            orderItemService.insertOrderItem(new OrderItem(null, orderId, cart.getGoodsid(), cart.getGoodsnum()));
         }
 
         return Msg.success("购买成功");

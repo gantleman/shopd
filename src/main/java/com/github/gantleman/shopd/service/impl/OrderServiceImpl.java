@@ -1,27 +1,24 @@
 package com.github.gantleman.shopd.service.impl;
 
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.dao.OrderMapper;
+import com.github.gantleman.shopd.dao.OrderItemMapper;
+import com.github.gantleman.shopd.dao.AddressMapper;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderExample;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.OrderItemExample;
+import com.github.gantleman.shopd.entity.Address;
+import com.github.gantleman.shopd.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/25.
- */
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 
     @Autowired(required = false)
     private OrderMapper orderMapper;
-
-    @Autowired(required = false)
-    private OrderItemMapper orderItemMapper;
-
-    @Autowired(required = false)
-    private AddressMapper addressMapper;
 
     @Override
     public void insertOrder(Order order) {
@@ -35,7 +32,26 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<Order> selectOrderByExample(OrderExample orderExample) {
+    public List<Order> selectOrderByIssen() {
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andIssendEqualTo(false);
+
+        return orderMapper.selectByExample(orderExample);
+    }
+
+    @Override
+    public List<Order> selectOrderByIssendAndIsreceive() {
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andIssendEqualTo(true).andIsreceiveEqualTo(false);
+
+        return orderMapper.selectByExample(orderExample);
+    }
+    
+    @Override
+    public List<Order> selectOrderByIssendAndIsreceiveAndIscomplete() {
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andIssendEqualTo(true).andIsreceiveEqualTo(true).andIscompleteEqualTo(true);
+ 
         return orderMapper.selectByExample(orderExample);
     }
 
@@ -48,24 +64,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItem> getOrderItemByExample(OrderItemExample orderItemExample) {
-        return orderItemMapper.selectByExample(orderItemExample);
-    }
-
-    public List<OrderItem> getOrderItemByID(Integer id) {
-
-        OrderItemExample orderItemExample=new OrderItemExample();
-        orderItemExample.or().andOrderidEqualTo(id);
-
-        return orderItemMapper.selectByExample(orderItemExample);
-    }
-
-    @Override
-    public Address getAddressByKey(Integer addressid) {
-        return addressMapper.selectByPrimaryKey(addressid);
-    }
-
-    @Override
     public void updateOrderByKey(Order order) {
         orderMapper.updateByPrimaryKeySelective(order);
     }
@@ -73,10 +71,5 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order selectByPrimaryKey(Integer orderid) {
         return orderMapper.selectByPrimaryKey(orderid);
-    }
-
-    @Override
-    public void insertOrderItem(OrderItem orderItem) {
-        orderItemMapper.insertSelective(orderItem);
     }
 }

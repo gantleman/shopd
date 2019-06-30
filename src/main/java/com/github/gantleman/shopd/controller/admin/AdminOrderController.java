@@ -3,7 +3,9 @@ package com.github.gantleman.shopd.controller.admin;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.service.AddressService;
 import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.OrderItemService;
 import com.github.gantleman.shopd.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,9 +17,6 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/26.
- */
 @Controller
 @RequestMapping("/admin/order")
 public class AdminOrderController {
@@ -27,6 +26,12 @@ public class AdminOrderController {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private OrderItemService orderItemService;
+
+    @Autowired
+    private AddressService addressService;
 
     @RequestMapping("/send")
     public String sendOrder(@RequestParam(value = "page",defaultValue = "1")Integer pn, Model model, HttpSession session) {
@@ -40,9 +45,7 @@ public class AdminOrderController {
         PageHelper.startPage(pn, 2);
 
         //查询未发货订单
-        OrderExample orderExample = new OrderExample();
-        orderExample.or().andIssendEqualTo(false);
-        List<Order> orderList = orderService.selectOrderByExample(orderExample);
+        List<Order> orderList = orderService.selectOrderByIssen();
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
@@ -51,12 +54,11 @@ public class AdminOrderController {
             Order order = orderList.get(i);
             OrderItemExample orderItemExample = new OrderItemExample();
             orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderService.getOrderItemByExample(orderItemExample);
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
             List<Integer> goodsIdList = new ArrayList<Integer>();
 
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-//                goodsIdList.add(orderItem.getGoodsid());
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
@@ -66,7 +68,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = orderService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid());
             order.setAddress(address);
 
             orderList.set(i, order);
@@ -102,9 +104,7 @@ public class AdminOrderController {
         PageHelper.startPage(pn, 2);
 
         //查询未收货订单
-        OrderExample orderExample = new OrderExample();
-        orderExample.or().andIssendEqualTo(true).andIsreceiveEqualTo(false);
-        List<Order> orderList = orderService.selectOrderByExample(orderExample);
+        List<Order> orderList = orderService.selectOrderByIssendAndIsreceive();
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
@@ -113,12 +113,9 @@ public class AdminOrderController {
             Order order = orderList.get(i);
             OrderItemExample orderItemExample = new OrderItemExample();
             orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderService.getOrderItemByExample(orderItemExample);
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
             List<Integer> goodsIdList = new ArrayList<Integer>();
-            /*for (OrderItem orderItem : orderItemList) {
-                goodsIdList.add(orderItem.getGoodsid());
-            }
-*/
+
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
@@ -129,7 +126,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = orderService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid());
             order.setAddress(address);
 
             orderList.set(i, order);
@@ -152,9 +149,7 @@ public class AdminOrderController {
         PageHelper.startPage(pn, 2);
 
         //查询已完成订单
-        OrderExample orderExample = new OrderExample();
-        orderExample.or().andIssendEqualTo(true).andIsreceiveEqualTo(true).andIscompleteEqualTo(true);
-        List<Order> orderList = orderService.selectOrderByExample(orderExample);
+        List<Order> orderList = orderService.selectOrderByIssendAndIsreceiveAndIscomplete();
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
@@ -163,7 +158,7 @@ public class AdminOrderController {
             Order order = orderList.get(i);
             OrderItemExample orderItemExample = new OrderItemExample();
             orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderService.getOrderItemByExample(orderItemExample);
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
             List<Integer> goodsIdList = new ArrayList<Integer>();
 
             List<Goods> goodsList = new ArrayList<Goods>();
@@ -177,7 +172,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = orderService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid());
             order.setAddress(address);
 
             orderList.set(i, order);

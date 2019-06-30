@@ -2,6 +2,7 @@ package com.github.gantleman.shopd.controller.front;
 
 import com.github.gantleman.shopd.entity.*;
 import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.ImagePathService;
 import com.github.gantleman.shopd.service.ShopCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,9 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-/**
- * Created by 文辉 on 2017/7/24.
- */
 @Controller
 public class CartController {
 
@@ -25,6 +23,9 @@ public class CartController {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private ImagePathService imagePathService;
 
     @RequestMapping("/addCart")
     public String addCart(ShopCart shopCart, HttpServletRequest request) {
@@ -77,7 +78,7 @@ public class CartController {
         for (ShopCart cart:shopCart) {
             Goods goods = goodsService.selectById(cart.getGoodsid());
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
             goods.setImagePaths(imagePathList);
             goods.setNum(cart.getGoodsnum());
             goodsAndImage.add(goods);

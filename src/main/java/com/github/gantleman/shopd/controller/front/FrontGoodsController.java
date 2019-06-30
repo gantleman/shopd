@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -22,6 +21,9 @@ public class FrontGoodsController {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private FavoriteService favoriteService;
 
     @Autowired
     private CateService cateService;
@@ -34,6 +36,9 @@ public class FrontGoodsController {
 
     @Autowired
     private ActivityService activityService;
+
+    @Autowired
+    private ImagePathService imagePathService;
 
     @RequestMapping(value = "/detail",method = RequestMethod.GET)
     public String detailGoods(Integer goodsid, Model model, HttpSession session) {
@@ -53,7 +58,7 @@ public class FrontGoodsController {
         if (user == null) {
             goods.setFav(false);
         } else {
-            Favorite favorite = goodsService.selectFavByKey(new FavoriteKey(user.getUserid(), goodsid));
+            Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goodsid));
             if (favorite == null) {
                 goods.setFav(false);
             } else {
@@ -65,7 +70,7 @@ public class FrontGoodsController {
         Category category = cateService.selectById(goods.getCategory());
 
         //商品图片
-        List<ImagePath> imagePath = goodsService.findImagePath(goodsid);
+        List<ImagePath> imagePath = imagePathService.findImagePath(goodsid);
 
         //商品评论
 
@@ -107,7 +112,7 @@ public class FrontGoodsController {
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
 
             goods.setImagePaths(imagePathList);
 
@@ -115,7 +120,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = goodsService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -150,7 +155,7 @@ public class FrontGoodsController {
         favorite.setGoodsid(goodsid);
         favorite.setUserid(user.getUserid());
 
-        goodsService.addFavorite(favorite);
+        favoriteService.insertFavorite(favorite);
 
         return Msg.success("收藏成功");
     }
@@ -164,7 +169,7 @@ public class FrontGoodsController {
         }
 
         //删除收藏
-        goodsService.deleteFavByKey(new FavoriteKey(user.getUserid(),goodsid));
+        favoriteService.deleteFavByKey(new FavoriteKey(user.getUserid(),goodsid));
 
         return Msg.success("取消收藏成功");
     }
@@ -192,7 +197,7 @@ public class FrontGoodsController {
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
 
             goods.setImagePaths(imagePathList);
 
@@ -200,7 +205,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = goodsService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {

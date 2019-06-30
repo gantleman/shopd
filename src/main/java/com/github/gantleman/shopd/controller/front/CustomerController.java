@@ -2,11 +2,22 @@ package com.github.gantleman.shopd.controller.front;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.Address;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.Order;
 import com.github.gantleman.shopd.service.AddressService;
+import com.github.gantleman.shopd.service.FavoriteService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.OrderService;
 import com.github.gantleman.shopd.service.UserService;
+import com.github.gantleman.shopd.service.ImagePathService;
+import com.github.gantleman.shopd.service.OrderItemService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,19 +31,31 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by 蒋松冬 on 2017/7/22.
- */
 @Controller
 public class CustomerController {
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private GoodsService goodsService;
+
+    @Autowired
+    private FavoriteService favoriteService;
+
+    @Autowired
+    private ImagePathService ImagePathService;
+
+    @Autowired
+    private OrderItemService orderItemService;
 
     @RequestMapping("/login")
     public String loginView(){
         return "login";
     }
-
-    @Autowired
-    private UserService userService;
 
     @RequestMapping("/register")
     public String register(){
@@ -129,7 +152,7 @@ public class CustomerController {
         {
             return "redirect:/login";
         }
-        List<Address> addressList=addressService.getAllAddressByExample(user.getUserid());
+        List<Address> addressList=addressService.getAllAddressByUserID(user.getUserid());
         addressModel.addAttribute("addressList",addressList);
         return "address";
     }
@@ -160,12 +183,6 @@ public class CustomerController {
         return Msg.success("添加成功");
     }
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private GoodsService goodsService;
-
     @RequestMapping("/info/list")
     public String list(HttpServletRequest request,Model orderModel){
 
@@ -187,7 +204,7 @@ public class CustomerController {
        for (Integer i=0;i<orderList.size();i++)
        {
            order=orderList.get(i);
-           orderItemList=orderService.getOrderItemByID(order.getOrderid());
+           orderItemList=orderItemService.getOrderItemByID(order.getOrderid());
            List<Goods> goodsList=new ArrayList<Goods>();
            List<Integer> goodsIdList=new ArrayList<Integer>();
            for (Integer j=0;j<orderItemList.size();j++)
@@ -228,7 +245,7 @@ public class CustomerController {
 
         //一页显示几个数据
         PageHelper.startPage(pn, 16);
-        List<Favorite> favoriteList = goodsService.selectFavByExample(user.getUserid());
+        List<Favorite> favoriteList = favoriteService.selectFavByExample(user.getUserid());
 
         List<Integer> goodsIdList = new ArrayList<Integer>();
         for (Favorite tmp:favoriteList) {
@@ -244,7 +261,7 @@ public class CustomerController {
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = goodsService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = ImagePathService.findImagePath(goods.getGoodsid());
 
             goods.setImagePaths(imagePathList);
 

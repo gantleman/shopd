@@ -180,12 +180,16 @@ public class DemoApplicationTests {
 
 	@Test
 	public void t5() {
-
 		try {
 			System.out.println("baidu.com --------" + httputils.doGet("http://baidu.com", "/").toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void t6() {
+		ru.sAddAndTime("key", 100, 0);
 	}
 }

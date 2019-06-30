@@ -10,7 +10,6 @@ import com.github.gantleman.shopd.entity.Admin;
 import com.github.gantleman.shopd.service.AdminService;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
-import com.github.gantleman.shopd.util.HttpUtils;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
 import com.github.gantleman.shopd.util.TimeUtils;
@@ -34,9 +33,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private RedisUtil redisu;
-    
-    @Autowired
-    private HttpUtils httputils;
 
     @Value("${srping.quartz.exprie}")
     Integer exprie;
@@ -47,13 +43,15 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminJob job;
 
+    private String classname = "Admin";
+    
     @PostConstruct
     public void init() {
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
         if (0 == adminDA.IsEmpty()) {
             ///create time todo
-            quartzManager.addJob("Admin","Admin","Admin","Admin", AdminJob.class, null, job);
+            quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
         }
     }
 
@@ -64,39 +62,45 @@ public class AdminServiceImpl implements AdminService {
         List<Admin> ra = adminDA.findAllChatByAdminNameAndPassword( admin.getAdminname(), admin.getPassword());
 
         Admin sqlra;
-        if( ra.size() >= 1 )
+        if( ra.size() >= 1 ) {
             sqlra =  ra.get(0);
-        else {
+
+            sqlra.MakeStamp();
+            adminDA.saveAdmin(sqlra);
+        }else {
             sqlra = adminMapper.selectByName(admin);
             if( sqlra != null)
             {
-                adminDA.saveAdmin(sqlra);
-                ///cache
-                cacheService.eventAdd("Admin");
+                ///init
+                if (cacheService.IsCache(classname)) {
+                    ///create time todo
+                    quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
+                }
 
-                 ///create time todo
-                 quartzManager.addJob("Admin","Admin","Admin","Admin", AdminJob.class, null, job);
+                sqlra.MakeStamp();
+                adminDA.saveAdmin(sqlra);
+
+                BDBEnvironmentManager.getMyEntityStore().sync();
+
+                ///cache
+                cacheService.eventAdd(classname);
             }
-            //redis
-            redisu.hset("Admin", sqlra.getAdminid().toString(), sqlra, 0);
         }
         return sqlra;
     }
 
     @Override
-    public void SaveBack() {
+    public void TickBack() {
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
         List<Admin> ladmin = adminDA.findAllUserWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
 
         for (Admin admin : ladmin) {
-            if(1 == adminMapper.updateByPrimaryKey(admin)) {
-                adminDA.removedAdminById(admin.getAdminid());
-            }
+            adminDA.removedAdminById(admin.getAdminid());
         }
 
         if (1 == adminDA.IsEmpty()){
-            cacheService.Archive("Admin");
+            cacheService.Archive(classname);
         }
     }
 }

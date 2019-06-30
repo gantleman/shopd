@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-/**
- * Created by 文辉 on 2017/7/22.
- */
 @Controller
 @RequestMapping("/admin/user")
 public class UserController {
@@ -28,7 +25,7 @@ public class UserController {
         //一页显示几个数据
         PageHelper.startPage(pn, 10);
 
-        List<User> userList = userService.selectByExample(new UserExample());
+        List<User> userList = userService.selectByAll();
 
         //显示几个页号
         PageInfo page = new PageInfo(userList,5);

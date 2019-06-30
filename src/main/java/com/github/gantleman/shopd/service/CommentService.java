@@ -13,4 +13,6 @@ public interface CommentService {
 
     //only read
     public List<Comment> selectByExample(Integer goodsid);
+
+    public void TickBack();
 }

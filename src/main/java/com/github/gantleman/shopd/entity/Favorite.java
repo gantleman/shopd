@@ -19,10 +19,40 @@ public class Favorite extends FavoriteKey {
 
     private Date collecttime;
 
-    long stamp;
+    private Integer status;
+
+    private long stamp;
 
     public void MakeStamp() {
-        stamp = TimeUtils.getTimeWhitLong();
+        setStamp(TimeUtils.getTimeWhitLong());
+    }
+
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the stamp
+     */
+    public long getStamp() {
+        return stamp;
+    }
+
+    /**
+     * @param stamp the stamp to set
+     */
+    public void setStamp(long stamp) {
+        this.stamp = stamp;
     }
 
     public Date getCollecttime() {

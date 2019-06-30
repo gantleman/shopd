@@ -14,4 +14,8 @@ public interface ActivityService {
     void insertActivitySelective(Activity activity);
 
     void deleteByActivityId(Integer activityid);
+
+    public void TickBack();
+
+    public void RefreshDBD();
 }

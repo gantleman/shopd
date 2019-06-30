@@ -14,6 +14,7 @@ public interface CateService {
     public List<Category> selectByNameForRead(String cate);
     
     public Category selectById(Integer category);
+
     //have write
     public List<Category> selectByName(String cate);
 
@@ -22,4 +23,8 @@ public interface CateService {
     public void updateByPrimaryKeySelective(Category category);
 
     public void deleteByPrimaryKey(Integer cateid);
+
+    public void TickBack();
+
+    public void RefreshDBD();
 }

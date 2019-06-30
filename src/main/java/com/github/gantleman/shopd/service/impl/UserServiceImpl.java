@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> selectByExample(UserExample userExample) {
-        return userMapper.selectByExample(userExample);
+    public List<User> selectByAll() {
+        return userMapper.selectByExample(new UserExample());
     }
 
     @Override

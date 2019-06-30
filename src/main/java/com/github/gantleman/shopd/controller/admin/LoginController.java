@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-/**
- * Created by 文辉 on 2017/7/19.
- */
 @Controller
 @RequestMapping("/admin")
 public class LoginController {

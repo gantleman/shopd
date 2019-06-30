@@ -8,15 +8,22 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
+import com.sleepycat.persist.SecondaryIndex;
 
 public class CategoryDA {
 
 	// 主键字段类型,实体类
 	PrimaryIndex<Integer, Category> pIdx;// 一级索引
 
+	// 辅助键字段类型,主键字段类型,实体类
+	SecondaryIndex<String, Integer, Category> sIdx;// 二级索引
+
 	public CategoryDA(EntityStore entityStore) {
 		// 主键字段类型,实体类
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Category.class);
+
+		// 主键索引,辅助键字段类型,辅助键字段名称
+		sIdx = entityStore.getSecondaryIndex(pIdx, String.class, "catename");
 	}
 
 	/**
@@ -38,6 +45,34 @@ public class CategoryDA {
 	 **/
 	public Category findCategoryById(Integer categoryId) {
 		return pIdx.get(categoryId);
+	}
+
+	/**
+	 * 根据chatName查找所有的Chat
+	 **/
+	public List<Category> findAllChatByCategoryName(String categoryname) {
+	    
+		List<Category> categoryList=new ArrayList<Category>();
+		
+		EntityCursor<Category> entityCursorList=null;
+		
+		//获取游标
+		try {
+			entityCursorList=sIdx.subIndex(categoryname).entities();
+			//遍历游标
+			for (Category category : entityCursorList) {
+				categoryList.add(category);
+			}
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			if(entityCursorList!=null) {
+				//关闭游标
+				entityCursorList.close();
+			}
+		}
+		return categoryList;
 	}
 
 	/**
@@ -84,5 +119,49 @@ public class CategoryDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<Category> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (Category category : cursor) {
+            	if(category!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
+
+
+	public List<Category> findAllWhitStamp(long stamp) {
+		List<Category> categoryList = new ArrayList<Category>();
+		// 打开游标
+		EntityCursor<Category> categoryCursorList = null;
+		try {
+			//获取游标
+			categoryCursorList = pIdx.entities();
+			// 遍历游标
+			for (Category category : categoryCursorList) {
+				if(category.getStamp() <= stamp) {
+					categoryList.add(category);
+				}
+			}
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+		} finally {
+			if (categoryCursorList != null) {
+				// 关闭游标
+				categoryCursorList.close();
+			}
+		}
+		return categoryList;
+	}
 }
