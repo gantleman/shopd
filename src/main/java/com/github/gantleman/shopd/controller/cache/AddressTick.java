@@ -17,6 +17,6 @@ public class AddressTick {
 
         addressservice.TickBack();
         
-        return Msg.success("更新成功");
+        return Msg.success("successful");
     }
 }

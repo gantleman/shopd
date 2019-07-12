@@ -4,7 +4,6 @@ import com.github.gantleman.shopd.da.FavoriteDA;
 import com.github.gantleman.shopd.dao.FavoriteMapper;
 import com.github.gantleman.shopd.entity.Favorite;
 import com.github.gantleman.shopd.entity.FavoriteExample;
-import com.github.gantleman.shopd.entity.FavoriteKey;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.FavoriteService;
 import com.github.gantleman.shopd.service.jobs.FavoriteJob;
@@ -47,6 +46,9 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     private String classname = "Favorite";
 
+    @Value("${srping.cache.page}")
+    Integer page;
+
     @PostConstruct
     public void init() {
         if (cacheService.IsCache(classname)) {
@@ -56,27 +58,115 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
+    public Favorite selectFavByKey(Integer userid, Integer goodsid) {
+        Favorite re = null;
+        if(redisu.hasKey("Favorite_u"+userid.toString())) {
+            //read redis
+            Set<Object> ro = redisu.sGet("Favorite_u"+userid.toString());
+            for (Object id : ro) {
+                if(id == goodsid) {
+                    re =  (Favorite) redisu.hget(classname, ((Integer)id).toString());
+                }
+            }
+            redisu.expire("Favorite_u"+goodsid.toString(), 0);
+            redisu.expire(classname, 0);
+        }else {
+            //write redis
+            FavoriteExample favoriteExample = new FavoriteExample();
+            favoriteExample.or().andUseridEqualTo(userid);            
+            List<Favorite> lre = favoriteMapper.selectByExample(favoriteExample);
+
+            ///read and write
+            if(!redisu.hasKey("Favorite_u"+userid.toString())) {
+                for( Favorite item : lre ){
+                    redisu.sAdd("Favorite_u"+userid.toString(), (Object)item.getFavoriteid());
+                    redisu.hset(classname, item.getFavoriteid().toString(), item);
+
+                    if (re != null && item != null && item.getGoodsid() == goodsid)
+                        re = item;
+                }
+                redisu.expire("Favorite_u"+userid.toString(), 0);
+                redisu.expire(classname, 0);
+            }   
+        }
+        return re;
+    }
+
+    @Override
+    public List<Favorite> selectFavByUser(Integer userid) {
+
+        List<Favorite> re = new ArrayList<Favorite>();
+        if(redisu.hasKey("Favorite_u"+userid.toString())) {
+            //read redis
+            Set<Object> ro = redisu.sGet("Favorite_u"+userid.toString());
+            for (Object id : ro) {
+                
+                Favorite r =  (Favorite) redisu.hget(classname, ((Integer)id).toString());
+                if(r != null){
+                    re.add(r);
+                } 
+            }
+            redisu.expire("Favorite_u"+userid.toString(), 0);
+            redisu.expire(classname, 0);
+        }else {
+            //write redis
+            FavoriteExample favoriteExample = new FavoriteExample();
+            favoriteExample.or().andUseridEqualTo(userid);            
+            re = favoriteMapper.selectByExample(favoriteExample);
+
+            ///read and write
+            if(!redisu.hasKey("Favorite_u"+userid.toString())) {
+                for( Favorite item : re ){
+                    redisu.sAdd("Favorite_u"+userid.toString(), (Object)item.getFavoriteid());
+                    redisu.hset(classname, item.getFavoriteid().toString(), item);
+                }
+                redisu.expire("Favorite_u"+userid.toString(), 0);
+                redisu.expire(classname, 0);
+            }   
+        }
+        return re;
+    }
+
+    @Override
     public void insertFavorite(Favorite favorite) {
-        favoriteMapper.insertSelective(favorite);
+        RefreshDBD(favorite.getUserid());
+
+        BDBEnvironmentManager.getInstance();
+        FavoriteDA favoriteDA=new FavoriteDA(BDBEnvironmentManager.getMyEntityStore());
+
+        long id = cacheService.eventCteate(classname);
+        favorite.setFavoriteid(new Long(id).intValue());
+        favorite.MakeStamp();
+        favorite.setStatus(2);
+        favoriteDA.saveFavorite(favorite);
+        BDBEnvironmentManager.getMyEntityStore().sync();
+
+        //Re-publish to redis
+        redisu.sAddAndTime("Favorite_u" + favorite.getUserid().toString(), 0, favorite.getFavoriteid()); 
+        redisu.hset(classname, favorite.getFavoriteid().toString(), (Object)favorite, 0);
     }
 
     @Override
-    public Favorite selectFavByKey(FavoriteKey favoriteKey) {
-        return favoriteMapper.selectByPrimaryKey(favoriteKey);
-    }
+    public void deleteFavByKey(Integer userid, Integer goodsid) {
+        RefreshDBD(userid);
 
-    @Override
-    public void deleteFavByKey(FavoriteKey favoriteKey) {
-        favoriteMapper.deleteByPrimaryKey(favoriteKey);
-    }
-
-    @Override
-    public List<Favorite> selectFavByExample(Integer userid) {
-
-        FavoriteExample favoriteExample = new FavoriteExample();
-        favoriteExample.or().andUseridEqualTo(userid);
-
-        return favoriteMapper.selectByExample(favoriteExample);
+        BDBEnvironmentManager.getInstance();
+        FavoriteDA favoriteDA=new FavoriteDA(BDBEnvironmentManager.getMyEntityStore());
+        List<Favorite> favorite = favoriteDA.findAllFavoriteByUserID(userid);
+ 
+        if (!favorite.isEmpty())
+        {
+            for(Favorite fa:favorite) {
+                if(fa.getGoodsid() == goodsid){
+                    fa.MakeStamp();
+                    fa.setStatus(1);
+                    favoriteDA.saveFavorite(fa);
+        
+                    //Re-publish to redis
+                    redisu.hdel(classname, fa.getFavoriteid().toString());
+                }
+            }
+        }
     }
 
     @Override
@@ -87,11 +177,15 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         for (Favorite favorite : lfavorite) {
             if(null ==  favorite.getStatus()) {
-                favoriteDA.removedFavoriteById(favorite.getGoodsid());
+                favoriteDA.removedFavoriteById(favorite.getFavoriteid());
+            }
+
+            if(1 ==  favorite.getStatus() && 1 == favoriteMapper.deleteByPrimaryKey(favorite.getFavoriteid())) {
+                favoriteDA.removedFavoriteById(favorite.getFavoriteid());
             }
 
             if(2 ==  favorite.getStatus()  && 1 == favoriteMapper.insert(favorite)) {
-                favoriteDA.removedFavoriteById(favorite.getGoodsid());
+                favoriteDA.removedFavoriteById(favorite.getFavoriteid());
             }
         }
 
@@ -110,6 +204,7 @@ public class FavoriteServiceImpl implements FavoriteService {
            List<Favorite> re = new ArrayList<Favorite>();
 
            FavoriteExample favoriteExample = new FavoriteExample();
+           favoriteExample.or().andUseridEqualTo(userid);
            re = favoriteMapper.selectByExample(favoriteExample);
            for (Favorite value : re) {
                value.MakeStamp();
@@ -120,9 +215,6 @@ public class FavoriteServiceImpl implements FavoriteService {
            }
 
            BDBEnvironmentManager.getMyEntityStore().sync();
-
-           id.add(userid);
-           cacheService.eventAdd(classname, id);
            
            if(cacheService.IsCache(classname)){         
                quartzManager.addJob(classname,classname,classname,classname, FavoriteJob.class, null, job);          

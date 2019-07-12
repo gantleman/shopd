@@ -6,9 +6,9 @@ import java.util.List;
 public interface ActivityService {
 
     //only read
-    List<Activity> getAllActivity();
+    List<Activity> getAllActivity(Integer pageId, String url);
     
-    Activity selectByKey(Integer activityid);
+    Activity selectByKey(Integer activityid, String url);
 
     ///have write
     void insertActivitySelective(Activity activity);
@@ -17,5 +17,5 @@ public interface ActivityService {
 
     public void TickBack();
 
-    public void RefreshDBD();
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
 }

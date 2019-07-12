@@ -19,7 +19,7 @@ public class AddressJob implements Job {
         try {
             httputils.doGet("/addresstick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

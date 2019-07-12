@@ -80,33 +80,37 @@
     <if test="distinct">
       distinct
     </if>
+    'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from indent
+    from order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    <if test="pageStart != null and pageStart gt -1 and pageSize != null and pageSize gt -1">
+      limit ${pageStart},${pageSize}
+    </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from indent
+    from order
     where orderId = #{orderid,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from indent
+    delete from order
     where orderId = #{orderid,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="com.github.gantleman.shopd.entity.OrderExample">
-    delete from indent
+    delete from order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.github.gantleman.shopd.entity.Order">
-    insert into indent (orderId, userId, orderTime, 
+    insert into order (orderId, userId, orderTime, 
       oldPrice, newPrice, isPay, isSend, 
       isReceive, isComplete, addressId
       )
@@ -115,8 +119,8 @@
       #{isreceive,jdbcType=BIT}, #{iscomplete,jdbcType=BIT}, #{addressid,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.github.gantleman.shopd.entity.Order" useGeneratedKeys="true" keyProperty="orderid">
-    insert into indent
+  <insert id="insertSelective" parameterType="com.github.gantleman.shopd.entity.Order">
+    insert into order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="orderid != null">
         orderId,
@@ -183,13 +187,13 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.github.gantleman.shopd.entity.OrderExample" resultType="java.lang.Long">
-    select count(*) from indent
+    select count(*) from order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update indent
+    update order
     <set>
       <if test="record.orderid != null">
         orderId = #{record.orderid,jdbcType=INTEGER},
@@ -227,7 +231,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update indent
+    update order
     set orderId = #{record.orderid,jdbcType=INTEGER},
       userId = #{record.userid,jdbcType=INTEGER},
       orderTime = #{record.ordertime,jdbcType=TIMESTAMP},
@@ -243,7 +247,7 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.github.gantleman.shopd.entity.Order">
-    update indent
+    update order
     <set>
       <if test="userid != null">
         userId = #{userid,jdbcType=INTEGER},
@@ -276,7 +280,7 @@
     where orderId = #{orderid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.Order">
-    update indent
+    update order
     set userId = #{userid,jdbcType=INTEGER},
       orderTime = #{ordertime,jdbcType=TIMESTAMP},
       oldPrice = #{oldprice,jdbcType=REAL},

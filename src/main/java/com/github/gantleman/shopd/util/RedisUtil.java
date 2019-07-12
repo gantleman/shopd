@@ -1,12 +1,15 @@
 package com.github.gantleman.shopd.util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -166,6 +169,22 @@ public final class RedisUtil {
      */
     public Object hget(String key, String item) {
         return redisTemplate.opsForHash().get(key, item);
+    }
+
+    /**
+     * HashGet
+     * @param key 键 不能为null
+     * @param item 项 不能为null
+     * @return 值
+     */
+    public Map<Object, Object> hsacn(String key, String item) {
+        Cursor<Map.Entry<Object,Object>> cursor = redisTemplate.opsForHash().scan(key,ScanOptions.scanOptions().match(item).build());
+        Map<Object, Object> re = new HashMap<Object, Object>();
+        while (cursor.hasNext()){  
+            Map.Entry<Object,Object> entry = cursor.next();  
+            re.put(entry.getKey(), entry.getValue());
+        }
+        return re;
     }
 
     /**

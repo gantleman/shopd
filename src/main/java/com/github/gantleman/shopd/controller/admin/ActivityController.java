@@ -2,7 +2,10 @@ package com.github.gantleman.shopd.controller.admin;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Admin;
+import com.github.gantleman.shopd.entity.Activity;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.service.ActivityService;
 import com.github.gantleman.shopd.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin/activity")
 public class ActivityController {
+
+    private static final int _1 = 1;
 
     @Autowired(required = false)
     ActivityService activityService;
@@ -36,10 +41,10 @@ public class ActivityController {
         //一页显示几个数据
         PageHelper.startPage(pn, 10);
 
-        List<Activity> activityList = activityService.getAllActivity();
+        List<Activity> activityList = activityService.getAllActivity(pn, "/show");
 
         //显示几个页号
-        PageInfo page = new PageInfo(activityList,5);
+        PageInfo page = new PageInfo(activityList,_1);
         model.addAttribute("pageInfo", page);
 
         return "activity";
@@ -54,7 +59,7 @@ public class ActivityController {
             return Msg.fail("请先登录");
         }
         
-        List<Activity> activityList = activityService.getAllActivity();
+        List<Activity> activityList = activityService.getAllActivity(pn, "/showjson");
 
         return Msg.success("获取活动信息成功").add("activity",activityList);
     }

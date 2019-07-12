@@ -1,17 +1,19 @@
 package com.github.gantleman.shopd.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.github.gantleman.shopd.util.TimeUtils;
-import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
-@Entity
-public class Favorite extends FavoriteKey {
+public class Favorite implements Serializable {
 
     @PrimaryKey(sequence = "ID")
+    private Integer favoriteid;
+
+    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer userid;
 
     @SecondaryKey(relate = Relationship.MANY_TO_ONE)
@@ -19,26 +21,14 @@ public class Favorite extends FavoriteKey {
 
     private Date collecttime;
 
+    private static final long serialVersionUID = 1L;
+
     private Integer status;
 
     private long stamp;
 
     public void MakeStamp() {
         setStamp(TimeUtils.getTimeWhitLong());
-    }
-
-    /**
-     * @return the status
-     */
-    public Integer getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     /**
@@ -55,12 +45,26 @@ public class Favorite extends FavoriteKey {
         this.stamp = stamp;
     }
 
-    public Date getCollecttime() {
-        return collecttime;
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setCollecttime(Date collecttime) {
-        this.collecttime = collecttime;
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getFavoriteid() {
+        return favoriteid;
+    }
+
+    public void setFavoriteid(Integer favoriteid) {
+        this.favoriteid = favoriteid;
     }
 
     public Integer getUserid() {
@@ -77,5 +81,13 @@ public class Favorite extends FavoriteKey {
 
     public void setGoodsid(Integer goodsid) {
         this.goodsid = goodsid;
+    }
+
+    public Date getCollecttime() {
+        return collecttime;
+    }
+
+    public void setCollecttime(Date collecttime) {
+        this.collecttime = collecttime;
     }
 }

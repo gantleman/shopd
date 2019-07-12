@@ -1,6 +1,7 @@
 package com.github.gantleman.shopd.dao;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

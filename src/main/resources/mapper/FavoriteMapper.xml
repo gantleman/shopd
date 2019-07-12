@@ -2,8 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.gantleman.shopd.dao.FavoriteMapper">
   <resultMap id="BaseResultMap" type="com.github.gantleman.shopd.entity.Favorite">
-    <id column="userId" jdbcType="INTEGER" property="userid" />
-    <id column="goodsId" jdbcType="INTEGER" property="goodsid" />
+    <id column="favoriteId" jdbcType="INTEGER" property="favoriteid" />
+    <result column="userId" jdbcType="INTEGER" property="userid" />
+    <result column="goodsId" jdbcType="INTEGER" property="goodsid" />
     <result column="collectTime" jdbcType="TIMESTAMP" property="collecttime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -65,49 +66,54 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    userId, goodsId, collectTime
+    favoriteId, userId, goodsId, collectTime
   </sql>
   <select id="selectByExample" parameterType="com.github.gantleman.shopd.entity.FavoriteExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
+    'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from collection
+    from favorite
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    <if test="pageStart != null and pageStart gt -1 and pageSize != null and pageSize gt -1">
+      limit ${pageStart},${pageSize}
+    </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.FavoriteKey" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from collection
-    where userId = #{userid,jdbcType=INTEGER}
-      and goodsId = #{goodsid,jdbcType=INTEGER}
+    from favorite
+    where favoriteId = #{favoriteid,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.FavoriteKey">
-    delete from collection
-    where userId = #{userid,jdbcType=INTEGER}
-      and goodsId = #{goodsid,jdbcType=INTEGER}
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from favorite
+    where favoriteId = #{favoriteid,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="com.github.gantleman.shopd.entity.FavoriteExample">
-    delete from collection
+    delete from favorite
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.github.gantleman.shopd.entity.Favorite">
-    insert into collection (userId, goodsId, collectTime
-      )
-    values (#{userid,jdbcType=INTEGER}, #{goodsid,jdbcType=INTEGER}, #{collecttime,jdbcType=TIMESTAMP}
-      )
+    insert into favorite (favoriteId, userId, goodsId, 
+      collectTime)
+    values (#{favoriteid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{goodsid,jdbcType=INTEGER}, 
+      #{collecttime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.github.gantleman.shopd.entity.Favorite">
-    insert into collection
+    insert into favorite
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="favoriteid != null">
+        favoriteId,
+      </if>
       <if test="userid != null">
         userId,
       </if>
@@ -119,6 +125,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="favoriteid != null">
+        #{favoriteid,jdbcType=INTEGER},
+      </if>
       <if test="userid != null">
         #{userid,jdbcType=INTEGER},
       </if>
@@ -131,14 +140,17 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.github.gantleman.shopd.entity.FavoriteExample" resultType="java.lang.Long">
-    select count(*) from collection
+    select count(*) from favorite
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update collection
+    update favorite
     <set>
+      <if test="record.favoriteid != null">
+        favoriteId = #{record.favoriteid,jdbcType=INTEGER},
+      </if>
       <if test="record.userid != null">
         userId = #{record.userid,jdbcType=INTEGER},
       </if>
@@ -154,8 +166,9 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update collection
-    set userId = #{record.userid,jdbcType=INTEGER},
+    update favorite
+    set favoriteId = #{record.favoriteid,jdbcType=INTEGER},
+      userId = #{record.userid,jdbcType=INTEGER},
       goodsId = #{record.goodsid,jdbcType=INTEGER},
       collectTime = #{record.collecttime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -163,19 +176,25 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.github.gantleman.shopd.entity.Favorite">
-    update collection
+    update favorite
     <set>
+      <if test="userid != null">
+        userId = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="goodsid != null">
+        goodsId = #{goodsid,jdbcType=INTEGER},
+      </if>
       <if test="collecttime != null">
         collectTime = #{collecttime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where userId = #{userid,jdbcType=INTEGER}
-      and goodsId = #{goodsid,jdbcType=INTEGER}
+    where favoriteId = #{favoriteid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.Favorite">
-    update collection
-    set collectTime = #{collecttime,jdbcType=TIMESTAMP}
-    where userId = #{userid,jdbcType=INTEGER}
-      and goodsId = #{goodsid,jdbcType=INTEGER}
+    update favorite
+    set userId = #{userid,jdbcType=INTEGER},
+      goodsId = #{goodsid,jdbcType=INTEGER},
+      collectTime = #{collecttime,jdbcType=TIMESTAMP}
+    where favoriteId = #{favoriteid,jdbcType=INTEGER}
   </update>
 </mapper>

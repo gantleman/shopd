@@ -10,7 +10,22 @@ public class FavoriteExample {
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
+    
+    protected Integer pageStart;
 
+    protected Integer pageSize;
+
+    public void setPageStart(Integer pageStart) {
+        this.pageStart = pageStart;
+    }
+
+    public Integer getPageStart() {
+        return pageStart;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
     public FavoriteExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
@@ -103,6 +118,66 @@ public class FavoriteExample {
                 throw new RuntimeException("Between values for " + property + " cannot be null");
             }
             criteria.add(new Criterion(condition, value1, value2));
+        }
+
+        public Criteria andFavoriteidIsNull() {
+            addCriterion("favoriteId is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidIsNotNull() {
+            addCriterion("favoriteId is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidEqualTo(Integer value) {
+            addCriterion("favoriteId =", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidNotEqualTo(Integer value) {
+            addCriterion("favoriteId <>", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidGreaterThan(Integer value) {
+            addCriterion("favoriteId >", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("favoriteId >=", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidLessThan(Integer value) {
+            addCriterion("favoriteId <", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidLessThanOrEqualTo(Integer value) {
+            addCriterion("favoriteId <=", value, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidIn(List<Integer> values) {
+            addCriterion("favoriteId in", values, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidNotIn(List<Integer> values) {
+            addCriterion("favoriteId not in", values, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidBetween(Integer value1, Integer value2) {
+            addCriterion("favoriteId between", value1, value2, "favoriteid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFavoriteidNotBetween(Integer value1, Integer value2) {
+            addCriterion("favoriteId not between", value1, value2, "favoriteid");
+            return (Criteria) this;
         }
 
         public Criteria andUseridIsNull() {

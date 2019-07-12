@@ -10,6 +10,26 @@ public class ActivityExample {
 
     protected List<Criteria> oredCriteria;
 
+    protected Integer pageStart;
+
+    protected Integer pageSize;
+
+    public void setPageStart(Integer pageStart) {
+        this.pageStart = pageStart;
+    }
+
+    public Integer getPageStart() {
+        return pageStart;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
     public ActivityExample() {
         oredCriteria = new ArrayList<Criteria>();
     }

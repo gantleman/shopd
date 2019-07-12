@@ -10,9 +10,9 @@ public interface OrderService {
 
     public List<Order> selectOrderByIssendAndIsreceive();
 
-    public List<Order> selectOrderByIssen();
+    public List<Order> selectOrderByIssend();
     
-    public List<Order> selectOrderByIUserID(Integer ID);  
+    public List<Order> selectOrderByIUserID(Integer UserID);  
 
     //have write
     public void insertOrder(Order order);
@@ -21,5 +21,7 @@ public interface OrderService {
 
     public void updateOrderByKey(Order order);
 
-    public Order selectByPrimaryKey(Integer orderid);
+    public void TickBack();
+
+    public void RefreshDBD();
 }

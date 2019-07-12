@@ -19,7 +19,7 @@ public class CategoryJob implements Job {
         try {
             httputils.doGet("/categorytick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

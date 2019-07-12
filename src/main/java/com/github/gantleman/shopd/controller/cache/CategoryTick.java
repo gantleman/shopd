@@ -17,6 +17,6 @@ public class CategoryTick {
 
         categoryservice.TickBack();
         
-        return Msg.success("更新成功");
+        return Msg.success("successful");
     }
 }

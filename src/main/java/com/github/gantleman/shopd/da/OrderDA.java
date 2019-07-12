@@ -94,7 +94,7 @@ public class OrderDA {
 				orderList.add(order);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (orderCursorList != null) {
 				// 关闭游标
@@ -121,7 +121,7 @@ public class OrderDA {
 				orderList.add(order);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -149,7 +149,7 @@ public class OrderDA {
 				orderList.add(order);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -177,7 +177,7 @@ public class OrderDA {
 				orderList.add(order);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -270,5 +270,48 @@ public class OrderDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<Order> findAllWhitStamp(long stamp) {
+		List<Order> adminList = new ArrayList<Order>();
+		// 打开游标
+		EntityCursor<Order> adminCursorList = null;
+		try {
+			//获取游标
+			adminCursorList = pIdx.entities();
+			// 遍历游标
+			for (Order order : adminCursorList) {
+				if(order.getStamp() <= stamp) {
+					adminList.add(order);
+				}
+			}
+		} catch (DatabaseException e) {
+			
+		} finally {
+			if (adminCursorList != null) {
+				// 关闭游标
+				adminCursorList.close();
+			}
+		}
+		return adminList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<Order> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (Order activity : cursor) {
+            	if(activity!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
 }

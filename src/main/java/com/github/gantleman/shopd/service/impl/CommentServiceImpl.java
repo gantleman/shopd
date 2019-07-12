@@ -44,6 +44,9 @@ public class CommentServiceImpl implements CommentService {
 
     private String classname = "Comment";
 
+    @Value("${srping.cache.page}")
+    Integer page;
+
     @PostConstruct
     public void init() {
         if (cacheService.IsCache(classname)) {
@@ -54,8 +57,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void insertSelective(Comment comment){
-        commentMapper.insertSelective(comment);
-
         //send do
         RefreshDBD(comment.getGoodsid());
 
@@ -154,9 +155,6 @@ public class CommentServiceImpl implements CommentService {
            }
 
            BDBEnvironmentManager.getMyEntityStore().sync();
-
-           id.add(goodsid);
-           cacheService.eventAdd(classname, id);
            
            if(cacheService.IsCache(classname)){         
                quartzManager.addJob(classname,classname,classname,classname, CommentJob.class, null, job);          

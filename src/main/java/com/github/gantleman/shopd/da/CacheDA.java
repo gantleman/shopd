@@ -77,7 +77,6 @@ public class CacheDA {
 				cacheList.add(cache);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (cacheCursorList != null) {
 				// 关闭游标
@@ -104,7 +103,6 @@ public class CacheDA {
 				nameList.add(address);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {

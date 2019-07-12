@@ -69,7 +69,7 @@ public class AddressDA {
 				addressList.add(address);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (addressCursorList != null) {
 				// 关闭游标
@@ -100,7 +100,7 @@ public class AddressDA {
 				addressList.add(address);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -166,7 +166,7 @@ public class AddressDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标
@@ -193,7 +193,7 @@ public class AddressDA {
 				re =  false;
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {

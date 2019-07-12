@@ -2,7 +2,8 @@ package com.github.gantleman.shopd.controller.admin;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.User;
 import com.github.gantleman.shopd.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -72,7 +72,7 @@ public class HttpUtils {
 
     public HttpResponse doGet(String path) throws Exception {
         Map<String, String> headers = new HashMap(); 
-        Map<String, String> querys = new HashMap(); ;
+        Map<String, String> querys = new HashMap();
         
         return this.doGet(NginxHost, path, headers, querys);
     }

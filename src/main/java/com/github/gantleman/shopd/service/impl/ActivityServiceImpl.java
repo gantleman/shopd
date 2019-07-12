@@ -8,9 +8,10 @@ import com.github.gantleman.shopd.service.ActivityService;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.jobs.ActivityJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
+import com.github.gantleman.shopd.util.HttpUtils;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
-import com.github.gantleman.shopd.util.TimeUtils;
+import com.github.gantleman.shopd.util.ServerConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,17 +31,20 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityMapper activityMapper;
 
     @Autowired(required = false)
+    ServerConfig serverConfig;
+
+    @Autowired
     private CacheService cacheService;
 
     @Autowired
     private RedisUtil redisu;
 
-    @Value("${srping.quartz.exprie}")
-    Integer exprie;
-
     @Autowired
     private ActivityJob job;
 
+    @Autowired
+    HttpUtils httputils;
+    
     @Autowired
     private QuartzManager quartzManager;
 
@@ -48,84 +52,105 @@ public class ActivityServiceImpl implements ActivityService {
     
     @PostConstruct
     public void init() {
-        if (cacheService.IsCache(classname)) {
+      if (cacheService.IsCache(classname)) {
             ///create time
-            quartzManager.addJob(classname,classname,classname,classname, ActivityJob.class, null, job);
+           quartzManager.addJob(classname,classname,classname,classname, ActivityJob.class, null, job);
         }
     }
 
     @Override
-    public List<Activity> getAllActivity() {
+    public List<Activity> getAllActivity(Integer pageId, String url) {
         List<Activity> re = new ArrayList<Activity>();
 
-        if(redisu.hasKey(classname)) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
-            Map<Object, Object> rm = redisu.hmget(classname);
-            for (Object value : rm.values()) {
-                re.add( (Activity)value);
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                Activity r = (Activity) redisu.hget(classname, pageId.toString());
+                if(r != null)
+                    re.add(r);
             }
 
-            redisu.expire(classname, 0);
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }else {
-            //write redis
-            Map<String, Object> tmap = new HashMap<>();
+            String host = (String)redisu.get(url);
+            if(!host.equals(serverConfig.getUrl())){
+                Map<String, String> headers = new HashMap(); 
+                Map<String, String> querys = new HashMap();
 
-            re = activityMapper.selectByExample(new ActivityExample());
-            for (Activity value : re) {
-                tmap.put(value.getActivityid().toString(), (Object)value);
+                querys.put("pageid", pageId.toString());
+
+                try {
+                    httputils.doGet(serverConfig.getUrl(), "/activitypage", headers, querys);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                RefreshDBD(pageId, true);
+            }
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                Activity r = (Activity) redisu.hget(classname, i.toString());
+                if(r != null)
+                    re.add(r);
             }
 
-            ///read and write
-            if(!redisu.hasKey(classname)) {
-                redisu.hmset(classname, tmap, 0);
-            }   
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }
         return re;
     }
 
     @Override
-    public Activity selectByKey(Integer activityid) {
+    public Activity selectByKey(Integer activityid, String url) {
         Activity re = null;
         if(redisu.hHasKey(classname, activityid.toString())) {
             //read redis
             Object o = redisu.hget(classname, activityid.toString());
-            re = (Activity) o;
-
-            redisu.expire(classname, 0);
-        }else {
-            ///init only one
-            if(!redisu.hasKey(classname)) {
-                //write redis
-                Map<String, Object> tmap = new HashMap<>();
-                List<Activity> lreturn = new ArrayList<Activity>();
-
-                lreturn = activityMapper.selectByExample(new ActivityExample());
-                for (Activity value : lreturn) {
-                    tmap.put(value.getActivityid().toString(), (Object)value);
-                    if(value.getActivityid() == activityid){
-                        re = value;
-                    }
-                }
-
-                ///read and write
-                if(!redisu.hasKey(classname)) {
-                    redisu.hmset(classname, tmap, 0);
-                }                 
+            if(o != null){
+                re = (Activity) o;
+                Integer pageId = cacheService.PageID(activityid);
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
             }
+        }else {
+            String host = (String)redisu.get(url);
+            Integer pageId = cacheService.PageID(activityid);
+            if(!host.equals(serverConfig.getUrl())){
+                Map<String, String> headers = new HashMap(); 
+                Map<String, String> querys = new HashMap();                
+                querys.put("pageid", pageId.toString());
+
+                try {
+                    httputils.doGet(serverConfig.getUrl(), "/activitypage", headers, querys);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                RefreshDBD(pageId, true);
+            }
+            Object o = redisu.hget(classname, activityid.toString());
+            if(o != null){
+                re = (Activity) o;
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+            }     
         }
         return re;
     }
 
     @Override
     public void deleteByActivityId(Integer activityid) {
-
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(activityid), false);
 
        BDBEnvironmentManager.getInstance();
        ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
        Activity activity = activityDA.findActivityById(activityid);
 
-       if (activity != null)
+       if(activity != null && activity.getStatus() == 2){
+            activityDA.removedActivityById(activityid);
+            //Re-publish to redis
+            redisu.hdel(classname, activity.getActivityid().toString());
+       } else if (activity != null)
        {
             activity.MakeStamp();
             activity.setStatus(1);
@@ -139,7 +164,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public void insertActivitySelective(Activity activity) {
 
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(activity.getActivityid()), false);
 
         BDBEnvironmentManager.getInstance();
         ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
@@ -159,39 +184,51 @@ public class ActivityServiceImpl implements ActivityService {
     public void TickBack() {
         BDBEnvironmentManager.getInstance();
         ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Activity> lactivity = activityDA.findAllWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
+        List<Integer> listid = cacheService.PageOut(classname);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                Activity activity = activityDA.findActivityById(i);
+                if(activity != null){
+                    if(null ==  activity.getStatus()) {
+                        activityDA.removedActivityById(activity.getActivityid());
+                    }
+        
+                    if(1 ==  activity.getStatus() && 1 == activityMapper.deleteByPrimaryKey(activity.getActivityid())) {
+                        activityDA.removedActivityById(activity.getActivityid());
+                    }
+        
+                    if(2 ==  activity.getStatus()  && 1 == activityMapper.insert(activity)) {
+                        activityDA.removedActivityById(activity.getActivityid());
+                    } 
 
-        for (Activity activity : lactivity) {
-            if(null ==  activity.getStatus()) {
-                activityDA.removedActivityById(activity.getActivityid());
+                    if(3 ==  activity.getStatus() && 1 == activityMapper.updateByPrimaryKey(activity)) {
+                        activityDA.removedActivityById(activity.getActivityid());
+                    } 
+                    
+                    redisu.hdel(classname, activity.getActivityid().toString());
+                }
             }
-
-            if(1 ==  activity.getStatus() && 1 == activityMapper.deleteByPrimaryKey(activity.getActivityid())) {
-                activityDA.removedActivityById(activity.getActivityid());
-            }
-
-            if(2 ==  activity.getStatus()  && 1 == activityMapper.insert(activity)) {
-                activityDA.removedActivityById(activity.getActivityid());
-            }
+            redisu.hdel(classname+"pageid", pageid.toString());
         }
-
         if (activityDA.IsEmpty()){
             cacheService.Archive(classname);
         }
     }
 
-    public void RefreshDBD() {
-        BDBEnvironmentManager.getInstance();
-        ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
-
-        if (cacheService.IsCache(classname)) {
+    public void RefreshDBD(Integer pageID, boolean refresRedis) {
+        if (cacheService.IsCache(classname, pageID)) {
+            BDBEnvironmentManager.getInstance();
+            ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
-            List<Activity> re = new ArrayList<Activity>();
-            Map<String, Object> tmap = new HashMap<>();
+            List<Activity> re = new ArrayList<Activity>();          
+            ActivityExample zctivityExample = new ActivityExample();
+            zctivityExample.or().andActivityidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            zctivityExample.or().andActivityidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
-            re = activityMapper.selectByExample(new ActivityExample());
+            re = activityMapper.selectByExample(zctivityExample);
             for (Activity value : re) {
-                tmap.put(value.getActivityid().toString(), (Object)value);
+                redisu.hset(classname, value.getActivityid().toString(), value);
 
                 value.MakeStamp();
                 activityDA.saveActivity(value);
@@ -199,8 +236,20 @@ public class ActivityServiceImpl implements ActivityService {
 
             BDBEnvironmentManager.getMyEntityStore().sync();
             quartzManager.addJob(classname,classname,classname,classname, ActivityJob.class, null, job);
+        }else if(refresRedis){
+            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+                BDBEnvironmentManager.getInstance();
+                ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
 
-            redisu.hmset(classname, tmap, 0);
-        }        
+                Integer i = cacheService.PageBegin(pageID);
+                Integer l = cacheService.PageEnd(pageID);
+                for(;i < l; i++){
+
+                    Activity r = activityDA.findActivityById(i);
+                    if(r!= null && r.getStatus() != 1)
+                     redisu.hset(classname, i.toString(), r);                        
+                }
+            }
+        }    
     }
 }

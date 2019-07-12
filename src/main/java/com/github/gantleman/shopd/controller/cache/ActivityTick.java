@@ -16,7 +16,12 @@ public class ActivityTick {
     public Msg activitytick(){
 
         activityservice.TickBack();
-        
-        return Msg.success("更新成功");
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/activitypage")
+    public Msg activitypage(Integer pageid){
+        activityservice.RefreshDBD(pageid, true);
+        return Msg.success("successful");
     }
 }

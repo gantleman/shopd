@@ -1,12 +1,11 @@
 package com.github.gantleman.shopd.service;
 
 import com.github.gantleman.shopd.entity.User;
-import com.github.gantleman.shopd.entity.UserExample;
 import java.util.List;
 
 public interface UserService {
     //only read
-    public User selectByPrimaryKey(int userId);
+    public User selectByPrimaryKey(Integer userId);
     
     public List<User> selectByAll();
     
@@ -22,5 +21,9 @@ public interface UserService {
     public void deleteUserById(Integer userid);
 
     public void updateByPrimaryKeySelective(User user);
+
+    public void TickBack();
+
+    public void RefreshDBD();
 
 }

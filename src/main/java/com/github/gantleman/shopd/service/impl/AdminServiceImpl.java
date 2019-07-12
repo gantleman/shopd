@@ -11,7 +11,6 @@ import com.github.gantleman.shopd.service.AdminService;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
-import com.github.gantleman.shopd.util.RedisUtil;
 import com.github.gantleman.shopd.util.TimeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +27,8 @@ public class AdminServiceImpl implements AdminService {
     @Autowired(required = false)
     private AdminMapper adminMapper;
 
-    @Autowired(required = false)
-    private CacheService cacheService;
-
     @Autowired
-    private RedisUtil redisu;
+    private CacheService cacheService;
 
     @Value("${srping.quartz.exprie}")
     Integer exprie;
@@ -44,6 +40,9 @@ public class AdminServiceImpl implements AdminService {
     private AdminJob job;
 
     private String classname = "Admin";
+
+    @Value("${srping.cache.page}")
+    Integer page;
     
     @PostConstruct
     public void init() {
@@ -82,8 +81,6 @@ public class AdminServiceImpl implements AdminService {
 
                 BDBEnvironmentManager.getMyEntityStore().sync();
 
-                ///cache
-                cacheService.eventAdd(classname);
             }
         }
         return sqlra;

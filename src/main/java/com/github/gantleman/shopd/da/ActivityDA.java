@@ -35,8 +35,8 @@ public class ActivityDA {
 	/**
 	 * 根据用户Id删除一个activity
 	 **/
-	public void removedActivityById(Integer activityId) {
-		pIdx.delete(activityId);
+	public boolean removedActivityById(Integer activityId) {
+		return pIdx.delete(activityId);
 	}
 
 	/**
@@ -65,7 +65,6 @@ public class ActivityDA {
 				activityList.add(activity);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (activityCursorList != null) {
 				// 关闭游标
@@ -129,7 +128,6 @@ public class ActivityDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标

@@ -19,11 +19,16 @@ public class FavoriteDA {
 	// 辅助键字段类型,主键字段类型,实体类
 	SecondaryIndex<Integer, Integer, Favorite> sIdx;// 二级索引
 
+	// 辅助键字段类型,主键字段类型,实体类
+	SecondaryIndex<Integer, Integer, Favorite> sIdx2;// 二级索引
+
 	public FavoriteDA(EntityStore entityStore) {
 		// 主键字段类型,实体类
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Favorite.class);
 		// 主键索引,辅助键字段类型,辅助键字段名称
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
+		// 主键索引,辅助键字段类型,辅助键字段名称
+		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
 	}
 
 	/**
@@ -45,6 +50,13 @@ public class FavoriteDA {
 	 **/
 	public void removedFavoriteByGoodsID(Integer goodsid) {
 		sIdx.delete(goodsid);
+	}
+
+		/**
+	 * 根据用户名称删除一个Favorite
+	 **/
+	public void removedFavoriteByUserID(Integer Userid) {
+		sIdx2.delete(Userid);
 	}
 
 	/**
@@ -69,7 +81,7 @@ public class FavoriteDA {
 				favoriteList.add(favorite);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (favoriteCursorList != null) {
 				// 关闭游标
@@ -82,7 +94,7 @@ public class FavoriteDA {
 	/**
 	 * 根据favoriteName查找所有的Favorite
 	 **/
-	public List<Favorite> findAllFavoriteByGoodsID(Integer goodsid) {
+	public List<Favorite> findAllFavoriteByUserID(Integer userid) {
 	    
 		List<Favorite> favoriteList=new ArrayList<Favorite>();
 		
@@ -90,13 +102,13 @@ public class FavoriteDA {
 		
 		//获取游标
 		try {
-			entityCursorList=sIdx.subIndex(goodsid).entities();
+			entityCursorList=sIdx2.subIndex(userid).entities();
 			//遍历游标
 			for (Favorite favorite : entityCursorList) {
 				favoriteList.add(favorite);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -163,7 +175,7 @@ public class FavoriteDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标

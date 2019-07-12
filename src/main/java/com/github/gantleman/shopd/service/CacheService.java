@@ -1,22 +1,22 @@
 package com.github.gantleman.shopd.service;
 
-import java.util.Set;
+import java.util.List;
 
 public interface CacheService {
 
-    public void eventAdd(String tablename);
-
-    public void eventAdd(String tablename, Set<Integer> ID);
-
     public long eventCteate(String tablename);
-
-    public long eventCteate(String tablename, Set<Integer> ID);
 
     public void Archive(String tablename);
 
+    public Boolean IsCache(String tablename, Integer pageID);
+
     public Boolean IsCache(String tablename);
 
-    public Boolean IsCache(String tablename, Integer ID);
+    public List<Integer> PageOut(String tablename);
 
-    public void eventDel(String tablename, Set<Integer> ID);
+    public Integer PageBegin(Integer pageID);
+
+    public Integer PageEnd(Integer pageID);
+
+    public Integer PageID(Integer ID);
 }

@@ -46,6 +46,9 @@ public class ChatServiceImpl implements ChatService {
 
     private String classname = "Chat";
 
+    @Value("${srping.cache.page}")
+    Integer page;
+
     @PostConstruct
     public void init() {
       if (cacheService.IsCache(classname)) {
@@ -239,9 +242,6 @@ public class ChatServiceImpl implements ChatService {
            }
 
            BDBEnvironmentManager.getMyEntityStore().sync();
-
-           id.add(userid);
-           cacheService.eventAdd(classname, id);
            
            if(cacheService.IsCache(classname)){         
                quartzManager.addJob(classname,classname,classname,classname, ChatJob.class, null, job);          

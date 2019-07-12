@@ -81,7 +81,7 @@ public class CommentDA {
 				commentList.add(comment);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (commentCursorList != null) {
 				// 关闭游标
@@ -108,7 +108,7 @@ public class CommentDA {
 				commentList.add(comment);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -136,7 +136,7 @@ public class CommentDA {
 				commentList.add(comment);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -225,7 +225,7 @@ public class CommentDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标

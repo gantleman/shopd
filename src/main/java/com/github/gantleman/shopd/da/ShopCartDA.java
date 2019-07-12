@@ -19,11 +19,16 @@ public class ShopCartDA {
 	// 辅助键字段类型,主键字段类型,实体类
 	SecondaryIndex<Integer, Integer, ShopCart> sIdx;// 二级索引
 
+	// 辅助键字段类型,主键字段类型,实体类
+	SecondaryIndex<Integer, Integer, ShopCart> sIdx2;// 二级索引
+
 	public ShopCartDA(EntityStore entityStore) {
 		// 主键字段类型,实体类
 		pIdx = entityStore.getPrimaryIndex(Integer.class, ShopCart.class);
 		// 主键索引,辅助键字段类型,辅助键字段名称
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
+		// 主键索引,辅助键字段类型,辅助键字段名称
+		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class ShopCartDA {
 				shopcartList.add(shopcart);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (shopcartCursorList != null) {
 				// 关闭游标
@@ -96,7 +101,7 @@ public class ShopCartDA {
 				shopcartList.add(shopcart);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -106,7 +111,36 @@ public class ShopCartDA {
 		}
 		return shopcartList;
 	}
-	
+
+	/**
+	 * 根据shopcartName查找所有的ShopCart
+	 **/
+	public List<ShopCart> findAllShopCartByUGID(Integer userid, Integer goodsid) {
+	    
+		List<ShopCart> shopcartList=new ArrayList<ShopCart>();
+		
+		EntityCursor<ShopCart> entityCursorList=null;
+		
+		//获取游标
+		try {
+			entityCursorList=sIdx2.subIndex(userid).entities();
+			//遍历游标
+			for (ShopCart shopcart : entityCursorList) {
+				if(shopcart.getGoodsid() == goodsid)
+					shopcartList.add(shopcart);
+			}
+		} catch (DatabaseException e) {
+			
+			e.printStackTrace();
+		}finally {
+			if(entityCursorList!=null) {
+				//关闭游标
+				entityCursorList.close();
+			}
+		}
+		return shopcartList;
+	}
+
 	/**
 	 * 统计所有用户数
 	**/
@@ -147,5 +181,48 @@ public class ShopCartDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<ShopCart> findAllWhitStamp(long stamp) {
+		List<ShopCart> adminList = new ArrayList<ShopCart>();
+		// 打开游标
+		EntityCursor<ShopCart> adminCursorList = null;
+		try {
+			//获取游标
+			adminCursorList = pIdx.entities();
+			// 遍历游标
+			for (ShopCart shopcart : adminCursorList) {
+				if(shopcart.getStamp() <= stamp) {
+					adminList.add(shopcart);
+				}
+			}
+		} catch (DatabaseException e) {
+			
+		} finally {
+			if (adminCursorList != null) {
+				// 关闭游标
+				adminCursorList.close();
+			}
+		}
+		return adminList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<ShopCart> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (ShopCart activity : cursor) {
+            	if(activity!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
 }

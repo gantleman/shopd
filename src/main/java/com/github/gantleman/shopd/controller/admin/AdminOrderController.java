@@ -2,7 +2,11 @@ package com.github.gantleman.shopd.controller.admin;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Admin;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.Address;
 import com.github.gantleman.shopd.service.AddressService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.OrderItemService;
@@ -45,18 +49,14 @@ public class AdminOrderController {
         PageHelper.startPage(pn, 2);
 
         //查询未发货订单
-        List<Order> orderList = orderService.selectOrderByIssen();
+        List<Order> orderList = orderService.selectOrderByIssend();
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            OrderItemExample orderItemExample = new OrderItemExample();
-            orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
-            List<Integer> goodsIdList = new ArrayList<Integer>();
-
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
@@ -111,11 +111,7 @@ public class AdminOrderController {
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            OrderItemExample orderItemExample = new OrderItemExample();
-            orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
-            List<Integer> goodsIdList = new ArrayList<Integer>();
-
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());
@@ -156,11 +152,7 @@ public class AdminOrderController {
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            OrderItemExample orderItemExample = new OrderItemExample();
-            orderItemExample.or().andOrderidEqualTo(order.getOrderid());
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByExample(orderItemExample);
-            List<Integer> goodsIdList = new ArrayList<Integer>();
-
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
                 Goods goods = goodsService.selectById(orderItem.getGoodsid());

@@ -1,7 +1,6 @@
 package com.github.gantleman.shopd.service;
 
 import com.github.gantleman.shopd.entity.Goods;
-import com.github.gantleman.shopd.entity.ImagePath;
 import java.util.List;
 
 public interface GoodsService {
@@ -17,7 +16,7 @@ public interface GoodsService {
 
     public Goods selectById(Integer goodsid);
 
-    public List<Goods> selectByExampleLimit(List<Integer> digCateId);
+    public List<Goods> selectByCateLimit(List<Integer> digCateId);
 
     //have write
     public Integer insertGoods(Goods goods);
@@ -25,4 +24,8 @@ public interface GoodsService {
     public void deleteGoodsById(Integer goodsid);
 
     public void updateGoodsById(Goods goods);
+
+    public void TickBack();
+
+    public void RefreshDBD();
 }

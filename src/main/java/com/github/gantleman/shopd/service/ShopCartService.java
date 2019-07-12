@@ -1,7 +1,6 @@
 package com.github.gantleman.shopd.service;
 
 import com.github.gantleman.shopd.entity.ShopCart;
-import com.github.gantleman.shopd.entity.ShopCartKey;
 import java.util.List;
 
 public interface ShopCartService {
@@ -11,9 +10,13 @@ public interface ShopCartService {
     //have write
     public void addShopCart(ShopCart shopCart);
 
-    public void deleteByKey(ShopCartKey shopCartKey);
-
     public void updateCartByKey(ShopCart shopCart);
 
-    public ShopCart selectCartByKey(ShopCartKey shopCartKey);
+    public void deleteByKey(Integer userid, Integer goodsid);
+
+    public ShopCart selectCartByKey(Integer userid, Integer goodsid);
+
+    public void TickBack();
+
+    public void RefreshDBD(Integer userid);
 }

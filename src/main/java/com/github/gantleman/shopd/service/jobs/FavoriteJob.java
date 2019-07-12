@@ -19,7 +19,7 @@ public class FavoriteJob implements Job {
         try {
             httputils.doGet("/favoritetick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

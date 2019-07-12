@@ -19,7 +19,7 @@ public class GoodsJob implements Job {
         try {
             httputils.doGet("/googdstick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

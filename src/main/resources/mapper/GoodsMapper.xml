@@ -93,6 +93,9 @@
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    <if test="pageStart != null and pageStart gt -1 and pageSize != null and pageSize gt -1">
+      limit ${pageStart},${pageSize}
+    </if>
   </select>
   <select id="selectByExampleWithBLOBsLimit" parameterType="com.github.gantleman.shopd.entity.GoodsExample" resultMap="ResultMapWithBLOBs">
     select

@@ -69,7 +69,6 @@ public class AdminDA {
 				adminList.add(admin);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标
@@ -120,7 +119,6 @@ public class AdminDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -146,7 +144,6 @@ public class AdminDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标

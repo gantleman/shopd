@@ -80,7 +80,7 @@ public class GoodsDA {
 				goodsList.add(goods);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (goodsCursorList != null) {
 				// 关闭游标
@@ -107,7 +107,7 @@ public class GoodsDA {
 				goodsList.add(goods);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -135,7 +135,7 @@ public class GoodsDA {
 				goodsList.add(goods);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -207,5 +207,48 @@ public class GoodsDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<Goods> findAllWhitStamp(long stamp) {
+		List<Goods> adminList = new ArrayList<Goods>();
+		// 打开游标
+		EntityCursor<Goods> adminCursorList = null;
+		try {
+			//获取游标
+			adminCursorList = pIdx.entities();
+			// 遍历游标
+			for (Goods goods : adminCursorList) {
+				if(goods.getStamp() <= stamp) {
+					adminList.add(goods);
+				}
+			}
+		} catch (DatabaseException e) {
+			
+		} finally {
+			if (adminCursorList != null) {
+				// 关闭游标
+				adminCursorList.close();
+			}
+		}
+		return adminList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<Goods> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (Goods activity : cursor) {
+            	if(activity!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
 }

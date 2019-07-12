@@ -1,6 +1,10 @@
 package com.github.gantleman.shopd.controller.front;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.ShopCart;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.ImagePath;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.ImagePathService;
 import com.github.gantleman.shopd.service.ShopCartService;
@@ -36,7 +40,7 @@ public class CartController {
         }
 
         //判断是否已经加入购物车
-        ShopCart shopCart1 = shopCartService.selectCartByKey(new ShopCartKey(user.getUserid(), shopCart.getGoodsid()));
+        ShopCart shopCart1 = shopCartService.selectCartByKey(user.getUserid(), shopCart.getGoodsid());
         if (shopCart1 != null) {
             return "redirect:/showcart";
         }
@@ -95,7 +99,7 @@ public class CartController {
             return Msg.fail("请先登录");
         }
 
-        shopCartService.deleteByKey(new ShopCartKey(user.getUserid(), goodsid));
+        shopCartService.deleteByKey(user.getUserid(), goodsid);
         return Msg.success("删除成功");
     }
 

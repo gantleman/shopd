@@ -8,7 +8,6 @@ import com.github.gantleman.shopd.entity.Msg;
 import com.github.gantleman.shopd.entity.ShopCart;
 import com.github.gantleman.shopd.entity.Address;
 import com.github.gantleman.shopd.entity.ImagePath;
-import com.github.gantleman.shopd.entity.ShopCartKey;
 import com.github.gantleman.shopd.entity.Activity;
 import com.github.gantleman.shopd.service.ActivityService;
 import com.github.gantleman.shopd.service.AddressService;
@@ -84,7 +83,7 @@ public class OrderController {
             goods.setNum(cart.getGoodsnum());
 
             //活动信息
-            Activity activity = activityService.selectByKey(goods.getActivityid());
+            Activity activity = activityService.selectByKey(goods.getActivityid(), "/order");
             goods.setActivity(activity);
 
             if(activity.getDiscount() != 1) {
@@ -120,7 +119,7 @@ public class OrderController {
 
         //删除购物车
         for (ShopCart cart : shopCart) {
-            shopCartService.deleteByKey(new ShopCartKey(cart.getUserid(),cart.getGoodsid()));
+            shopCartService.deleteByKey(cart.getUserid(),cart.getGoodsid());
         }
 
         //把订单信息写入数据库

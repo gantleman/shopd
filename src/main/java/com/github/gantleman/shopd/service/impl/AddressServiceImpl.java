@@ -29,7 +29,7 @@ public class AddressServiceImpl implements AddressService {
     @Autowired(required = false)
     private AddressMapper addressMapper;
 
-    @Autowired(required = false)
+    @Autowired
     private CacheService cacheService;
 
     @Autowired
@@ -45,6 +45,9 @@ public class AddressServiceImpl implements AddressService {
     private QuartzManager quartzManager;
 
     private String classname = "Address";
+
+    @Value("${srping.cache.page}")
+    Integer page;
     
     @PostConstruct
     public void init() {
@@ -56,7 +59,35 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address getAddressByKey(Integer addressid) {
-        return addressMapper.selectByPrimaryKey(addressid);
+        Address re = null;
+
+        if(redisu.hHasKey("Address", addressid.toString())) {
+
+            re =  (Address) redisu.hget(classname, addressid.toString());
+            //read redis
+            redisu.expire("Address_u"+re.getUserid().toString(), 0);
+            redisu.expire(classname, 0);
+        }else {
+            re = addressMapper.selectByPrimaryKey(addressid);
+            if(re!= null && !redisu.hasKey("Address_u"+re.getUserid().toString())){
+                //write redis
+                AddressExample addressExample=new AddressExample();
+                addressExample.or().andUseridEqualTo(re.getUserid());
+                
+                List<Address> lre = addressMapper.selectByExample(addressExample);
+
+                ///read and write
+                if(!redisu.hasKey("Address_u"+re.getUserid().toString())) {
+                    for( Address item : lre ){
+                        redisu.sAdd("Address_u"+re.getUserid().toString(), (Object)item.getAddressid());
+                        redisu.hset(classname, item.getAddressid().toString(), item);
+                    }
+                    redisu.expire("Address_u"+re.getUserid().toString(), 0);
+                    redisu.expire(classname, 0);
+                }  
+            }
+        }
+        return re;
     }
     
     @Override
@@ -84,10 +115,9 @@ public class AddressServiceImpl implements AddressService {
             ///read and write
             if(!redisu.hasKey("Address_u"+UserID.toString())) {
                 for( Address item : re ){
-                    redisu.sAdd("Address_u"+UserID.toString(), (Object)item.getAddressid());
+                    redisu.sAddAndTime("Address_u"+item.getUserid().toString(), 0, (Object)item.getAddressid());
                     redisu.hset(classname, item.getAddressid().toString(), item);
                 }
-                redisu.expire("Address_u"+UserID.toString(), 0);
                 redisu.expire(classname, 0);
             }   
         }
@@ -298,13 +328,10 @@ public class AddressServiceImpl implements AddressService {
         if (cacheService.IsCache(classname, userid)) {
             BDBEnvironmentManager.getInstance();
             AddressDA addressDA=new AddressDA(BDBEnvironmentManager.getMyEntityStore());
-
-            Set<Integer> id = new HashSet<Integer>();
             List<Address> re = new ArrayList<Address>();
 
             AddressExample addressExample=new AddressExample();
             addressExample.or().andUseridEqualTo(userid);
-
             re = addressMapper.selectByExample(addressExample);
             for (Address value : re) {
                 value.MakeStamp();
@@ -315,9 +342,6 @@ public class AddressServiceImpl implements AddressService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-
-            id.add(userid);
-            cacheService.eventAdd(classname, id);
             
             if(cacheService.IsCache(classname)){         
                 quartzManager.addJob(classname,classname,classname,classname, AddressJob.class, null, job);          

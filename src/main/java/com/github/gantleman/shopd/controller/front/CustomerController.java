@@ -136,7 +136,7 @@ public class CustomerController {
             updateUser.setEmail(email);
             updateUser.setTelephone(telephone);
             userService.updateByPrimaryKeySelective(updateUser);
-            return Msg.success("更新成功");
+            return Msg.success("successful");
         }
         else  {return Msg.fail("更新失败");}
     }
@@ -204,7 +204,7 @@ public class CustomerController {
        for (Integer i=0;i<orderList.size();i++)
        {
            order=orderList.get(i);
-           orderItemList=orderItemService.getOrderItemByID(order.getOrderid());
+           orderItemList=orderItemService.getOrderItemByOrderId(order.getOrderid());
            List<Goods> goodsList=new ArrayList<Goods>();
            List<Integer> goodsIdList=new ArrayList<Integer>();
            for (Integer j=0;j<orderItemList.size();j++)
@@ -245,7 +245,7 @@ public class CustomerController {
 
         //一页显示几个数据
         PageHelper.startPage(pn, 16);
-        List<Favorite> favoriteList = favoriteService.selectFavByExample(user.getUserid());
+        List<Favorite> favoriteList = favoriteService.selectFavByUser(user.getUserid());
 
         List<Integer> goodsIdList = new ArrayList<Integer>();
         for (Favorite tmp:favoriteList) {
@@ -292,7 +292,8 @@ public class CustomerController {
     @RequestMapping("/finishList")
     @ResponseBody
     public Msg finishiList(Integer orderid){
-        Order order=orderService.selectByPrimaryKey(orderid);
+        Order order=new Order();
+        order.setOrderid(orderid);
         order.setIsreceive(true);
         order.setIscomplete(true);
         orderService.updateOrderByKey(order);

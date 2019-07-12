@@ -5,7 +5,6 @@ import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.ImagePath;
 import com.github.gantleman.shopd.entity.Favorite;
 import com.github.gantleman.shopd.entity.Category;
-import com.github.gantleman.shopd.entity.FavoriteKey;
 import com.github.gantleman.shopd.service.CateService;
 import com.github.gantleman.shopd.service.FavoriteService;
 import com.github.gantleman.shopd.service.GoodsService;
@@ -79,7 +78,7 @@ public class MainController {
             digCateId.add(tmp.getCateid());
         }
 
-        List<Goods> goodsList = goodsService.selectByExampleLimit(digCateId);
+        List<Goods> goodsList = goodsService.selectByCateLimit(digCateId);
 
         List<Goods> goodsAndImage = new ArrayList<Goods>();
         //获取每个商品的图片
@@ -88,7 +87,7 @@ public class MainController {
             if (userid == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(userid, goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(userid, goods.getGoodsid());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {

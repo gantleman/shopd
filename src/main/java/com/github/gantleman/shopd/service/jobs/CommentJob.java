@@ -19,7 +19,7 @@ public class CommentJob implements Job {
         try {
             httputils.doGet("/commenttick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

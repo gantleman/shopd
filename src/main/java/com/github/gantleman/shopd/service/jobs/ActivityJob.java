@@ -19,7 +19,7 @@ public class ActivityJob implements Job {
         try {
             httputils.doGet("/activitytick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

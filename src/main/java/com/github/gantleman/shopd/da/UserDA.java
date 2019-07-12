@@ -83,7 +83,7 @@ public class UserDA {
 				userList.add(user);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (userCursorList != null) {
 				// 关闭游标
@@ -110,7 +110,36 @@ public class UserDA {
 				userList.add(user);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
+			e.printStackTrace();
+		}finally {
+			if(entityCursorList!=null) {
+				//关闭游标
+				entityCursorList.close();
+			}
+		}
+		return userList;
+	}
+
+		/**
+	 * 根据userName查找所有的User
+	 **/
+	public List<User> findAllUserByUserNameAndPassword(String userName, String passWord) {
+	    
+		List<User> userList=new ArrayList<User>();
+		
+		EntityCursor<User> entityCursorList=null;
+		
+		//获取游标
+		try {
+			entityCursorList=sIdx.subIndex(userName).entities();
+			//遍历游标
+			for (User user : entityCursorList) {
+				if(user.getPassword().equals(passWord))
+					userList.add(user);
+			}
+		} catch (DatabaseException e) {
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -163,7 +192,7 @@ public class UserDA {
 		return count;
 	}
 
-	public List<User> findAllUserWhitStamp(long stamp) {
+	public List<User> findAllWhitStamp(long stamp) {
 		List<User> userList = new ArrayList<User>();
 		// 打开游标
 		EntityCursor<User> userCursorList = null;
@@ -177,7 +206,7 @@ public class UserDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (userCursorList != null) {
 				// 关闭游标
@@ -185,5 +214,24 @@ public class UserDA {
 			}
 		}
 		return userList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<User> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (User user : cursor) {
+            	if(user!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
 	}
 }

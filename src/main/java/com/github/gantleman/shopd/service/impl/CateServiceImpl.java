@@ -46,6 +46,9 @@ public class CateServiceImpl implements CateService {
     private QuartzManager quartzManager;
 
     private String classname = "Category";
+
+    @Value("${srping.cache.page}")
+    Integer page;
     
     @PostConstruct
     public void init() {
@@ -79,6 +82,7 @@ public class CateServiceImpl implements CateService {
                 for (Category value : re) {
                     tmap.put(value.getCateid().toString(), (Object)value);
                     redisu.sAddAndTime("Category_i"+value.getCatename(), 0, value.getCateid());
+                    redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
                 }
                 redisu.hmset(classname, tmap, 0);
             }   
@@ -114,6 +118,7 @@ public class CateServiceImpl implements CateService {
                     for (Category value : re) {
                         tmap.put(value.getCateid().toString(), (Object)value);
                         redisu.sAddAndTime("Category_i"+value.getCatename(), 0, value.getCateid());
+                        redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
                     }
                     redisu.hmset(classname, tmap, 0);
                 }                
@@ -147,7 +152,8 @@ public class CateServiceImpl implements CateService {
         BDBEnvironmentManager.getMyEntityStore().sync();
 
         //Re-publish to redis
-        redisu.sAddAndTime("Category_i" + category.getCatename(), 0, category.getCateid()); 
+        redisu.sAddAndTime("Category_i" + category.getCatename(), 0, category.getCateid());
+        redisu.hset(classname, category.getCatename().toString(), category.getCateid(), 0);
         redisu.hset(classname, category.getCateid().toString(), category, 0);
     }
     
@@ -179,7 +185,6 @@ public class CateServiceImpl implements CateService {
 
         //Re-publish to redis
         redisu.hset(classname, lcategory.getCateid().toString(), (Object)lcategory, 0);
-
     }
 
     @Override
@@ -247,7 +252,8 @@ public class CateServiceImpl implements CateService {
                 value.MakeStamp();
                 categoryDA.saveCategory(value);
 
-                redisu.sAddAndTime("Category_i"+value.getCatename().toString(), 0, value.getCateid()); 
+                redisu.sAddAndTime("Category_i"+value.getCatename().toString(), 0, value.getCateid());
+                redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();

@@ -2,7 +2,11 @@ package com.github.gantleman.shopd.controller.admin;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.Admin;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.ImagePath;
 import com.github.gantleman.shopd.service.CateService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.ImagePathService;
@@ -10,7 +14,12 @@ import com.github.gantleman.shopd.service.ImagePathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -88,7 +97,7 @@ public class GoodsController {
         }
        /* goods.setGoodsid(goodsid);*/
         goodsService.updateGoodsById(goods);
-        return Msg.success("更新成功!");
+        return Msg.success("successful!");
     }
 
     @RequestMapping(value = "/delete/{goodsid}", method = RequestMethod.DELETE)
@@ -171,7 +180,7 @@ public class GoodsController {
         if (categoryList.isEmpty())
         {
             cateService.updateByPrimaryKeySelective(category);
-            return Msg.success("更新成功");
+            return Msg.success("successful");
         }
         else return Msg.success("名字已经存在");
     }

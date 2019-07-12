@@ -64,7 +64,6 @@ public class CategoryDA {
 				categoryList.add(category);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -90,7 +89,6 @@ public class CategoryDA {
 				categoryList.add(category);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (categoryCursorList != null) {
 				// 关闭游标
@@ -155,7 +153,6 @@ public class CategoryDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (categoryCursorList != null) {
 				// 关闭游标

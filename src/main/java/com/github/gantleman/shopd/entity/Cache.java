@@ -1,6 +1,7 @@
 package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 import com.sleepycat.persist.model.Entity;
@@ -28,24 +29,24 @@ public class Cache implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Set<Integer> userid;
-
-    public Integer getcId() {
-        return cId;
-    }
+    private Map<Integer, Integer> userid;
 
     /**
      * @return the userid
      */
-    public Set<Integer> getUserid() {
+    public Map<Integer, Integer> getUserid() {
         return userid;
     }
 
     /**
      * @param userid the userid to set
      */
-    public void setUserid(Set<Integer> userid) {
+    public void setUserid(Map<Integer, Integer> userid) {
         this.userid = userid;
+    }
+    
+    public Integer getcId() {
+        return cId;
     }
 
     public void setcId(Integer cId) {

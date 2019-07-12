@@ -1,6 +1,7 @@
 package com.github.gantleman.shopd.dao;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.FavoriteExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +10,7 @@ public interface FavoriteMapper {
 
     int deleteByExample(FavoriteExample example);
 
-    int deleteByPrimaryKey(FavoriteKey key);
+    int deleteByPrimaryKey(Integer favoriteid);
 
     int insert(Favorite record);
 
@@ -17,7 +18,7 @@ public interface FavoriteMapper {
 
     List<Favorite> selectByExample(FavoriteExample example);
 
-    Favorite selectByPrimaryKey(FavoriteKey key);
+    Favorite selectByPrimaryKey(Integer favoriteid);
 
     int updateByExampleSelective(@Param("record") Favorite record, @Param("example") FavoriteExample example);
 

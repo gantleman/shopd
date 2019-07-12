@@ -19,7 +19,7 @@ public class AdminJob implements Job {
         try {
             httputils.doGet("/admintick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

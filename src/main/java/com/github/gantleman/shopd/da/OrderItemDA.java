@@ -81,7 +81,7 @@ public class OrderItemDA {
 				orderitemList.add(orderitem);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (orderitemCursorList != null) {
 				// 关闭游标
@@ -108,7 +108,7 @@ public class OrderItemDA {
 				orderitemList.add(orderitem);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -136,7 +136,7 @@ public class OrderItemDA {
 				orderitemList.add(orderitem);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -208,5 +208,48 @@ public class OrderItemDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<OrderItem> findAllWhitStamp(long stamp) {
+		List<OrderItem> adminList = new ArrayList<OrderItem>();
+		// 打开游标
+		EntityCursor<OrderItem> adminCursorList = null;
+		try {
+			//获取游标
+			adminCursorList = pIdx.entities();
+			// 遍历游标
+			for (OrderItem orderitem : adminCursorList) {
+				if(orderitem.getStamp() <= stamp) {
+					adminList.add(orderitem);
+				}
+			}
+		} catch (DatabaseException e) {
+			
+		} finally {
+			if (adminCursorList != null) {
+				// 关闭游标
+				adminCursorList.close();
+			}
+		}
+		return adminList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<OrderItem> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (OrderItem activity : cursor) {
+            	if(activity!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
 }

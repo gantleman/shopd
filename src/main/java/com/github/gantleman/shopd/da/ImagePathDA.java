@@ -69,7 +69,7 @@ public class ImagePathDA {
 				imagepathList.add(imagepath);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (imagepathCursorList != null) {
 				// 关闭游标
@@ -96,7 +96,7 @@ public class ImagePathDA {
 				imagepathList.add(imagepath);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -147,5 +147,48 @@ public class ImagePathDA {
             }
         }
 		return count;
-	} 
+	}
+
+	public List<ImagePath> findAllWhitStamp(long stamp) {
+		List<ImagePath> adminList = new ArrayList<ImagePath>();
+		// 打开游标
+		EntityCursor<ImagePath> adminCursorList = null;
+		try {
+			//获取游标
+			adminCursorList = pIdx.entities();
+			// 遍历游标
+			for (ImagePath imagepath : adminCursorList) {
+				if(imagepath.getStamp() <= stamp) {
+					adminList.add(imagepath);
+				}
+			}
+		} catch (DatabaseException e) {
+			
+		} finally {
+			if (adminCursorList != null) {
+				// 关闭游标
+				adminCursorList.close();
+			}
+		}
+		return adminList;
+	}
+
+	public boolean IsEmpty() {
+		boolean count = true;
+		EntityCursor<ImagePath> cursor = null;
+        try{
+            cursor = pIdx.entities();
+            for (ImagePath activity : cursor) {
+            	if(activity!=null) {
+					count = false;
+					break;
+            	}
+			}
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+		return count;
+	}
 }

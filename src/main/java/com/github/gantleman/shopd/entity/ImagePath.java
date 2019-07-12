@@ -17,10 +17,40 @@ public class ImagePath {
 
     private String path;
 
-    long stamp;
+    private Integer status;
+
+    private long stamp;
 
     public void MakeStamp() {
-        stamp = TimeUtils.getTimeWhitLong();
+        setStamp(TimeUtils.getTimeWhitLong());
+    }
+    
+    /**
+     * @return the stamp
+     */
+    public long getStamp() {
+        return stamp;
+    }
+
+    /**
+     * @param stamp the stamp to set
+     */
+    public void setStamp(long stamp) {
+        this.stamp = stamp;
+    }
+
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public ImagePath() {

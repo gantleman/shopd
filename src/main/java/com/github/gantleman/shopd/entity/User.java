@@ -12,6 +12,8 @@ import com.sleepycat.persist.model.SecondaryKey;
 @Entity
 public class User implements Serializable{
 
+    private static final long serialVersionUID = 1L;
+
     @PrimaryKey(sequence = "ID")
     private Integer userid;
 
@@ -26,14 +28,29 @@ public class User implements Serializable{
 
     private String telephone;
 
+    private Integer status;
+
     private long stamp;
 
-    public User() {
-        super();
-        this.stamp = TimeUtils.getTimeWhitLong();
-	}
+    public void MakeStamp() {
+        setStamp(TimeUtils.getTimeWhitLong());
+    }
 	
-	/**
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
      * @return the stamp
      */
     public long getStamp() {
@@ -47,27 +64,7 @@ public class User implements Serializable{
         this.stamp = stamp;
     }
 
-    void MakeStamp() {
-        stamp = TimeUtils.getTimeWhitLong();
-    }
-
-    public User(String userName, String password) {
-		super();
-		this.username = userName;
-        this.password = password;
-        this.stamp = TimeUtils.getTimeWhitLong();
-	}
-
-
-	public User(Integer userId, String userName, String password) {
-		super();
-		this.userid = userId;
-		this.username = userName;
-        this.password = password;
-        this.stamp = TimeUtils.getTimeWhitLong();
-	}
-
-    public Integer getUserid() {
+	public Integer getUserid() {
         return userid;
     }
 

@@ -19,7 +19,7 @@ public class ChatJob implements Job {
         try {
             httputils.doGet("/chattick");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }		
 	}

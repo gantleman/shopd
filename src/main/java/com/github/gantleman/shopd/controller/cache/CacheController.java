@@ -9,6 +9,6 @@ public class CacheController {
     @RequestMapping("/cache")
     public Msg cache(){
 
-        return Msg.success("更新成功");
+        return Msg.success("successful");
     }
 }

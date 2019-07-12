@@ -15,8 +15,8 @@ public class GoodsTick {
     @RequestMapping("/goodstick")
     public Msg goodstick(){
 
-        //goodsservice.TickBack();
+        goodsservice.TickBack();
         
-        return Msg.success("更新成功");
+        return Msg.success("successful");
     }
 }

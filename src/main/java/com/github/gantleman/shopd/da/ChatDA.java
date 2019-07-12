@@ -81,7 +81,6 @@ public class ChatDA {
 				chatList.add(chat);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 		} finally {
 			if (chatCursorList != null) {
 				// 关闭游标
@@ -108,7 +107,7 @@ public class ChatDA {
 				chatList.add(chat);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -137,7 +136,7 @@ public class ChatDA {
 				chatList.add(chat);
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
@@ -225,7 +224,7 @@ public class ChatDA {
 				}
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			
 		} finally {
 			if (adminCursorList != null) {
 				// 关闭游标

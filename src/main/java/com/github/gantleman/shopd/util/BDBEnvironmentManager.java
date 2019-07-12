@@ -104,7 +104,7 @@ public class BDBEnvironmentManager {
 						try {
 							envHome.mkdir();
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						}
 					}
@@ -116,27 +116,27 @@ public class BDBEnvironmentManager {
 							myEntityStore = new EntityStore(myEnvironment, "EntityStore", myStoreConfig);
 						} catch (EnvironmentNotFoundException e) {
 							e.printStackTrace();
-							// TODO Auto-generated catch block
+							
 						} catch (EnvironmentLockedException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (VersionMismatchException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (StoreExistsException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (StoreNotFoundException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (IncompatibleClassException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (DatabaseException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						}
 					}

@@ -1,6 +1,7 @@
 package com.github.gantleman.shopd.dao;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.ShopCart;
+import com.github.gantleman.shopd.entity.ShopCartExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +10,7 @@ public interface ShopCartMapper {
 
     int deleteByExample(ShopCartExample example);
 
-    int deleteByPrimaryKey(ShopCartKey key);
+    int deleteByPrimaryKey(Integer shopcartid);
 
     int insert(ShopCart record);
 
@@ -17,7 +18,7 @@ public interface ShopCartMapper {
 
     List<ShopCart> selectByExample(ShopCartExample example);
 
-    ShopCart selectByPrimaryKey(ShopCartKey key);
+    ShopCart selectByPrimaryKey(Integer shopcartid);
 
     int updateByExampleSelective(@Param("record") ShopCart record, @Param("example") ShopCartExample example);
 

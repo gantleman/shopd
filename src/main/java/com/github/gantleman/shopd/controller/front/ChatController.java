@@ -1,6 +1,9 @@
 package com.github.gantleman.shopd.controller.front;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Chat;
+import com.github.gantleman.shopd.entity.Admin;
 import com.github.gantleman.shopd.service.ChatService;
 import com.github.gantleman.shopd.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +49,8 @@ public class ChatController {
         if (user == null) {
             return Msg.fail("未登录");
         }
-        ChatExample chatExample = new ChatExample();
-        chatExample.or().andReceiveuserEqualTo(user.getUserid());
         List<Chat> chatList1 = chatService.selectChatByReceive(user.getUserid());
 
-        ChatExample chatExample2 = new ChatExample();
-        chatExample2.or().andSenduserEqualTo(user.getUserid());
         List<Chat> chatList2 = chatService.selectChatBySend(user.getUserid());
 
         //获取userid列表
@@ -115,8 +114,6 @@ public class ChatController {
         Integer userid = 5;
         List<Chat> chatList1 = chatService.selectChatByReceive(userid);
 
-        ChatExample chatExample2 = new ChatExample();
-        chatExample2.or().andSenduserEqualTo(userid);
         List<Chat> chatList2 = chatService.selectChatBySend(userid);
 
         //获取userid列表

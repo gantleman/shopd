@@ -47,11 +47,9 @@ public class DemoApplicationTests {
 	}
 
 	@Test
-	public void t2() {
-		// TODO Auto-generated method stub
-		
+	public void t2() {		
 		//打开数据库和存储环境
-		BDBEnvironmentManager.getInstance();
+/*		BDBEnvironmentManager.getInstance();
 		UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 		
 		userDA.saveUser(new User((int) 1L, "A", "root1"));
@@ -82,11 +80,10 @@ public class DemoApplicationTests {
 		System.out.println(user);
 
 
-		BDBEnvironmentManager.getMyEnvironment().sync();
+		BDBEnvironmentManager.getMyEnvironment().sync();*/
 	}
 	
 	private static void printAllData(UserDA userDA) {
-		// TODO Auto-generated method stub
 		System.out.println("------start--------");
 		 List<User> userList=userDA.findAllUser();
 		for (User user : userList) {
@@ -98,7 +95,6 @@ public class DemoApplicationTests {
 	}
 	
 	private static void printAllDataByUserName(UserDA userDA,String userName) {
-		// TODO Auto-generated method stub
 		System.out.println("------start--------");
 		 List<User> userList=userDA.findAllUserByUserName(userName);
 		for (User user : userList) {
@@ -118,7 +114,6 @@ public class DemoApplicationTests {
 		try {
 			time = sdf.parse(sdf.format(new Date()));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -133,7 +128,7 @@ public class DemoApplicationTests {
 	//@Test
 	public void t3() {		
 		//打开数据库和存储环境
-		BDBEnvironmentManager.getInstance();
+/*		BDBEnvironmentManager.getInstance();
 		UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
 		long stamp = System.currentTimeMillis();
@@ -158,7 +153,7 @@ public class DemoApplicationTests {
 
 		stamp = System.currentTimeMillis();
 		System.out.println("stamp user:" + stamp);
-		List<User> ru = userDA.findAllUserWhitStamp(System.currentTimeMillis());
+		List<User> ru = userDA.findAllWhitStamp(System.currentTimeMillis());
 		System.out.println("stamp return user:" + ru.size() + ":::" + (System.currentTimeMillis()-stamp));
 
 		stamp = System.currentTimeMillis();
@@ -169,7 +164,7 @@ public class DemoApplicationTests {
 		System.out.println("del user:" + (System.currentTimeMillis()-stamp));
 
 		
-		BDBEnvironmentManager.getMyEnvironment().sync();
+		BDBEnvironmentManager.getMyEnvironment().sync();*/
 	}
 
 	@Test
@@ -183,7 +178,6 @@ public class DemoApplicationTests {
 		try {
 			System.out.println("baidu.com --------" + httputils.doGet("http://baidu.com", "/").toString());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

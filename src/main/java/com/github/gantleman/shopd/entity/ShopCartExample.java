@@ -10,7 +10,22 @@ public class ShopCartExample {
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
+    
+    protected Integer pageStart;
 
+    protected Integer pageSize;
+
+    public void setPageStart(Integer pageStart) {
+        this.pageStart = pageStart;
+    }
+
+    public Integer getPageStart() {
+        return pageStart;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
     public ShopCartExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
@@ -103,6 +118,66 @@ public class ShopCartExample {
                 throw new RuntimeException("Between values for " + property + " cannot be null");
             }
             criteria.add(new Criterion(condition, value1, value2));
+        }
+
+        public Criteria andShopcartidIsNull() {
+            addCriterion("shopcartId is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidIsNotNull() {
+            addCriterion("shopcartId is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidEqualTo(Integer value) {
+            addCriterion("shopcartId =", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidNotEqualTo(Integer value) {
+            addCriterion("shopcartId <>", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidGreaterThan(Integer value) {
+            addCriterion("shopcartId >", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("shopcartId >=", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidLessThan(Integer value) {
+            addCriterion("shopcartId <", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidLessThanOrEqualTo(Integer value) {
+            addCriterion("shopcartId <=", value, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidIn(List<Integer> values) {
+            addCriterion("shopcartId in", values, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidNotIn(List<Integer> values) {
+            addCriterion("shopcartId not in", values, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidBetween(Integer value1, Integer value2) {
+            addCriterion("shopcartId between", value1, value2, "shopcartid");
+            return (Criteria) this;
+        }
+
+        public Criteria andShopcartidNotBetween(Integer value1, Integer value2) {
+            addCriterion("shopcartId not between", value1, value2, "shopcartid");
+            return (Criteria) this;
         }
 
         public Criteria andUseridIsNull() {

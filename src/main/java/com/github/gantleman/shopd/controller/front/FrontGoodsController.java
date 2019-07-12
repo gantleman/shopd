@@ -2,8 +2,21 @@ package com.github.gantleman.shopd.controller.front;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Activity;
+import com.github.gantleman.shopd.entity.Comment;
+import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.UserService;
+import com.github.gantleman.shopd.service.FavoriteService;
+import com.github.gantleman.shopd.service.ActivityService;
+import com.github.gantleman.shopd.service.ImagePathService;
+import com.github.gantleman.shopd.service.CommentService;
+import com.github.gantleman.shopd.service.CateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,7 +71,7 @@ public class FrontGoodsController {
         if (user == null) {
             goods.setFav(false);
         } else {
-            Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goodsid));
+            Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goodsid);
             if (favorite == null) {
                 goods.setFav(false);
             } else {
@@ -75,7 +88,7 @@ public class FrontGoodsController {
         //商品评论
 
         //商品折扣信息
-        Activity activity = activityService.selectByKey(goods.getActivityid());
+        Activity activity = activityService.selectByKey(goods.getActivityid(), "/detail");
         goods.setActivity(activity);
 
         //返回数据
@@ -120,7 +133,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -169,7 +182,7 @@ public class FrontGoodsController {
         }
 
         //删除收藏
-        favoriteService.deleteFavByKey(new FavoriteKey(user.getUserid(),goodsid));
+        favoriteService.deleteFavByKey(user.getUserid(),goodsid);
 
         return Msg.success("取消收藏成功");
     }
@@ -205,7 +218,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(new FavoriteKey(user.getUserid(), goods.getGoodsid()));
+                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
