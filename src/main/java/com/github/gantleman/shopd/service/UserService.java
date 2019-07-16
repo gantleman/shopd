@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface UserService {
     //only read
-    public User selectByPrimaryKey(Integer userId);
+    public User selectByUserID(Integer userId);
     
     public List<User> selectByAll();
     

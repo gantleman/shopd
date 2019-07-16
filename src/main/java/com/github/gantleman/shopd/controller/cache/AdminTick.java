@@ -15,9 +15,7 @@ public class AdminTick {
 
     @RequestMapping("/admintick")
     public Msg admintick(){
-
         adminservice.TickBack();
-        
         return Msg.success("successful");
     }
 }

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.gantleman.shopd.dao.OrderitemOrderMapper">
+  <resultMap id="BaseResultMap" type="com.github.gantleman.shopd.entity.OrderitemOrder">
+    <id column="orderID" jdbcType="INTEGER" property="orderid" />
+    <result column="orderitem_size" jdbcType="INTEGER" property="orderitemSize" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.gantleman.shopd.entity.OrderitemOrder">
+    <result column="orderitem_list" jdbcType="LONGVARCHAR" property="orderitemList" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    orderID, orderitem_size
+  </sql>
+  <sql id="Blob_Column_List">
+    orderitem_list
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.github.gantleman.shopd.entity.OrderitemOrderExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from orderitem_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.github.gantleman.shopd.entity.OrderitemOrderExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from orderitem_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from orderitem_order
+    where orderID = #{orderid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from orderitem_order
+    where orderID = #{orderid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.github.gantleman.shopd.entity.OrderitemOrderExample">
+    delete from orderitem_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.github.gantleman.shopd.entity.OrderitemOrder">
+    insert into orderitem_order (orderID, orderitem_size, orderitem_list
+      )
+    values (#{orderid,jdbcType=INTEGER}, #{orderitemSize,jdbcType=INTEGER}, #{orderitemList,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.github.gantleman.shopd.entity.OrderitemOrder">
+    insert into orderitem_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderid != null">
+        orderID,
+      </if>
+      <if test="orderitemSize != null">
+        orderitem_size,
+      </if>
+      <if test="orderitemList != null">
+        orderitem_list,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderid != null">
+        #{orderid,jdbcType=INTEGER},
+      </if>
+      <if test="orderitemSize != null">
+        #{orderitemSize,jdbcType=INTEGER},
+      </if>
+      <if test="orderitemList != null">
+        #{orderitemList,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.github.gantleman.shopd.entity.OrderitemOrderExample" resultType="java.lang.Long">
+    select count(*) from orderitem_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update orderitem_order
+    <set>
+      <if test="record.orderid != null">
+        orderID = #{record.orderid,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderitemSize != null">
+        orderitem_size = #{record.orderitemSize,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderitemList != null">
+        orderitem_list = #{record.orderitemList,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update orderitem_order
+    set orderID = #{record.orderid,jdbcType=INTEGER},
+      orderitem_size = #{record.orderitemSize,jdbcType=INTEGER},
+      orderitem_list = #{record.orderitemList,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update orderitem_order
+    set orderID = #{record.orderid,jdbcType=INTEGER},
+      orderitem_size = #{record.orderitemSize,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.gantleman.shopd.entity.OrderitemOrder">
+    update orderitem_order
+    <set>
+      <if test="orderitemSize != null">
+        orderitem_size = #{orderitemSize,jdbcType=INTEGER},
+      </if>
+      <if test="orderitemList != null">
+        orderitem_list = #{orderitemList,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where orderID = #{orderid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.github.gantleman.shopd.entity.OrderitemOrder">
+    update orderitem_order
+    set orderitem_size = #{orderitemSize,jdbcType=INTEGER},
+      orderitem_list = #{orderitemList,jdbcType=LONGVARCHAR}
+    where orderID = #{orderid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.OrderitemOrder">
+    update orderitem_order
+    set orderitem_size = #{orderitemSize,jdbcType=INTEGER}
+    where orderID = #{orderid,jdbcType=INTEGER}
+  </update>
+</mapper>

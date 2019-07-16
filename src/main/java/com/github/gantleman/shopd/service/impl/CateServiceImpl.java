@@ -1,5 +1,13 @@
 package com.github.gantleman.shopd.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import com.github.gantleman.shopd.da.CategoryDA;
 import com.github.gantleman.shopd.dao.CategoryMapper;
 import com.github.gantleman.shopd.entity.Category;
@@ -13,16 +21,7 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import com.github.gantleman.shopd.util.TimeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 @Service("cateService")
 public class CateServiceImpl implements CateService {
@@ -36,19 +35,13 @@ public class CateServiceImpl implements CateService {
     @Autowired
     private RedisUtil redisu;
 
-    @Value("${srping.quartz.exprie}")
-    Integer exprie;
-
     @Autowired
     private CategoryJob job;
-
+    
     @Autowired
     private QuartzManager quartzManager;
 
     private String classname = "Category";
-
-    @Value("${srping.cache.page}")
-    Integer page;
     
     @PostConstruct
     public void init() {
@@ -59,124 +52,145 @@ public class CateServiceImpl implements CateService {
     }
 
     @Override
-    public List<Category> selectByAll() {
+    public List<Category> selectByAll(Integer pageId, String url) {
         List<Category> re = new ArrayList<Category>();
-        if(redisu.hasKey(classname)) {
+
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
-            Map<Object, Object> rm = redisu.hmget(classname);
-            for (Object value : rm.values()) {
-                Category tovalue = (Category)value;
-                re.add( tovalue );
-
-                redisu.expire("Category_i"+tovalue.getCatename(), 0);
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                Category r = (Category) redisu.hget(classname, pageId.toString());
+                if(r != null)
+                    re.add(r);
             }
-            redisu.expire(classname, 0);
-        }else {
-            ///init, only once
-            //write redis
-            Map<String, Object> tmap = new HashMap<>();
-            re = categoryMapper.selectByExample(new CategoryExample());
 
-            ///read and write
-            if(!redisu.hasKey(classname)) {
-                for (Category value : re) {
-                    tmap.put(value.getCateid().toString(), (Object)value);
-                    redisu.sAddAndTime("Category_i"+value.getCatename(), 0, value.getCateid());
-                    redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
-                }
-                redisu.hmset(classname, tmap, 0);
-            }   
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
+        }else {
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/categorypage", pageId);
+            }else{
+                RefreshDBD(pageId, true);
+            }
+
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                Category r = (Category) redisu.hget(classname, i.toString());
+                if(r != null)
+                    re.add(r);
+            }
+
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }
         return re;
     }
 
     @Override
-    public List<Category> selectByNameForRead(String cate) {
+    public List<Category> selectByNameForRead(String cate, String url) {
         List<Category> re = new ArrayList<>();
-        //index Category_i id to name is more to one
-        if(redisu.hasKey("Category_i"+cate)) {
+
+        if(redisu.hasKey("category_u"+cate)) {
             //read redis
-            Set<Object> o = redisu.sGet("Category_i"+cate);
-            for(Object oi: o) {
-                Integer i = (Integer) oi;                    
-                Category rc = (Category) redisu.hget(classname, i.toString());
-
-                if (rc != null)
-                    re.add(rc);
+            Set<Object> ro = redisu.sGet("category_u"+cate);
+            re = new ArrayList<Category>();
+            for (Object id : ro) {
+                Category r =  selectById((Integer)id, url);
+                if (r != null)
+                    re.add(r);
             }
-
-            redisu.expire("Category_i", 0);
-            redisu.expire(classname, 0);
         }else {
-            ///init, only once
-            if(!redisu.hasKey(classname)) {
-                Map<String, Object> tmap = new HashMap<>();
-                re = categoryMapper.selectByExample(new CategoryExample());
-    
-                ///read and write
-                if(!redisu.hasKey(classname)) {
-                    for (Category value : re) {
-                        tmap.put(value.getCateid().toString(), (Object)value);
-                        redisu.sAddAndTime("Category_i"+value.getCatename(), 0, value.getCateid());
-                        redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
-                    }
-                    redisu.hmset(classname, tmap, 0);
-                }                
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/catepagename", cate);
+            }else{
+                RefreshDBD(cate, true);
+            }
+            if(redisu.hasKey("category_u"+cate)) {
+                //read redis
+                Object id = redisu.hget("category_u", cate);
+                if(id != null){
+                    Category r =  selectById((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
+                }
             }
         }
         return re;
     }
 
     @Override
-    public List<Category> selectByName(String cate) {
-        RefreshDBD();
+    public Category selectById(Integer categoryid, String url) {
+        Category re = null;
+        Integer pageId = cacheService.PageID(categoryid);
+        if(redisu.hHasKey(classname, categoryid.toString())) {
+            //read redis
+            Object o = redisu.hget(classname, categoryid.toString());
+            if(o != null){
+                re = (Category) o;
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+            }
+        }else {
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/categorypage", pageId);
+            }else{
+                RefreshDBD(pageId, true);
+            }
 
+            Object o = redisu.hget(classname, categoryid.toString());
+            if(o != null){
+                re = (Category) o;
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+            }     
+        }
+        return re;
+    }
+
+    @Override
+    public List<Category> selectByName(String catename) {
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Category> category = categoryDA.findAllChatByCategoryName(cate);
+        List<Category> category = categoryDA.findAllChatByCategoryName(catename);
+        if(category.isEmpty()){
+            CategoryExample categoryExample = new CategoryExample();
+            categoryExample.or().andCatenameEqualTo(catename);
+            category = categoryMapper.selectByExample(categoryExample);
+            
+            for(Category ca : category){
+                RefreshDBD(cacheService.PageID(ca.getCateid()), false);
+            }
+        }
         return category;
     }
 
     @Override
     public void insertSelective(Category category) {
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(category.getCateid()), false);
 
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
 
         long id = cacheService.eventCteate(classname);
         category.setCateid(new Long(id).intValue());
-        category.MakeStamp();
-        category.setStatus(2);
+        category.setStatus(CacheService.STATUS_INSERT);
         categoryDA.saveCategory(category);
         BDBEnvironmentManager.getMyEntityStore().sync();
 
         //Re-publish to redis
-        redisu.sAddAndTime("Category_i" + category.getCatename(), 0, category.getCateid());
-        redisu.hset(classname, category.getCatename().toString(), category.getCateid(), 0);
-        redisu.hset(classname, category.getCateid().toString(), category, 0);
-    }
-    
-    @Override
-    public Category selectById(Integer category) {
-        RefreshDBD();
-
-        BDBEnvironmentManager.getInstance();
-        CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
-        return categoryDA.findCategoryById(category);
+        redisu.hset("category_u", category.getCatename(), category.getCateid());
+        redisu.hset(classname, category.getCateid().toString(), category);
     }
 
     @Override
     public void updateByPrimaryKeySelective(Category category) {
         ///init
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(category.getCateid()), false);
 
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
         Category lcategory = categoryDA.findCategoryById(category.getCateid());
 
-        lcategory.MakeStamp();
-        lcategory.setStatus(3);
+        if(lcategory.getStatus()== null)
+            lcategory.setStatus(CacheService.STATUS_UPDATE);
         
         if(category.getCatename() != null){
             lcategory.setCatename(category.getCatename());
@@ -184,26 +198,31 @@ public class CateServiceImpl implements CateService {
         categoryDA.saveCategory(lcategory);
 
         //Re-publish to redis
-        redisu.hset(classname, lcategory.getCateid().toString(), (Object)lcategory, 0);
+        redisu.hset("category_u", lcategory.getCatename(), lcategory.getCateid());
+        redisu.hset(classname, lcategory.getCateid().toString(), (Object)lcategory);
     }
 
     @Override
-    public void deleteByPrimaryKey(Integer cateid) {
-        RefreshDBD();
+    public void deleteByPrimaryKey(Integer categoryid) {
+        RefreshDBD(cacheService.PageID(categoryid), false);
 
-        BDBEnvironmentManager.getInstance();
-        CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
-        Category category = categoryDA.findCategoryById(cateid);
- 
-        if (category != null)
-        {
-             category.MakeStamp();
-             category.setStatus(1);
-             categoryDA.saveCategory(category);
- 
-             //Re-publish to redis
-             redisu.hdel(classname, category.getCateid().toString());
-        } 
+       BDBEnvironmentManager.getInstance();
+       CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
+       Category category = categoryDA.findCategoryById(categoryid);
+
+       if(category != null && category.getStatus() == CacheService.STATUS_INSERT){
+            categoryDA.removedCategoryById(categoryid);
+            //Re-publish to redis
+            redisu.hdel(classname, category.getCateid().toString());
+       } else if (category != null)
+       {
+            category.setStatus(CacheService.STATUS_DELETE);
+            categoryDA.saveCategory(category);
+
+            //Re-publish to redis
+            redisu.hdel("category_u", category.getCatename());
+            redisu.hdel(classname, category.getCateid().toString());
+       }  
     }
 
 
@@ -211,55 +230,90 @@ public class CateServiceImpl implements CateService {
     public void TickBack() {
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Category> lcategory = categoryDA.findAllWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
+        List<Integer> listid = cacheService.PageOut(classname);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                Category category = categoryDA.findCategoryById(i);
+                if(category != null){
+                    if(null ==  category.getStatus()) {
+                        categoryDA.removedCategoryById(category.getCateid());
+                    }
+        
+                    if(CacheService.STATUS_DELETE ==  category.getStatus() && 1 == categoryMapper.deleteByPrimaryKey(category.getCateid())) {
+                        categoryDA.removedCategoryById(category.getCateid());
+                    }
+        
+                    if(CacheService.STATUS_INSERT ==  category.getStatus()  && 1 == categoryMapper.insert(category)) {
+                        categoryDA.removedCategoryById(category.getCateid());
+                    } 
 
-        for (Category category : lcategory) {
-            if(null ==  category.getStatus()) {
-                categoryDA.removedCategoryById(category.getCateid());
+                    if(CacheService.STATUS_UPDATE ==  category.getStatus() && 1 == categoryMapper.updateByPrimaryKey(category)) {
+                        categoryDA.removedCategoryById(category.getCateid());
+                    } 
+                    redisu.hdel("category_u", category.getCatename());
+                    redisu.hdel(classname, category.getCateid().toString());
+                }
             }
-
-            if(1 ==  category.getStatus() && 1 == categoryMapper.deleteByPrimaryKey(category.getCateid())) {
-                categoryDA.removedCategoryById(category.getCateid());
-            }
-
-            if(2 ==  category.getStatus()  && 1 == categoryMapper.insert(category)) {
-                categoryDA.removedCategoryById(category.getCateid());
-            }
-
-            if(3 ==  category.getStatus() && 1 == categoryMapper.updateByPrimaryKey(category)) {
-                categoryDA.removedCategoryById(category.getCateid());
-            }
+            redisu.hdel(classname+"pageid", pageid.toString());
         }
-
         if (categoryDA.IsEmpty()){
             cacheService.Archive(classname);
         }
     }
 
-    public void RefreshDBD() {
-        BDBEnvironmentManager.getInstance();
-        CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
-
-        if (cacheService.IsCache(classname)) {
+    @Override
+    public void RefreshDBD(Integer pageID, boolean refresRedis) {
+        if (cacheService.IsCache(classname, pageID)) {
+            BDBEnvironmentManager.getInstance();
+            CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
-            List<Category> re = new ArrayList<Category>();
-            Map<String, Object> tmap = new HashMap<>();
+            List<Category> re = new ArrayList<Category>();          
+            CategoryExample categoryExample = new CategoryExample();
+            categoryExample.or().andCateidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            categoryExample.or().andCateidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
-            re = categoryMapper.selectByExample(new CategoryExample());
+            re = categoryMapper.selectByExample(categoryExample);
             for (Category value : re) {
-                tmap.put(value.getCateid().toString(), (Object)value);
-
-                value.MakeStamp();
+                redisu.hset("category_u", value.getCatename(), value.getCateid());
+                redisu.hset(classname, value.getCateid().toString(), value);
                 categoryDA.saveCategory(value);
-
-                redisu.sAddAndTime("Category_i"+value.getCatename().toString(), 0, value.getCateid());
-                redisu.hset(classname, value.getCatename().toString(), value.getCateid(), 0);
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
             quartzManager.addJob(classname,classname,classname,classname, CategoryJob.class, null, job);
+            redisu.hincr(classname+"pageid", pageID.toString(), 1);
+        }else if(refresRedis){
+            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+                BDBEnvironmentManager.getInstance();
+                CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
 
-            redisu.hmset(classname, tmap, 0);
-        }        
+                Integer i = cacheService.PageBegin(pageID);
+                Integer l = cacheService.PageEnd(pageID);
+                for(;i < l; i++){
+                    Category r = categoryDA.findCategoryById(i);
+                    if(r != null && r.getStatus() != CacheService.STATUS_DELETE)
+                    redisu.hset("category_u", r.getCatename(), r.getCateid());
+                    redisu.hset(classname, i.toString(), r);                        
+                }
+                redisu.hincr(classname+"pageid", pageID.toString(), 1);
+            }
+        }    
+    }
+
+    @Override
+    public void RefreshDBD(String name, boolean refresRedis) {
+        BDBEnvironmentManager.getInstance();
+        CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
+        List<Category> category = categoryDA.findAllChatByCategoryName(name);
+        if(category.isEmpty()){
+            CategoryExample categoryExample = new CategoryExample();
+            categoryExample.or().andCatenameEqualTo(name);
+            category = categoryMapper.selectByExample(categoryExample);
+            
+            for(Category ca : category){
+                RefreshDBD(cacheService.PageID(ca.getCateid()), refresRedis);
+            }     
+        }
     }
 }

@@ -1,25 +1,28 @@
 package com.github.gantleman.shopd.controller.admin;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.Admin;
-import com.github.gantleman.shopd.entity.Order;
-import com.github.gantleman.shopd.entity.Goods;
-import com.github.gantleman.shopd.entity.OrderItem;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import com.github.gantleman.shopd.entity.Address;
+import com.github.gantleman.shopd.entity.Admin;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderItem;
 import com.github.gantleman.shopd.service.AddressService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.OrderItemService;
 import com.github.gantleman.shopd.service.OrderService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin/order")
@@ -36,6 +39,9 @@ public class AdminOrderController {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @RequestMapping("/send")
     public String sendOrder(@RequestParam(value = "page",defaultValue = "1")Integer pn, Model model, HttpSession session) {
@@ -68,7 +74,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = addressService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid(),request.getServletPath());
             order.setAddress(address);
 
             orderList.set(i, order);
@@ -122,7 +128,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = addressService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
             order.setAddress(address);
 
             orderList.set(i, order);
@@ -164,7 +170,7 @@ public class AdminOrderController {
             order.setGoodsInfo(goodsList);
 
             //查询地址
-            Address address = addressService.getAddressByKey(order.getAddressid());
+            Address address = addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
             order.setAddress(address);
 
             orderList.set(i, order);

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.gantleman.shopd.dao.ImagepathGoodsMapper">
+  <resultMap id="BaseResultMap" type="com.github.gantleman.shopd.entity.ImagepathGoods">
+    <id column="goodsID" jdbcType="INTEGER" property="goodsid" />
+    <result column="imagepath_size" jdbcType="INTEGER" property="imagepathSize" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.gantleman.shopd.entity.ImagepathGoods">
+    <result column="imagepath_list" jdbcType="LONGVARCHAR" property="imagepathList" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    goodsID, imagepath_size
+  </sql>
+  <sql id="Blob_Column_List">
+    imagepath_list
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.github.gantleman.shopd.entity.ImagepathGoodsExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from imagepath_goods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.github.gantleman.shopd.entity.ImagepathGoodsExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from imagepath_goods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from imagepath_goods
+    where goodsID = #{goodsid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from imagepath_goods
+    where goodsID = #{goodsid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.github.gantleman.shopd.entity.ImagepathGoodsExample">
+    delete from imagepath_goods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.github.gantleman.shopd.entity.ImagepathGoods">
+    insert into imagepath_goods (goodsID, imagepath_size, imagepath_list
+      )
+    values (#{goodsid,jdbcType=INTEGER}, #{imagepathSize,jdbcType=INTEGER}, #{imagepathList,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.github.gantleman.shopd.entity.ImagepathGoods">
+    insert into imagepath_goods
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="goodsid != null">
+        goodsID,
+      </if>
+      <if test="imagepathSize != null">
+        imagepath_size,
+      </if>
+      <if test="imagepathList != null">
+        imagepath_list,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="goodsid != null">
+        #{goodsid,jdbcType=INTEGER},
+      </if>
+      <if test="imagepathSize != null">
+        #{imagepathSize,jdbcType=INTEGER},
+      </if>
+      <if test="imagepathList != null">
+        #{imagepathList,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.github.gantleman.shopd.entity.ImagepathGoodsExample" resultType="java.lang.Long">
+    select count(*) from imagepath_goods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update imagepath_goods
+    <set>
+      <if test="record.goodsid != null">
+        goodsID = #{record.goodsid,jdbcType=INTEGER},
+      </if>
+      <if test="record.imagepathSize != null">
+        imagepath_size = #{record.imagepathSize,jdbcType=INTEGER},
+      </if>
+      <if test="record.imagepathList != null">
+        imagepath_list = #{record.imagepathList,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update imagepath_goods
+    set goodsID = #{record.goodsid,jdbcType=INTEGER},
+      imagepath_size = #{record.imagepathSize,jdbcType=INTEGER},
+      imagepath_list = #{record.imagepathList,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update imagepath_goods
+    set goodsID = #{record.goodsid,jdbcType=INTEGER},
+      imagepath_size = #{record.imagepathSize,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.gantleman.shopd.entity.ImagepathGoods">
+    update imagepath_goods
+    <set>
+      <if test="imagepathSize != null">
+        imagepath_size = #{imagepathSize,jdbcType=INTEGER},
+      </if>
+      <if test="imagepathList != null">
+        imagepath_list = #{imagepathList,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where goodsID = #{goodsid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.github.gantleman.shopd.entity.ImagepathGoods">
+    update imagepath_goods
+    set imagepath_size = #{imagepathSize,jdbcType=INTEGER},
+      imagepath_list = #{imagepathList,jdbcType=LONGVARCHAR}
+    where goodsID = #{goodsid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.github.gantleman.shopd.entity.ImagepathGoods">
+    update imagepath_goods
+    set imagepath_size = #{imagepathSize,jdbcType=INTEGER}
+    where goodsID = #{goodsid,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -224,7 +224,6 @@ public class ChatServiceImpl implements ChatService {
            BDBEnvironmentManager.getInstance();
            ChatDA chatDA=new ChatDA(BDBEnvironmentManager.getMyEntityStore());
 
-           Set<Integer> id = new HashSet<Integer>();
            List<Chat> re = new ArrayList<Chat>();
 
            ChatExample chatExample = new ChatExample();

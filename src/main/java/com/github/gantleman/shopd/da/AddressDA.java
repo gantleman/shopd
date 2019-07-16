@@ -92,11 +92,7 @@ public class AddressDA {
 		try {
 			entityCursorList=sIdx.subIndex(userid).entities();
 			//遍历游标
-			for (Address address : entityCursorList) {
-				
-				if (1 == address.getStatus())
-				continue;
-				
+			for (Address address : entityCursorList) {				
 				addressList.add(address);
 			}
 		} catch (DatabaseException e) {
@@ -149,58 +145,5 @@ public class AddressDA {
             }
         }
 		return count;
-	}
-
-
-	public List<Address> findAllWhitStamp(long stamp) {
-		List<Address> adminList = new ArrayList<Address>();
-		// 打开游标
-		EntityCursor<Address> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Address address : adminCursorList) {
-				if(address.getStamp() <= stamp) {
-					adminList.add(address);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
-	}
-
-		/**
-	 * 根据addressName查找所有的Address
-	 **/
-	public boolean IsEmptyAddressByUserID(Integer userid) {
-	    
-		boolean re = true;
-		
-		EntityCursor<Address> entityCursorList=null;
-		
-		//获取游标
-		try {
-			entityCursorList=sIdx.subIndex(userid).entities();
-			//遍历游标
-			for (Address address : entityCursorList) {
-				re =  false;
-			}
-		} catch (DatabaseException e) {
-			
-			e.printStackTrace();
-		}finally {
-			if(entityCursorList!=null) {
-				//关闭游标
-				entityCursorList.close();
-			}
-		}
-		return re;
 	}
 }

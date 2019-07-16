@@ -1,9 +1,8 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.gantleman.shopd.entity.Activity;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
@@ -58,10 +57,6 @@ public class ActivityDA {
 			activityCursorList = pIdx.entities();
 			// 遍历游标
 			for (Activity activity : activityCursorList) {
-
-				if(1 == activity.getStatus())
-					continue;
-					
 				activityList.add(activity);
 			}
 		} catch (DatabaseException e) {
@@ -112,28 +107,5 @@ public class ActivityDA {
             }
         }
 		return count;
-	}
-
-	public List<Activity> findAllWhitStamp(long stamp) {
-		List<Activity> adminList = new ArrayList<Activity>();
-		// 打开游标
-		EntityCursor<Activity> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Activity activity : adminCursorList) {
-				if(activity.getStamp() <= stamp) {
-					adminList.add(activity);
-				}
-			}
-		} catch (DatabaseException e) {
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 }

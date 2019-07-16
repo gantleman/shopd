@@ -137,28 +137,4 @@ public class CategoryDA {
         }
 		return count;
 	}
-
-
-	public List<Category> findAllWhitStamp(long stamp) {
-		List<Category> categoryList = new ArrayList<Category>();
-		// 打开游标
-		EntityCursor<Category> categoryCursorList = null;
-		try {
-			//获取游标
-			categoryCursorList = pIdx.entities();
-			// 遍历游标
-			for (Category category : categoryCursorList) {
-				if(category.getStamp() <= stamp) {
-					categoryList.add(category);
-				}
-			}
-		} catch (DatabaseException e) {
-		} finally {
-			if (categoryCursorList != null) {
-				// 关闭游标
-				categoryCursorList.close();
-			}
-		}
-		return categoryList;
-	}
 }

@@ -128,39 +128,14 @@ public class AdminDA {
 		}
 		return adminList;
 	}
-
-
-	public List<Admin> findAllUserWhitStamp(long stamp) {
-		List<Admin> adminList = new ArrayList<Admin>();
-		// 打开游标
-		EntityCursor<Admin> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Admin admin : adminCursorList) {
-				if(admin.getStamp() <= stamp) {
-					adminList.add(admin);
-				}
-			}
-		} catch (DatabaseException e) {
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
-	}
-
-	public Integer IsEmpty() {
-		Integer count = 1;
+	public boolean IsEmpty() {
+		boolean count = true;
 		EntityCursor<Admin> cursor = null;
         try{
             cursor = pIdx.entities();
             for (Admin admin : cursor) {
             	if(admin!=null) {
-					count = 0;
+					count = false;
 					break;
             	}
 			}

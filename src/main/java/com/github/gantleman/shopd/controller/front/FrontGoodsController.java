@@ -53,6 +53,9 @@ public class FrontGoodsController {
     @Autowired
     private ImagePathService imagePathService;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping(value = "/detail",method = RequestMethod.GET)
     public String detailGoods(Integer goodsid, Model model, HttpSession session) {
 
@@ -80,7 +83,7 @@ public class FrontGoodsController {
         }
 
         //查询商品类别
-        Category category = cateService.selectById(goods.getCategory());
+        Category category = cateService.selectById(goods.getCategory(), request.getServletPath());
 
         //商品图片
         List<ImagePath> imagePath = imagePathService.findImagePath(goodsid);
@@ -88,7 +91,7 @@ public class FrontGoodsController {
         //商品评论
 
         //商品折扣信息
-        Activity activity = activityService.selectByKey(goods.getActivityid(), "/detail");
+        Activity activity = activityService.selectByKey(goods.getActivityid(), request.getServletPath());
         goods.setActivity(activity);
 
         //返回数据
@@ -98,11 +101,11 @@ public class FrontGoodsController {
         model.addAttribute("goodsInfo",goodsInfo);
 
         //评论信息
-        List<Comment> commentList=commentService.selectByExample(goods.getGoodsid());
+        List<Comment> commentList=commentService.selectByGoodsID(goods.getGoodsid());
         for (Integer i=0;i<commentList.size();i++)
         {
             Comment comment=commentList.get(i);
-            User commentUser=userService.selectByPrimaryKey(comment.getUserid());
+            User commentUser=userService.selectByUserID(comment.getUserid());
             comment.setUserName(commentUser.getUsername());
             commentList.set(i,comment);
         }
@@ -195,7 +198,7 @@ public class FrontGoodsController {
         PageHelper.startPage(pn, 16);
 
         //查询分类id
-        List<Category> categoryList = cateService.selectByNameForRead(cate);
+        List<Category> categoryList = cateService.selectByNameForRead(cate, request.getServletPath());
 
         //获取查出的类别id
         List<Integer> cateId = new ArrayList<Integer>();

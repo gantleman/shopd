@@ -1,6 +1,5 @@
 package com.github.gantleman.shopd.entity;
 
-import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
@@ -26,12 +25,6 @@ public class Activity {
 
     private Integer status;
 
-    private long stamp;
-
-    public void MakeStamp() {
-        setStamp(TimeUtils.getTimeWhitLong());
-    }
-
     /**
      * @return the status
      */
@@ -44,20 +37,6 @@ public class Activity {
      */
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    /**
-     * @return the stamp
-     */
-    public long getStamp() {
-        return stamp;
-    }
-
-    /**
-     * @param stamp the stamp to set
-     */
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
     }
 
     public Integer getActivityid() {

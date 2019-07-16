@@ -10,6 +10,8 @@ import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
 public class Admin implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     @PrimaryKey(sequence = "ID")
     private Integer adminid;
 
@@ -18,30 +20,26 @@ public class Admin implements Serializable{
 
     private String password;
 
-    private long stamp;
-
-    public void MakeStamp() {
-        setStamp(TimeUtils.getTimeWhitLong());
-    }
-
-    /**
-     * @return the stamp
-     */
-    public long getStamp() {
-        return stamp;
-    }
-
-    /**
-     * @param stamp the stamp to set
-     */
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
-    }
+    private Integer status;
 
     public Admin(Integer adminid, String adminname, String password) {
         this.adminid = adminid;
         this.adminname = adminname;
         this.password = password;
+    }
+
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public Admin() {

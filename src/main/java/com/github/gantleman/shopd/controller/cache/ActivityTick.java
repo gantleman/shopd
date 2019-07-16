@@ -14,14 +14,13 @@ public class ActivityTick {
 
     @RequestMapping("/activitytick")
     public Msg activitytick(){
-
         activityservice.TickBack();
         return Msg.success("successful");
     }
 
     @RequestMapping("/activitypage")
-    public Msg activitypage(Integer pageid){
-        activityservice.RefreshDBD(pageid, true);
+    public Msg activitypage(Integer id){
+        activityservice.RefreshDBD(id, true);
         return Msg.success("successful");
     }
 }

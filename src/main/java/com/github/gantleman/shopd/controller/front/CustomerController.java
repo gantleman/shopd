@@ -52,6 +52,9 @@ public class CustomerController {
     @Autowired
     private OrderItemService orderItemService;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping("/login")
     public String loginView(){
         return "login";
@@ -114,7 +117,7 @@ public class CustomerController {
             return "redirect:/login";
         }
         userId=user.getUserid();
-        user=userService.selectByPrimaryKey(userId);
+        user=userService.selectByUserID(userId);
         userModel.addAttribute("user",user);
         return "information";
     }
@@ -152,7 +155,7 @@ public class CustomerController {
         {
             return "redirect:/login";
         }
-        List<Address> addressList=addressService.getAllAddressByUserID(user.getUserid());
+        List<Address> addressList=addressService.getAllAddressByUserID(user.getUserid(),request.getServletPath());
         addressModel.addAttribute("addressList",addressList);
         return "address";
     }
@@ -215,7 +218,7 @@ public class CustomerController {
            goodsList=goodsService.selectByID(goodsIdList);
 
            order.setGoodsInfo(goodsList);
-           address=addressService.selectByPrimaryKey(order.getAddressid());
+           address=addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
            order.setAddress(address);
            orderList.set(i,order);
        }

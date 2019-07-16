@@ -76,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> selectByExample(Integer goodsid) {
+    public List<Comment> selectByGoodsID(Integer goodsid) {
         List<Comment> re = new ArrayList<>();
         if(redisu.hasKey("Comment_u"+goodsid.toString())) {
             //read redis

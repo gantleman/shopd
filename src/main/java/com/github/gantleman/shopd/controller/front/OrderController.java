@@ -23,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +53,9 @@ public class OrderController {
     @Autowired
     private OrderItemService orderItemService;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping("/order")
     public String showOrder(HttpSession session, Model model) {
 
@@ -61,7 +65,7 @@ public class OrderController {
         }
 
         //查询当前用户的收货地址
-        List<Address> addressList = addressService.getAllAddressByUserID(user.getUserid());
+        List<Address> addressList = addressService.getAllAddressByUserID(user.getUserid(), request.getServletPath());
 
         model.addAttribute("address", addressList);
 
@@ -83,7 +87,7 @@ public class OrderController {
             goods.setNum(cart.getGoodsnum());
 
             //活动信息
-            Activity activity = activityService.selectByKey(goods.getActivityid(), "/order");
+            Activity activity = activityService.selectByKey(goods.getActivityid(), request.getServletPath());
             goods.setActivity(activity);
 
             if(activity.getDiscount() != 1) {

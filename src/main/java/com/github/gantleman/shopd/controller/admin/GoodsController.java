@@ -1,15 +1,26 @@
 package com.github.gantleman.shopd.controller.admin;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.Goods;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.github.gantleman.shopd.entity.Admin;
-import com.github.gantleman.shopd.entity.Msg;
 import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Msg;
 import com.github.gantleman.shopd.service.CateService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.ImagePathService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,13 +34,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 @Controller
 @RequestMapping("/admin/goods")
 public class GoodsController {
@@ -39,6 +43,9 @@ public class GoodsController {
 
     @Autowired
     private ImagePathService imagePathService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @RequestMapping("/showjson")
     @ResponseBody
@@ -64,7 +71,7 @@ public class GoodsController {
         if (admin == null) {
             return "redirect:/admin/login";
         }
-        List<Category> categoryList = cateService.selectByAll();
+        List<Category> categoryList = cateService.selectByAll(pn -1, request.getServletPath());
         model.addAttribute("categoryList",categoryList);
 
         return "adminAllGoods";
@@ -81,7 +88,7 @@ public class GoodsController {
             model.addAttribute("msg", msg);
         }
 
-        List<Category> categoryList = cateService.selectByAll();
+        List<Category> categoryList = cateService.selectByAll(0, request.getServletPath());
         model.addAttribute("categoryList",categoryList);
 
         //还需要查询分类传给addGoods页面
@@ -146,7 +153,7 @@ public class GoodsController {
         }
 
         List<Category> categoryList;
-        categoryList = cateService.selectByAll();
+        categoryList = cateService.selectByAll(0, request.getServletPath());
         model.addAttribute("categoryList", categoryList);
         if (!msg.equals("")) {
             model.addAttribute("msg", msg);

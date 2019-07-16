@@ -2,15 +2,17 @@ package com.github.gantleman.shopd.service.impl;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.gantleman.shopd.da.CacheDA;
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.dao.CacheMapper;
+import com.github.gantleman.shopd.entity.Cache;
+import com.github.gantleman.shopd.entity.CacheExample;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
+import com.github.gantleman.shopd.util.HttpUtils;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
 import com.github.gantleman.shopd.util.ServerConfig;
@@ -41,12 +43,28 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     private RedisUtil redisu;
 
+    @Autowired
+    private ServerConfig serverConfig;
+
+    @Autowired
+    private HttpUtils httputils;
+
     @Override
     public void Archive(String tablename) {
         //backe to sql
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
+
+        if(ra == null ){
+            CacheExample cacheExample = new CacheExample();
+            cacheExample.or().andCNameEqualTo(tablename);
+            List<Cache> lc = cacheMapper.selectByExample(cacheExample);
+
+            if(!lc.isEmpty())
+               ra = lc.get(0);
+        }
+        
         if(ra != null)
         {
             ra.setcHost2(sc.getUrl());
@@ -54,7 +72,6 @@ public class CacheServiceImpl implements CacheService {
             cacheMapper.updateByPrimaryKeySelective(ra);
 
             quartzManager.removeJob(tablename,tablename, tablename, tablename);
-
             cacheDA.removedCacheById(ra.getcId());
         }
     }
@@ -107,6 +124,15 @@ public class CacheServiceImpl implements CacheService {
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
 
+        if(ra == null ){
+            CacheExample cacheExample = new CacheExample();
+            cacheExample.or().andCNameEqualTo(tablename);
+            List<Cache> lc = cacheMapper.selectByExample(cacheExample);
+
+            if(!lc.isEmpty())
+               ra = lc.get(0);
+        }
+
         if (ra != null) {
             Map<Integer, Integer> ruserid = ra.getUserid();
             if (ruserid != null)
@@ -125,6 +151,15 @@ public class CacheServiceImpl implements CacheService {
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
+
+        if(ra == null ){
+            CacheExample cacheExample = new CacheExample();
+            cacheExample.or().andCNameEqualTo(tablename);
+            List<Cache> lc = cacheMapper.selectByExample(cacheExample);
+
+            if(!lc.isEmpty())
+               ra = lc.get(0);
+        }
 
         if (ra != null) {
             return true;
@@ -187,6 +222,38 @@ public class CacheServiceImpl implements CacheService {
         return ID/page;
     }
     
+    @Override
+    public boolean IsLocal(String url) {
+        String host = (String)redisu.get(url);
+        if(!host.equals(serverConfig.getUrl()))
+        return false;
+        else
+        return true;
+    }
 
+    @Override
+    public void RemoteRefresh(String url, Integer Id) {
+        Map<String, String> headers = new HashMap<>(); 
+        Map<String, String> querys = new HashMap<>();                
+        querys.put("id", Id.toString());
+
+        try {
+            httputils.doGet(serverConfig.getUrl(), url, headers, querys);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void RemoteRefresh(String url, String name) {
+        Map<String, String> headers = new HashMap<>(); 
+        Map<String, String> querys = new HashMap<>();                
+        querys.put("name", name);
+
+        try {
+            httputils.doGet(serverConfig.getUrl(), url, headers, querys);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }      
+    }
 }
 

@@ -9,14 +9,14 @@ import java.util.List;
 public interface CateService {
 
     //only read
-    public List<Category> selectByAll();
+    public List<Category> selectByAll(Integer pageId, String url);
 
-    public List<Category> selectByNameForRead(String cate);
+    public List<Category> selectByNameForRead(String catename, String url);
     
-    public Category selectById(Integer category);
+    public Category selectById(Integer category, String url);
 
     //have write
-    public List<Category> selectByName(String cate);
+    public List<Category> selectByName(String catename);
 
     public void insertSelective(Category category);
 
@@ -26,5 +26,7 @@ public interface CateService {
 
     public void TickBack();
 
-    public void RefreshDBD();
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
+
+    public void RefreshDBD(String name, boolean refresRedis);
 }

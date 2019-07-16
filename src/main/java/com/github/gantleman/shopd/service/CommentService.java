@@ -12,7 +12,7 @@ public interface CommentService {
     public void insertSelective(Comment comment);
 
     //only read
-    public List<Comment> selectByExample(Integer goodsid);
+    public List<Comment> selectByGoodsID(Integer goodsid);
 
     public void TickBack();
 }

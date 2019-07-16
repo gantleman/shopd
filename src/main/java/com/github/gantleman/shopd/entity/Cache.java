@@ -2,7 +2,6 @@ package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;

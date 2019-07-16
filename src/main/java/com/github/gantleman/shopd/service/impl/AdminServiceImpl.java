@@ -1,5 +1,6 @@
 package com.github.gantleman.shopd.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -7,17 +8,16 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.AdminDA;
 import com.github.gantleman.shopd.dao.AdminMapper;
 import com.github.gantleman.shopd.entity.Admin;
+import com.github.gantleman.shopd.entity.AdminExample;
 import com.github.gantleman.shopd.service.AdminService;
 import com.github.gantleman.shopd.service.CacheService;
+import com.github.gantleman.shopd.service.jobs.AdminJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
-import com.github.gantleman.shopd.util.TimeUtils;
+import com.github.gantleman.shopd.util.RedisUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.github.gantleman.shopd.service.jobs.AdminJob;
 
 
 
@@ -30,8 +30,8 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private CacheService cacheService;
 
-    @Value("${srping.quartz.exprie}")
-    Integer exprie;
+    @Autowired
+    private RedisUtil redisu;
 
     @Autowired
     private QuartzManager quartzManager;
@@ -41,63 +41,80 @@ public class AdminServiceImpl implements AdminService {
 
     private String classname = "Admin";
 
-    @Value("${srping.cache.page}")
-    Integer page;
-    
     @PostConstruct
     public void init() {
-        BDBEnvironmentManager.getInstance();
-        AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
-        if (0 == adminDA.IsEmpty()) {
-            ///create time todo
+        if (cacheService.IsCache(classname)) {
+            ///create time
             quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
         }
     }
 
     @Override
     public Admin selectByName(Admin admin) {
+        Admin ra = new Admin();
+        ///first check localDB
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Admin> ra = adminDA.findAllChatByAdminNameAndPassword( admin.getAdminname(), admin.getPassword());
+        List<Admin> lra = adminDA.findAllChatByAdminNameAndPassword( admin.getAdminname(), admin.getPassword());
+        if(lra != null){
+            ra = lra.get(0);
+        }else{
+            ///second
+            AdminExample adminExample = new AdminExample();
+            adminExample.or().andAdminnameEqualTo(admin.getAdminname());
+            List<Admin> sqlra = adminMapper.selectByExample(adminExample);    
+            if(!sqlra.isEmpty()){
+                //cache page
+                RefreshDBD(cacheService.PageID(sqlra.get(0).getAdminid()), false);
 
-        Admin sqlra;
-        if( ra.size() >= 1 ) {
-            sqlra =  ra.get(0);
-
-            sqlra.MakeStamp();
-            adminDA.saveAdmin(sqlra);
-        }else {
-            sqlra = adminMapper.selectByName(admin);
-            if( sqlra != null)
-            {
-                ///init
-                if (cacheService.IsCache(classname)) {
-                    ///create time todo
-                    quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
-                }
-
-                sqlra.MakeStamp();
-                adminDA.saveAdmin(sqlra);
-
-                BDBEnvironmentManager.getMyEntityStore().sync();
-
+                //third
+                if(sqlra.get(0).getPassword() == admin.getPassword())
+                    ra = sqlra.get(0);
             }
         }
-        return sqlra;
+  
+        return ra;
     }
 
     @Override
     public void TickBack() {
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Admin> ladmin = adminDA.findAllUserWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
-
-        for (Admin admin : ladmin) {
-            adminDA.removedAdminById(admin.getAdminid());
+        List<Integer> listid = cacheService.PageOut(classname);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                Admin admin = adminDA.findAdminById(i);
+                if(admin != null){
+                    if(null ==  admin.getStatus()) {
+                        adminDA.removedAdminById(admin.getAdminid());
+                    }
+                }
+            }
         }
-
-        if (1 == adminDA.IsEmpty()){
+        if (adminDA.IsEmpty()){
             cacheService.Archive(classname);
         }
     }
+
+    @Override
+    public void RefreshDBD(Integer pageID, boolean refresRedis) {
+        if (cacheService.IsCache(classname, pageID)) {
+            BDBEnvironmentManager.getInstance();
+            AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
+            ///init
+            List<Admin> re = new ArrayList<Admin>();          
+            AdminExample adminExample = new AdminExample();
+            adminExample.or().andAdminidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            adminExample.or().andAdminidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+
+            re = adminMapper.selectByExample(adminExample);
+            for (Admin value : re) {
+                adminDA.saveAdmin(value);
+            }
+
+            BDBEnvironmentManager.getMyEntityStore().sync();
+            quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
+        }
+    }  
 }

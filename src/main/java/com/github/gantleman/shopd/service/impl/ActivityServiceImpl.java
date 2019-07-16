@@ -1,5 +1,10 @@
 package com.github.gantleman.shopd.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import com.github.gantleman.shopd.da.ActivityDA;
 import com.github.gantleman.shopd.dao.ActivityMapper;
 import com.github.gantleman.shopd.entity.Activity;
@@ -8,30 +13,17 @@ import com.github.gantleman.shopd.service.ActivityService;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.jobs.ActivityJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
-import com.github.gantleman.shopd.util.HttpUtils;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
-import com.github.gantleman.shopd.util.ServerConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 @Service("activityService")
 public class ActivityServiceImpl implements ActivityService {
 
     @Autowired(required = false)
     ActivityMapper activityMapper;
-
-    @Autowired(required = false)
-    ServerConfig serverConfig;
 
     @Autowired
     private CacheService cacheService;
@@ -41,9 +33,6 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private ActivityJob job;
-
-    @Autowired
-    HttpUtils httputils;
     
     @Autowired
     private QuartzManager quartzManager;
@@ -74,21 +63,12 @@ public class ActivityServiceImpl implements ActivityService {
 
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }else {
-            String host = (String)redisu.get(url);
-            if(!host.equals(serverConfig.getUrl())){
-                Map<String, String> headers = new HashMap(); 
-                Map<String, String> querys = new HashMap();
-
-                querys.put("pageid", pageId.toString());
-
-                try {
-                    httputils.doGet(serverConfig.getUrl(), "/activitypage", headers, querys);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/activitypage", pageId);
             }else{
                 RefreshDBD(pageId, true);
             }
+
             Integer i = cacheService.PageBegin(pageId);
             Integer l = cacheService.PageEnd(pageId);
             for(;i < l; i++){
@@ -105,30 +85,21 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public Activity selectByKey(Integer activityid, String url) {
         Activity re = null;
+        Integer pageId = cacheService.PageID(activityid);
         if(redisu.hHasKey(classname, activityid.toString())) {
             //read redis
             Object o = redisu.hget(classname, activityid.toString());
             if(o != null){
                 re = (Activity) o;
-                Integer pageId = cacheService.PageID(activityid);
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
             }
         }else {
-            String host = (String)redisu.get(url);
-            Integer pageId = cacheService.PageID(activityid);
-            if(!host.equals(serverConfig.getUrl())){
-                Map<String, String> headers = new HashMap(); 
-                Map<String, String> querys = new HashMap();                
-                querys.put("pageid", pageId.toString());
-
-                try {
-                    httputils.doGet(serverConfig.getUrl(), "/activitypage", headers, querys);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/activitypage", pageId);
             }else{
                 RefreshDBD(pageId, true);
             }
+
             Object o = redisu.hget(classname, activityid.toString());
             if(o != null){
                 re = (Activity) o;
@@ -146,14 +117,13 @@ public class ActivityServiceImpl implements ActivityService {
        ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
        Activity activity = activityDA.findActivityById(activityid);
 
-       if(activity != null && activity.getStatus() == 2){
+       if(activity != null && activity.getStatus() == CacheService.STATUS_INSERT){
             activityDA.removedActivityById(activityid);
             //Re-publish to redis
             redisu.hdel(classname, activity.getActivityid().toString());
        } else if (activity != null)
        {
-            activity.MakeStamp();
-            activity.setStatus(1);
+            activity.setStatus(CacheService.STATUS_DELETE);
             activityDA.saveActivity(activity);
 
             //Re-publish to redis
@@ -171,8 +141,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         long id = cacheService.eventCteate(classname);
         activity.setActivityid(new Long(id).intValue());
-        activity.MakeStamp();
-        activity.setStatus(2);
+        activity.setStatus(CacheService.STATUS_INSERT);
         activityDA.saveActivity(activity);
         BDBEnvironmentManager.getMyEntityStore().sync();
 
@@ -194,15 +163,15 @@ public class ActivityServiceImpl implements ActivityService {
                         activityDA.removedActivityById(activity.getActivityid());
                     }
         
-                    if(1 ==  activity.getStatus() && 1 == activityMapper.deleteByPrimaryKey(activity.getActivityid())) {
+                    if(CacheService.STATUS_DELETE ==  activity.getStatus() && 1 == activityMapper.deleteByPrimaryKey(activity.getActivityid())) {
                         activityDA.removedActivityById(activity.getActivityid());
                     }
         
-                    if(2 ==  activity.getStatus()  && 1 == activityMapper.insert(activity)) {
+                    if(CacheService.STATUS_INSERT ==  activity.getStatus()  && 1 == activityMapper.insert(activity)) {
                         activityDA.removedActivityById(activity.getActivityid());
                     } 
 
-                    if(3 ==  activity.getStatus() && 1 == activityMapper.updateByPrimaryKey(activity)) {
+                    if(CacheService.STATUS_UPDATE ==  activity.getStatus() && 1 == activityMapper.updateByPrimaryKey(activity)) {
                         activityDA.removedActivityById(activity.getActivityid());
                     } 
                     
@@ -216,26 +185,26 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
         if (cacheService.IsCache(classname, pageID)) {
             BDBEnvironmentManager.getInstance();
             ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
             List<Activity> re = new ArrayList<Activity>();          
-            ActivityExample zctivityExample = new ActivityExample();
-            zctivityExample.or().andActivityidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            zctivityExample.or().andActivityidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            ActivityExample activityExample = new ActivityExample();
+            activityExample.or().andActivityidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            activityExample.or().andActivityidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
-            re = activityMapper.selectByExample(zctivityExample);
+            re = activityMapper.selectByExample(activityExample);
             for (Activity value : re) {
                 redisu.hset(classname, value.getActivityid().toString(), value);
-
-                value.MakeStamp();
                 activityDA.saveActivity(value);
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
             quartzManager.addJob(classname,classname,classname,classname, ActivityJob.class, null, job);
+            redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
                 BDBEnvironmentManager.getInstance();
@@ -246,9 +215,10 @@ public class ActivityServiceImpl implements ActivityService {
                 for(;i < l; i++){
 
                     Activity r = activityDA.findActivityById(i);
-                    if(r!= null && r.getStatus() != 1)
+                    if(r != null && r.getStatus() != CacheService.STATUS_DELETE)
                      redisu.hset(classname, i.toString(), r);                        
                 }
+                redisu.hincr(classname+"pageid", pageID.toString(), 1);
             }
         }    
     }

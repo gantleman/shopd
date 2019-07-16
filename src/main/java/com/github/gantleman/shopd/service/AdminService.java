@@ -7,4 +7,6 @@ public interface AdminService {
     public Admin selectByName(Admin admin);
 
     public void TickBack();
+
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
 }

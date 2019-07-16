@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User selectByPrimaryKey(Integer userId) {
+    public User selectByUserID(Integer userId) {
         User re = (User) redisu.hget(classname, userId.toString());
         if(re == null){
             if(redisu.hasKey(classname)){
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
     public List<User> selectByInList(List<Integer> user) {
         List<User> re = new ArrayList<User>();
         for(Integer id : user){
-            User r = selectByPrimaryKey(id);
+            User r = selectByUserID(id);
             if(r != null)
                 re.add(r);
         }
@@ -248,7 +248,6 @@ public class UserServiceImpl implements UserService {
            UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
            List<User> re = new ArrayList<User>();
-
            re = userMapper.selectByExample(new UserExample());
            for (User value : re) {
                 value.MakeStamp();

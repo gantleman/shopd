@@ -34,7 +34,7 @@ public class ChatController {
         }
 
         if (sendto != null) {
-            User user = userService.selectByPrimaryKey(sendto);
+            User user = userService.selectByUserID(sendto);
             model.addAttribute("sendto", user);
         }
         return "chat";
@@ -96,7 +96,7 @@ public class ChatController {
         }
 
         if (sendto != null) {
-            User user = userService.selectByPrimaryKey(sendto);
+            User user = userService.selectByUserID(sendto);
             model.addAttribute("sendto", user);
         }
         return "adminChat";

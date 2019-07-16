@@ -14,9 +14,19 @@ public class CategoryTick {
 
     @RequestMapping("/categorytick")
     public Msg categorytick(){
-
         categoryservice.TickBack();
-        
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/catepage")
+    public Msg catepage(Integer id){
+        categoryservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/catepagename")
+    public Msg catepagename(String name){
+        categoryservice.RefreshDBD(name, true);
         return Msg.success("successful");
     }
 }
