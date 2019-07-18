@@ -1,9 +1,18 @@
 package com.github.gantleman.shopd.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import com.github.gantleman.shopd.da.UserDA;
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.dao.UserMapper;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.entity.UserExample;
+import com.github.gantleman.shopd.service.CacheService;
+import com.github.gantleman.shopd.service.UserService;
 import com.github.gantleman.shopd.service.jobs.UserJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
@@ -14,15 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
@@ -32,22 +32,16 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CacheService cacheService;
 
-    @Autowired(required = false)
+    @Autowired
     private RedisUtil redisu;
-
-    @Value("${srping.quartz.exprie}")
-    Integer exprie;
 
     @Autowired
     private UserJob job;
-
+    
     @Autowired
     private QuartzManager quartzManager;
 
     private String classname = "User";
-
-    @Value("${srping.cache.page}")
-    Integer page;
 
     @PostConstruct
     public void init() {
@@ -58,62 +52,72 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User selectByUserID(Integer userId) {
-        User re = (User) redisu.hget(classname, userId.toString());
-        if(re == null){
-            if(redisu.hasKey(classname)){
-                //write redis
-                Map<String, Object> tmap = new HashMap<>();
-
-                List<User> lre = userMapper.selectByExample(new UserExample());
-                for (User value : lre) {
-                    tmap.put(value.getUserid().toString(), (Object)value);
-                }
-
-                ///read and write
-                if(!redisu.hasKey(classname)) {
-                    redisu.hmset(classname, tmap, 0);
-                }   
+    public User selectByUserID(Integer userid, String url) {
+        User re = null;
+        Integer pageId = cacheService.PageID(userid);
+        if(redisu.hHasKey(classname, userid.toString())) {
+            //read redis
+            Object o = redisu.hget(classname, userid.toString());
+            if(o != null){
+                re = (User) o;
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
             }
-        }
+        }else {
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/userpage", pageId);
+            }else{
+                RefreshDBD(pageId, true);
+            }
 
+            Object o = redisu.hget(classname, userid.toString());
+            if(o != null){
+                re = (User) o;
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+            }     
+        }
         return re;
     }
 
     @Override
-    public List<User> selectByAll() {
+    public List<User> selectByAll(Integer pageId, String url) {
         List<User> re = new ArrayList<User>();
 
-        if(redisu.hasKey(classname)) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
-            Map<Object, Object> rm = redisu.hmget(classname);
-            for (Object value : rm.values()) {
-                re.add( (User)value);
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                User r = (User) redisu.hget(classname, pageId.toString());
+                if(r != null)
+                    re.add(r);
             }
 
-            redisu.expire(classname, 0);
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }else {
-            //write redis
-            Map<String, Object> tmap = new HashMap<>();
-
-            re = userMapper.selectByExample(new UserExample());
-            for (User value : re) {
-                tmap.put(value.getUserid().toString(), (Object)value);
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/userpage", pageId);
+            }else{
+                RefreshDBD(pageId, true);
             }
 
-            ///read and write
-            if(!redisu.hasKey(classname)) {
-                redisu.hmset(classname, tmap, 0);
-            }   
+            Integer i = cacheService.PageBegin(pageId);
+            Integer l = cacheService.PageEnd(pageId);
+            for(;i < l; i++){
+                User r = (User) redisu.hget(classname, i.toString());
+                if(r != null)
+                    re.add(r);
+            }
+
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }
         return re;
     }
 
     @Override
-    public List<User> selectByInList(List<Integer> user) {
+    public List<User> selectByInList(List<Integer> user, String url) {
         List<User> re = new ArrayList<User>();
         for(Integer id : user){
-            User r = selectByUserID(id);
+            User r = selectByUserID(id, url);
             if(r != null)
                 re.add(r);
         }
@@ -123,65 +127,86 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> selectByName(String name) {
-        RefreshDBD();
-
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
-
-        return userDA.findAllUserByUserName(name);
+        List<User> user = userDA.findAllUserByUserName(name);
+        if(user.isEmpty()){
+            UserExample userExample = new UserExample();
+            userExample.or().andUsernameEqualTo(name);
+            user = userMapper.selectByExample(userExample);
+            
+            for(User u : user){
+                RefreshDBD(cacheService.PageID(u.getUserid()), false);
+            }
+        }
+        return user;
     }
 
     @Override
     public List<User> selectByNameAndPasswrod(String name, String Passwrod) {
-        RefreshDBD();
-
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
-
-        return userDA.findAllUserByUserNameAndPassword(name, Passwrod);
+        List<User> user = userDA.findAllUserByUserNameAndPassword(name, Passwrod);
+        if(user.isEmpty()){
+            UserExample userExample = new UserExample();
+            userExample.or().andUsernameEqualTo(name);
+            userExample.or().andPasswordEqualTo(Passwrod);
+            user = userMapper.selectByExample(userExample);
+            
+            for(User u : user){
+                RefreshDBD(cacheService.PageID(u.getUserid()), false);
+            }
+        }
+        return user;
 
     }
 
     @Override
     public void insertSelective(User user) {
-        RefreshDBD();
+
+        RefreshDBD(cacheService.PageID(user.getUserid()), false);
 
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
         long id = cacheService.eventCteate(classname);
         user.setUserid(new Long(id).intValue());
-        user.MakeStamp();
-        user.setStatus(2);
+        user.setStatus(CacheService.STATUS_INSERT);
         userDA.saveUser(user);
         BDBEnvironmentManager.getMyEntityStore().sync();
 
         //Re-publish to redis
+        redisu.hset("user_u", user.getUsername(), user.getUserid());
         redisu.hset(classname, user.getUserid().toString(), user, 0);
     }
 
     @Override
     public void deleteUserById(Integer userid) {
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(userid), false);
 
-        BDBEnvironmentManager.getInstance();
-        UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
-        User user = userDA.findUserById(userid);
- 
-        if (user != null)
-        {
-             user.MakeStamp();
-             user.setStatus(1);
-             userDA.saveUser(user);
- 
-             //Re-publish to redis
-             redisu.hdel(classname, user.getUserid().toString());
-        } 
+       BDBEnvironmentManager.getInstance();
+       UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
+       User user = userDA.findUserById(userid);
+
+       if(user != null && user.getStatus() == CacheService.STATUS_INSERT){
+            userDA.removedUserById(userid);
+            //Re-publish to redis
+            redisu.hdel(classname, user.getUserid().toString());
+            redisu.hdel("user_u", user.getUsername());
+       } else if (user != null)
+       {
+            user.setStatus(CacheService.STATUS_DELETE);
+            userDA.saveUser(user);
+
+            //Re-publish to redis
+            redisu.hdel("user_u", user.getUsername());
+            redisu.hdel(classname, user.getUserid().toString());
+       }   
     }
 
     @Override
     public void updateByPrimaryKeySelective(User iuser) {
-        RefreshDBD();
+        RefreshDBD(cacheService.PageID(iuser.getUserid()), false);
 
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
@@ -189,8 +214,9 @@ public class UserServiceImpl implements UserService {
  
         if (user != null)
         {
-            iuser.MakeStamp();
-            iuser.setStatus(3);
+            if(iuser.getStatus()== null){
+                iuser.setStatus(CacheService.STATUS_UPDATE);
+            }
             
             if(iuser.getEmail() != null){
                 user.setEmail(iuser.getEmail());
@@ -216,51 +242,73 @@ public class UserServiceImpl implements UserService {
     public void TickBack() {
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
-        List<User> luser = userDA.findAllWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
+        List<Integer> listid = cacheService.PageOut(classname);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                User user = userDA.findUserById(i);
+                if(user != null){
+                    if(null ==  user.getStatus()) {
+                        userDA.removedUserById(user.getUserid());
+                    }
+        
+                    if(CacheService.STATUS_DELETE ==  user.getStatus() && 1 == userMapper.deleteByPrimaryKey(user.getUserid())) {
+                        userDA.removedUserById(user.getUserid());
+                    }
+        
+                    if(CacheService.STATUS_INSERT ==  user.getStatus()  && 1 == userMapper.insert(user)) {
+                        userDA.removedUserById(user.getUserid());
+                    } 
 
-        for (User user : luser) {
-            if(null ==  user.getStatus()) {
-                userDA.removedUserById(user.getUserid());
+                    if(CacheService.STATUS_UPDATE ==  user.getStatus() && 1 == userMapper.updateByPrimaryKey(user)) {
+                        userDA.removedUserById(user.getUserid());
+                    } 
+                    redisu.hdel("user_u", user.getUsername());
+                    redisu.hdel(classname, user.getUserid().toString());
+                }
             }
-
-            if(1 ==  user.getStatus() && 1 == userMapper.deleteByPrimaryKey(user.getUserid  ())) {
-                userDA.removedUserById(user.getUserid());
-            }
-
-            if(2 ==  user.getStatus()  && 1 == userMapper.insert(user)) {
-                userDA.removedUserById(user.getUserid());
-            }
-
-            if(3 ==  user.getStatus() && 1 == userMapper.updateByPrimaryKey(user)) {
-                userDA.removedUserById(user.getUserid());
-            }
+            redisu.hdel(classname+"pageid", pageid.toString());
         }
-
         if (userDA.IsEmpty()){
             cacheService.Archive(classname);
         }
     }
 
-    public void RefreshDBD() {
-        ///init
-       if (cacheService.IsCache(classname)) {
-           BDBEnvironmentManager.getInstance();
-           UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
+    @Override
+    public void RefreshDBD(Integer pageID, boolean refresRedis) {
+        if (cacheService.IsCache(classname, pageID)) {
+            BDBEnvironmentManager.getInstance();
+            UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
+            ///init
+            List<User> re = new ArrayList<User>();          
+            UserExample userExample = new UserExample();
+            userExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            userExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
-           List<User> re = new ArrayList<User>();
-           re = userMapper.selectByExample(new UserExample());
-           for (User value : re) {
-                value.MakeStamp();
+            re = userMapper.selectByExample(userExample);
+            for (User value : re) {
+                redisu.hset(classname, value.getUserid().toString(), value);
                 userDA.saveUser(value);
+            }
 
-                redisu.hset(classname, value.getUserid().toString(), value, 0);
-           }
+            BDBEnvironmentManager.getMyEntityStore().sync();
+            quartzManager.addJob(classname,classname,classname,classname, UserJob.class, null, job);
+            redisu.hincr(classname+"pageid", pageID.toString(), 1);
+        }else if(refresRedis){
+            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+                BDBEnvironmentManager.getInstance();
+                UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
-           BDBEnvironmentManager.getMyEntityStore().sync();
-           
-           if(cacheService.IsCache(classname)){         
-               quartzManager.addJob(classname,classname,classname,classname, UserJob.class, null, job);          
-           }
-       }
-   }
+                Integer i = cacheService.PageBegin(pageID);
+                Integer l = cacheService.PageEnd(pageID);
+                for(;i < l; i++){
+
+                    User r = userDA.findUserById(i);
+                    if(r != null && r.getStatus() != CacheService.STATUS_DELETE)
+                     redisu.hset(classname, i.toString(), r);                        
+                }
+                redisu.hincr(classname+"pageid", pageID.toString(), 1);
+            }
+        }    
+    }
 }

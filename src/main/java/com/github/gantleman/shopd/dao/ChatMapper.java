@@ -1,7 +1,10 @@
 package com.github.gantleman.shopd.dao;
 
-import com.github.gantleman.shopd.entity.*;
 import java.util.List;
+
+import com.github.gantleman.shopd.entity.Chat;
+import com.github.gantleman.shopd.entity.ChatExample;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ChatMapper {

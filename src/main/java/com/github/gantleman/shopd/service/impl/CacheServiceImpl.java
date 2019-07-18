@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.CRC32;
 
 import com.github.gantleman.shopd.da.CacheDA;
 import com.github.gantleman.shopd.dao.CacheMapper;
@@ -34,11 +35,11 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     private ServerConfig sc;
 
-    @Value("${srping.cache.pagecount}")
-    Integer pagecount;
+    @Value("${srping.cache.pageamount}")
+    Integer pageamount;
 
-    @Value("${srping.cache.page}")
-    Integer page;
+    @Value("${srping.cache.pagesize}")
+    Integer pagesize;
 
     @Autowired
     private RedisUtil redisu;
@@ -139,6 +140,9 @@ public class CacheServiceImpl implements CacheService {
                 if(ruserid.containsKey(pageID)){
                     Integer value = ruserid.get(pageID);
                     ruserid.put(pageID, value+1);
+
+                    ra.setUserid(ruserid);
+                    cacheDA.saveCache(ra);
                     return true;
                 }
         }
@@ -151,15 +155,6 @@ public class CacheServiceImpl implements CacheService {
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
-
-        if(ra == null ){
-            CacheExample cacheExample = new CacheExample();
-            cacheExample.or().andCNameEqualTo(tablename);
-            List<Cache> lc = cacheMapper.selectByExample(cacheExample);
-
-            if(!lc.isEmpty())
-               ra = lc.get(0);
-        }
 
         if (ra != null) {
             return true;
@@ -177,8 +172,8 @@ public class CacheServiceImpl implements CacheService {
         if (ra != null) {
             Map<Integer, Integer> ListPage = ra.getUserid();
 
-            if(ListPage.size() >= pagecount){
-                Integer l = ListPage.size()-pagecount;
+            if(ListPage.size() >= pageamount){
+                Integer l = ListPage.size()-pageamount;
                 for(Integer i = 0;i < l;i++){
                     Integer k=0,v=0; 
                     for(Map.Entry<Integer, Integer> entry : ListPage.entrySet()){
@@ -209,17 +204,22 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public Integer PageBegin(Integer pageID) {
-        return pageID*page;
+        return pageID*pagesize;
     }
 
     @Override
     public Integer PageEnd(Integer pageID) {
-        return pageID*page+page-1;
+        return pageID*pagesize+pagesize-1;
     }
 
     @Override
     public Integer PageID(Integer ID) {
-        return ID/page;
+        return ID/pagesize;
+    }
+
+    @Override
+    public Integer PageSize() {
+        return pagesize;
     }
     
     @Override
@@ -244,6 +244,7 @@ public class CacheServiceImpl implements CacheService {
         }
     }
 
+    @Override
     public void RemoteRefresh(String url, String name) {
         Map<String, String> headers = new HashMap<>(); 
         Map<String, String> querys = new HashMap<>();                
@@ -254,6 +255,40 @@ public class CacheServiceImpl implements CacheService {
         } catch (Exception e) {
             e.printStackTrace();
         }      
+    }
+
+    @Override
+    public boolean EventCteateLocalCache(String tablename) {
+        ///create new
+        BDBEnvironmentManager.getInstance();
+        CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
+        Cache ra = cacheDA.findCacheByName(tablename);
+        if(ra == null)
+        {
+            CRC32 crc = new CRC32();
+            crc.update(tablename.getBytes());
+            
+            ra = new Cache();
+            Long id =crc.getValue();
+            ra.setcId(id.intValue());
+            ra.setcName(tablename);
+            cacheDA.saveCache(ra);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void ArchiveLocalCache(String tablename) {
+        //backe to sql
+        BDBEnvironmentManager.getInstance();
+        CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
+        Cache ra = cacheDA.findCacheByName(tablename);
+
+        if(ra != null)
+        {
+            cacheDA.removedCacheById(ra.getcId());
+        }
     }
 }
 

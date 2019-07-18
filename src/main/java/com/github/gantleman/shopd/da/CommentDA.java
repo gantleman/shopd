@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,31 +208,6 @@ public class CommentDA {
             }
         }
 		return count;
-	}
-
-
-	public List<Comment> findAllWhitStamp(long stamp) {
-		List<Comment> adminList = new ArrayList<Comment>();
-		// 打开游标
-		EntityCursor<Comment> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Comment comment : adminCursorList) {
-				if(comment.getStamp() <= stamp) {
-					adminList.add(comment);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 
 	public boolean IsEmpty() {

@@ -9,9 +9,9 @@ import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 //https://www.cnblogs.com/yipiaoganlu/p/9229874.html
 

@@ -14,8 +14,24 @@ public class ChatUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer status;
+
     public Integer getUserid() {
         return userid;
+    }
+
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public void setUserid(Integer userid) {

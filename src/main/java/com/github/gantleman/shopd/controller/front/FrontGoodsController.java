@@ -1,22 +1,33 @@
 package com.github.gantleman.shopd.controller.front;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.github.gantleman.shopd.entity.Activity;
+import com.github.gantleman.shopd.entity.Category;
+import com.github.gantleman.shopd.entity.Comment;
+import com.github.gantleman.shopd.entity.Favorite;
+import com.github.gantleman.shopd.entity.Goods;
+import com.github.gantleman.shopd.entity.ImagePath;
+import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.service.ActivityService;
+import com.github.gantleman.shopd.service.CacheService;
+import com.github.gantleman.shopd.service.CateService;
+import com.github.gantleman.shopd.service.CommentService;
+import com.github.gantleman.shopd.service.FavoriteService;
+import com.github.gantleman.shopd.service.GoodsService;
+import com.github.gantleman.shopd.service.ImagePathService;
+import com.github.gantleman.shopd.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.gantleman.shopd.entity.Msg;
-import com.github.gantleman.shopd.entity.Goods;
-import com.github.gantleman.shopd.entity.User;
-import com.github.gantleman.shopd.entity.Favorite;
-import com.github.gantleman.shopd.entity.Category;
-import com.github.gantleman.shopd.entity.ImagePath;
-import com.github.gantleman.shopd.entity.Activity;
-import com.github.gantleman.shopd.entity.Comment;
-import com.github.gantleman.shopd.service.GoodsService;
-import com.github.gantleman.shopd.service.UserService;
-import com.github.gantleman.shopd.service.FavoriteService;
-import com.github.gantleman.shopd.service.ActivityService;
-import com.github.gantleman.shopd.service.ImagePathService;
-import com.github.gantleman.shopd.service.CommentService;
-import com.github.gantleman.shopd.service.CateService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.*;
 
 @Controller
 public class FrontGoodsController {
@@ -56,6 +63,9 @@ public class FrontGoodsController {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private CacheService cacheService;
+
     @RequestMapping(value = "/detail",method = RequestMethod.GET)
     public String detailGoods(Integer goodsid, Model model, HttpSession session) {
 
@@ -69,12 +79,12 @@ public class FrontGoodsController {
         Map<String,Object> goodsInfo = new HashMap<String,Object>();
 
         //查询商品的基本信息
-        Goods goods = goodsService.selectById(goodsid);
+        Goods goods = goodsService.selectById(goodsid, request.getServletPath());
 
         if (user == null) {
             goods.setFav(false);
         } else {
-            Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goodsid);
+            Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goodsid, request.getServletPath());
             if (favorite == null) {
                 goods.setFav(false);
             } else {
@@ -86,7 +96,7 @@ public class FrontGoodsController {
         Category category = cateService.selectById(goods.getCategory(), request.getServletPath());
 
         //商品图片
-        List<ImagePath> imagePath = imagePathService.findImagePath(goodsid);
+        List<ImagePath> imagePath = imagePathService.findImagePath(goodsid,request.getServletPath());
 
         //商品评论
 
@@ -101,11 +111,11 @@ public class FrontGoodsController {
         model.addAttribute("goodsInfo",goodsInfo);
 
         //评论信息
-        List<Comment> commentList=commentService.selectByGoodsID(goods.getGoodsid());
+        List<Comment> commentList=commentService.selectByGoodsID(goods.getGoodsid(), request.getServletPath());
         for (Integer i=0;i<commentList.size();i++)
         {
             Comment comment=commentList.get(i);
-            User commentUser=userService.selectByUserID(comment.getUserid());
+            User commentUser=userService.selectByUserID(comment.getUserid(), request.getServletPath());
             comment.setUserName(commentUser.getUsername());
             commentList.set(i,comment);
         }
@@ -118,17 +128,17 @@ public class FrontGoodsController {
     public String searchGoods(@RequestParam(value = "page",defaultValue = "1") Integer pn, String keyword, Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        //一页显示几个数据
-        PageHelper.startPage(pn, 16);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
         //查询数据
-        List<Goods> goodsList = goodsService.selectByName(keyword);
+        List<Goods> goodsList = goodsService.selectByName(keyword, request.getServletPath());
 
         //获取图片地址
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
 
             goods.setImagePaths(imagePathList);
 
@@ -136,7 +146,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid());
+                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid(), request.getServletPath());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -148,7 +158,7 @@ public class FrontGoodsController {
         }
 
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(goodsList,5);
         model.addAttribute("pageInfo", page);
         model.addAttribute("keyword", keyword);
@@ -194,8 +204,8 @@ public class FrontGoodsController {
     public String getCateGoods(String cate, @RequestParam(value = "page",defaultValue = "1") Integer pn, Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        //一页显示几个数据
-        PageHelper.startPage(pn, 16);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
         //查询分类id
         List<Category> categoryList = cateService.selectByNameForRead(cate, request.getServletPath());
@@ -207,13 +217,13 @@ public class FrontGoodsController {
         }
 
         //查询数据
-        List<Goods> goodsList = goodsService.selectByDetailcateAndID(cate, cateId);
+        List<Goods> goodsList = goodsService.selectByDetailcateAndID(cateId, request.getServletPath());
 
         //获取图片地址
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
 
             goods.setImagePaths(imagePathList);
 
@@ -221,7 +231,7 @@ public class FrontGoodsController {
             if (user == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid());
+                Favorite favorite = favoriteService.selectFavByKey(user.getUserid(), goods.getGoodsid(), request.getServletPath());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -233,7 +243,7 @@ public class FrontGoodsController {
         }
 
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(goodsList,5);
         model.addAttribute("pageInfo", page);
         model.addAttribute("cate", cate);

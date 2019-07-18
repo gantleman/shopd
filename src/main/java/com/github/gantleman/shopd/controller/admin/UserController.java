@@ -2,10 +2,12 @@ package com.github.gantleman.shopd.controller.admin;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.github.gantleman.shopd.entity.Msg;
 import com.github.gantleman.shopd.entity.User;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -26,18 +28,23 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CacheService cacheService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping("/showjson")
     @ResponseBody
     public Msg getAllGoods(@RequestParam(value = "page",defaultValue = "1") Integer pn, HttpServletResponse response, Model model) {
-        //一页显示几个数据
-        PageHelper.startPage(pn, 10);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
-        List<User> userList = userService.selectByAll();
+        List<User> userList = userService.selectByAll(pn-1, request.getServletPath());
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(userList,5);
-
-       /* model.addAttribute("pageInfo", page);*/
+        //model.addAttribute("pageInfo", page);
 
         return Msg.success("查询成功!").add("pageInfo", page);
     }

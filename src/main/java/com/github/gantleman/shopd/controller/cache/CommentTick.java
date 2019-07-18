@@ -19,4 +19,16 @@ public class CommentTick {
         
         return Msg.success("successful");
     }
+
+    @RequestMapping("/commentpage")
+    public Msg commentpage(Integer id){
+        commentservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/commentgoodspage")
+    public Msg commentgoodspage(Integer id){
+        commentservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
 }

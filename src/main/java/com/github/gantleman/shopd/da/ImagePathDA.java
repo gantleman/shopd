@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.ImagePath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,30 +147,6 @@ public class ImagePathDA {
             }
         }
 		return count;
-	}
-
-	public List<ImagePath> findAllWhitStamp(long stamp) {
-		List<ImagePath> adminList = new ArrayList<ImagePath>();
-		// 打开游标
-		EntityCursor<ImagePath> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (ImagePath imagepath : adminCursorList) {
-				if(imagepath.getStamp() <= stamp) {
-					adminList.add(imagepath);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 
 	public boolean IsEmpty() {

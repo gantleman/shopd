@@ -16,6 +16,7 @@ import com.github.gantleman.shopd.entity.Category;
 import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.ImagePath;
 import com.github.gantleman.shopd.entity.Msg;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.CateService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.ImagePathService;
@@ -47,6 +48,9 @@ public class GoodsController {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private CacheService cacheService;
+
     @RequestMapping("/showjson")
     @ResponseBody
     public Msg getAllGoods(@RequestParam(value = "page", defaultValue = "1") Integer pn, HttpServletResponse response, Model model, HttpSession session) {
@@ -54,12 +58,12 @@ public class GoodsController {
         if (admin == null) {
             return Msg.fail("请先登录");
         }
-        //一页显示几个数据
-        PageHelper.startPage(pn, 10);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
-        List<Goods> employees = goodsService.selectByAll();
+        List<Goods> employees = goodsService.selectByAll(pn-1, request.getServletPath());
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(employees, 5);
         model.addAttribute("pageInfo", page);
         return Msg.success("查询成功!").add("pageInfo", page);

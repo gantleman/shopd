@@ -26,9 +26,15 @@ public interface CacheService {
 
     public Integer PageID(Integer ID);
 
+    public Integer PageSize();
+
     public boolean IsLocal(String url);
 
     public void RemoteRefresh(String url, Integer Id);
 
     public void RemoteRefresh(String url, String name);
+
+    public boolean EventCteateLocalCache(String tablename);
+
+    public void ArchiveLocalCache(String tablename);
 }

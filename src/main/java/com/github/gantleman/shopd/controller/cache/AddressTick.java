@@ -19,7 +19,7 @@ public class AddressTick {
     }
 
     @RequestMapping("/addresspage")
-    public Msg activitypage(Integer id){
+    public Msg addresspage(Integer id){
         addressservice.RefreshDBD(id, true);
         return Msg.success("successful");
     }

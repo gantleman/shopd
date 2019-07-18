@@ -1,18 +1,21 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.Order;
 import java.util.List;
+
+import com.github.gantleman.shopd.entity.Order;
 
 public interface OrderService {
 
     //only read
-    public List<Order> selectOrderByIssendAndIsreceiveAndIscomplete();
+    public List<Order> selectOrderByAll(Integer pageId,  String url);
 
-    public List<Order> selectOrderByIssendAndIsreceive();
+    public List<Order> selectOrderByIssendAndIsreceive(String url);
 
-    public List<Order> selectOrderByIssend();
+    public List<Order> selectOrderByIssend(String url);
     
-    public List<Order> selectOrderByIUserID(Integer UserID);  
+    public List<Order> selectOrderByIUserID(Integer UserID, String url);
+
+    public Order getOrderByKey(Integer orderid, String url);
 
     //have write
     public void insertOrder(Order order);
@@ -23,5 +26,11 @@ public interface OrderService {
 
     public void TickBack();
 
-    public void RefreshDBD();
+    public void TickBack_extra();
+
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
+
+    public void RefreshUserDBD(Integer pageID, boolean andAll, boolean refresRedis);
+
+    public void RefreshIsDBD(boolean refresRedis);
 }

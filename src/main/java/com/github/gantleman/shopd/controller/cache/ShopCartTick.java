@@ -13,10 +13,22 @@ public class ShopCartTick {
     private ShopCartService shopcartservice;
 
     @RequestMapping("/shopcarttick")
-    public Msg goodstick(){
+    public Msg shopcarttick(){
 
         shopcartservice.TickBack();
-        
+        return Msg.success("successful");
+    }
+
+
+    @RequestMapping("/shopcartpage")
+    public Msg shopcartpage(Integer id){
+        shopcartservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/shopcartuserpage")
+    public Msg shopcartuserpage(Integer id){
+        shopcartservice.RefreshUserDBD(id, true, true);
         return Msg.success("successful");
     }
 }

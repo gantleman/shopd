@@ -12,6 +12,7 @@ import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.Order;
 import com.github.gantleman.shopd.entity.OrderItem;
 import com.github.gantleman.shopd.service.AddressService;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.gantleman.shopd.service.OrderItemService;
 import com.github.gantleman.shopd.service.OrderService;
@@ -43,6 +44,9 @@ public class AdminOrderController {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private CacheService cacheService;
+
     @RequestMapping("/send")
     public String sendOrder(@RequestParam(value = "page",defaultValue = "1")Integer pn, Model model, HttpSession session) {
 
@@ -51,21 +55,21 @@ public class AdminOrderController {
             return "redirect:/admin/login";
         }
 
-        //一页显示几个数据
-        PageHelper.startPage(pn, 2);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
         //查询未发货订单
-        List<Order> orderList = orderService.selectOrderByIssend();
+        List<Order> orderList = orderService.selectOrderByIssend(request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-                Goods goods = goodsService.selectById(orderItem.getGoodsid());
+                Goods goods = goodsService.selectById(orderItem.getGoodsid(), request.getServletPath());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
@@ -80,7 +84,7 @@ public class AdminOrderController {
             orderList.set(i, order);
         }
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(orderList,5);
         model.addAttribute("pageInfo", page);
 
@@ -106,21 +110,21 @@ public class AdminOrderController {
         if (admin == null) {
             return "redirect:/admin/login";
         }
-        //一页显示几个数据
-        PageHelper.startPage(pn, 2);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
         //查询未收货订单
-        List<Order> orderList = orderService.selectOrderByIssendAndIsreceive();
+        List<Order> orderList = orderService.selectOrderByIssendAndIsreceive(request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-                Goods goods = goodsService.selectById(orderItem.getGoodsid());
+                Goods goods = goodsService.selectById(orderItem.getGoodsid(), request.getServletPath());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
@@ -134,7 +138,7 @@ public class AdminOrderController {
             orderList.set(i, order);
         }
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(orderList,5);
         model.addAttribute("pageInfo", page);
 
@@ -147,21 +151,21 @@ public class AdminOrderController {
         if (admin == null) {
             return "redirect:/admin/login";
         }
-        //一页显示几个数据
-        PageHelper.startPage(pn, 2);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
         //查询已完成订单
-        List<Order> orderList = orderService.selectOrderByIssendAndIsreceiveAndIscomplete();
+        List<Order> orderList = orderService.selectOrderByAll(pn -1, request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
         //查询该订单中的商品
         for (int i = 0; i < orderList.size(); i++) {
             //获取订单项中的goodsid
             Order order = orderList.get(i);
-            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid());
+            List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
             for (OrderItem orderItem : orderItemList) {
-                Goods goods = goodsService.selectById(orderItem.getGoodsid());
+                Goods goods = goodsService.selectById(orderItem.getGoodsid(), request.getServletPath());
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
@@ -176,7 +180,7 @@ public class AdminOrderController {
             orderList.set(i, order);
         }
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(orderList, 5);
         model.addAttribute("pageInfo", page);
         return "adminOrderComplete";

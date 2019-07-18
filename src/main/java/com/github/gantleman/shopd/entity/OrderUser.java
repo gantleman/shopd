@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 import com.sleepycat.persist.model.PrimaryKey;
 
-public class ShopcartUser implements Serializable {
+public class OrderUser implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer userid;
 
-    private Integer shopcartSize;
+    private Integer orderSize;
 
-    private String shopcartList;
+    private String orderList;
 
     private static final long serialVersionUID = 1L;
 
@@ -38,19 +38,19 @@ public class ShopcartUser implements Serializable {
         this.userid = userid;
     }
 
-    public Integer getShopcartSize() {
-        return shopcartSize;
+    public Integer getOrderSize() {
+        return orderSize;
     }
 
-    public void setShopcartSize(Integer shopcartSize) {
-        this.shopcartSize = shopcartSize;
+    public void setOrderSize(Integer orderSize) {
+        this.orderSize = orderSize;
     }
 
-    public String getShopcartList() {
-        return shopcartList;
+    public String getOrderList() {
+        return orderList;
     }
 
-    public void setShopcartList(String shopcartList) {
-        this.shopcartList = shopcartList == null ? null : shopcartList.trim();
+    public void setOrderList(String orderList) {
+        this.orderList = orderList == null ? null : orderList.trim();
     }
 }

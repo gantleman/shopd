@@ -1,9 +1,15 @@
 package com.github.gantleman.shopd.service.impl;
 
 import com.github.gantleman.shopd.da.ShopCartDA;
-import com.github.gantleman.shopd.dao.*;
-import com.github.gantleman.shopd.entity.*;
-import com.github.gantleman.shopd.service.*;
+import com.github.gantleman.shopd.da.ShopcartUserDA;
+import com.github.gantleman.shopd.dao.ShopCartMapper;
+import com.github.gantleman.shopd.dao.ShopcartUserMapper;
+import com.github.gantleman.shopd.entity.ShopCart;
+import com.github.gantleman.shopd.entity.ShopCartExample;
+import com.github.gantleman.shopd.entity.ShopcartUser;
+import com.github.gantleman.shopd.entity.ShopcartUserExample;
+import com.github.gantleman.shopd.service.ShopCartService;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.jobs.ShopCartJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
@@ -13,6 +19,8 @@ import com.github.gantleman.shopd.util.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import net.sf.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,14 +35,14 @@ public class ShopCartServiceImpl implements ShopCartService {
     @Autowired(required = false)
     ShopCartMapper shopCartMapper;
 
+    @Autowired(required = false)
+    private ShopcartUserMapper shopcartUserMapper;
+
     @Autowired
     private CacheService cacheService;
 
-    @Autowired(required = false)
+    @Autowired
     private RedisUtil redisu;
-
-    @Value("${srping.quartz.exprie}")
-    Integer exprie;
 
     @Autowired
     private ShopCartJob job;
@@ -44,8 +52,7 @@ public class ShopCartServiceImpl implements ShopCartService {
 
     private String classname = "ShopCart";
 
-    @Value("${srping.cache.page}")
-    Integer page;
+    private String classname_extra = "ShopCart_User";
 
     @PostConstruct
     public void init() {
@@ -56,75 +63,182 @@ public class ShopCartServiceImpl implements ShopCartService {
     }
 
     @Override
-    public List<ShopCart> selectByID(Integer UserID) {
-        List<ShopCart> re = null;
-
-        if(redisu.hasKey("ShopCart_u"+UserID.toString())) {
+    public List<ShopCart> selectByID(Integer userID, String url) {
+        List<ShopCart> re = new  ArrayList<ShopCart>();
+        if(redisu.hasKey("shopcart_u"+userID.toString())) {
             //read redis
-            Set<Object> ro = redisu.sGet("ShopCart_u"+UserID.toString());
+            Set<Object> ro = redisu.sGet("shopcart_u"+userID.toString());
             re = new ArrayList<ShopCart>();
             for (Object id : ro) {
-                ShopCart r =  (ShopCart) redisu.hget(classname, ((Integer)id).toString());
+                ShopCart r =  getShopCartByKey((Integer)id, url);
                 if (r != null)
                     re.add(r);
             }
-            redisu.expire("ShopCart_u"+UserID.toString(), 0);
-            redisu.expire(classname, 0);
+            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else {
-            //write redis
-            ShopCartExample shopcartExample=new ShopCartExample();
-            shopcartExample.or().andUseridEqualTo(UserID);
-            
-            re = shopCartMapper.selectByExample(shopcartExample);
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/shopcartuserpage", userID);
+            }else{
+                RefreshUserDBD(userID, true, true);
+            }
 
-            ///read and write
-            if(!redisu.hasKey("ShopCart_u"+UserID.toString())) {
-                for( ShopCart item : re ){
-                    redisu.sAddAndTime("ShopCart_u"+item.getUserid().toString(), 0, (Object)item.getShopcartid());
-                    redisu.hset(classname, item.getShopcartid().toString(), item);
+            if(redisu.hasKey("shopcart_u"+userID.toString())) {
+                //read redis
+                Set<Object> ro = redisu.sGet("shopcart_u"+userID.toString());
+                re = new ArrayList<ShopCart>();
+                for (Object id : ro) {
+                    ShopCart r =  getShopCartByKey((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
                 }
-                redisu.expire(classname, 0);
-            }   
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
+            }
         }
         return re;
     }
 
     @Override
-    public void addShopCart(ShopCart shopcart) {
-        RefreshDBD(shopcart.getUserid());
+    public ShopCart getShopCartByKey(Integer shopcartid, String url) {
+        ShopCart re = null;
+        Integer pageId = cacheService.PageID(shopcartid);
+        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+            //read redis
+            re = (ShopCart) redisu.hget(classname, shopcartid.toString());
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
+        }else {         
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/shopcartpage", pageId);
+            }else{
+                RefreshDBD(pageId, true);
+            }
 
+            if(redisu.hHasKey(classname, shopcartid.toString())) {
+                //read redis
+                re = (ShopCart) redisu.hget(classname, shopcartid.toString());
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+            }
+        }
+        return re;
+    }
+
+    public void insertSelective_extra(ShopCart shopcart) {
+        //add to ShopcartUserDA
+        RefreshUserDBD(shopcart.getUserid(), false, false);
+        BDBEnvironmentManager.getInstance();
+        ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
+        ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(shopcart.getUserid());
+        if(shopcartUser == null){
+            List<Integer> shopcartIdList = new ArrayList<>();
+            shopcartIdList.add(shopcart.getShopcartid());
+            JSONArray jsonArray = JSONArray.fromObject(shopcartIdList);
+
+            shopcartUser = new ShopcartUser();
+            shopcartUser.setShopcartSize(1); 
+            shopcartUser.setShopcartList(jsonArray.toString());
+            shopcartUser.setStatus(CacheService.STATUS_INSERT);
+        }else{
+            List<Integer> shopcartIdList = new ArrayList<>();
+            JSONArray jsonArray = JSONArray.fromObject(shopcartUser.getShopcartList());
+            shopcartIdList = JSONArray.toList(jsonArray,Integer.class);
+            shopcartIdList.add(shopcart.getShopcartid());
+
+            shopcartUser.setShopcartSize(shopcartUser.getShopcartSize() + 1); 
+            shopcartUser.setShopcartList(jsonArray.toString());
+            if(shopcartUser.getStatus() == null || shopcartUser.getStatus() == CacheService.STATUS_DELETE)
+                shopcartUser.setStatus(CacheService.STATUS_UPDATE);
+        }
+        shopcartUserDA.saveShopcartUser(shopcartUser);
+
+        //Re-publish to redis
+        redisu.sAdd("shopcart_u" + shopcart.getUserid().toString(), shopcart.getShopcartid()); 
+    }
+
+    @Override
+    public void addShopCart(ShopCart shopcart) {
         BDBEnvironmentManager.getInstance();
         ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
 
         long id = cacheService.eventCteate(classname);
+        Integer iid = (int) id;
+        RefreshDBD(cacheService.PageID(iid), false);
+
         shopcart.setShopcartid(new Long(id).intValue());
-        shopcart.MakeStamp();
-        shopcart.setStatus(2);
+        shopcart.setStatus(CacheService.STATUS_INSERT);
         shopcartDA.saveShopCart(shopcart);
         BDBEnvironmentManager.getMyEntityStore().sync();
 
         //Re-publish to redis
-        redisu.hset(classname, shopcart.getShopcartid().toString(), shopcart, 0);
+        redisu.hset(classname, shopcart.getShopcartid().toString(), (Object)shopcart, 0);
+
+        insertSelective_extra(shopcart);
+    }
+
+    public void deleteByPrimaryKey_extra(ShopCart shopcart) {
+        RefreshUserDBD(shopcart.getUserid(), false, false);
+
+        BDBEnvironmentManager.getInstance();
+        ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
+        ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(shopcart.getUserid());
+
+        if(shopcartUser != null){
+            List<Integer> shopcartList = new ArrayList<>();
+            JSONArray jsonArray = JSONArray.fromObject(shopcartUser.getShopcartList());
+            shopcartList = JSONArray.toList(jsonArray, Integer.class);
+
+            shopcartList.remove(shopcart.getShopcartid());
+            JSONArray jsonarray = JSONArray.fromObject(shopcartList);
+            shopcartUser.setShopcartList(jsonarray.toString());
+
+            if(shopcartUser.getShopcartSize() >= 1){
+                shopcartUser.setShopcartSize(shopcartUser.getShopcartSize() - 1);
+                //Re-publish to redis
+                 redisu.setRemove("shopcart_u" + shopcart.getUserid().toString(), shopcart.getShopcartid());
+            } else if(shopcartUser.getShopcartSize() == 0){
+                //list empty
+                if(shopcartUser.getStatus() == CacheService.STATUS_INSERT){
+                    shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
+                }else{
+                    shopcartUser.setStatus(CacheService.STATUS_DELETE);
+                }
+                //Re-publish to redis
+                redisu.del("shopcart_u" + shopcart.getUserid().toString());
+            }
+            shopcartUserDA.saveShopcartUser(shopcartUser);
+            BDBEnvironmentManager.getMyEntityStore().sync();
+        }
+    }
+
+    @Override
+    public void deleteByPrimaryKey(Integer shopcartid) {
+        RefreshDBD(cacheService.PageID(shopcartid), false);
+
+        BDBEnvironmentManager.getInstance();
+        ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
+        ShopCart shopcart = shopcartDA.findShopCartById(shopcartid);
+ 
+        if (shopcart != null)
+        {
+             shopcart.setStatus(CacheService.STATUS_DELETE);
+             shopcartDA.saveShopCart(shopcart);
+
+             //Re-publish to redis
+             redisu.hdel(classname, shopcart.getShopcartid().toString(), 0);
+             
+             deleteByPrimaryKey_extra(shopcart);
+        }   
     }
 
     @Override
     public void deleteByKey(Integer userid, Integer goodsid) {
-        RefreshDBD(userid);
-        BDBEnvironmentManager.getInstance();
-        ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
-        List <ShopCart> shopCart = shopcartDA.findAllShopCartByUGID(userid, goodsid);
-
-        for(ShopCart item : shopCart){
-            item.MakeStamp();
-            item.setStatus(1);
-            shopcartDA.saveShopCart(item);
-            redisu.hdel(classname, item.getShopcartid().toString());        
+        ShopCart r =  selectCartByKey(userid, goodsid);
+        if(r != null){
+            deleteByPrimaryKey(r.getShopcartid());
         }
     }
 
     @Override
     public void updateCartByKey(ShopCart ishopcart) {
-        RefreshDBD(ishopcart.getUserid());
+        RefreshDBD(ishopcart.getShopcartid(), false);
 
         BDBEnvironmentManager.getInstance();
         ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
@@ -132,8 +246,8 @@ public class ShopCartServiceImpl implements ShopCartService {
  
         if (shopcart != null)
         {
-            ishopcart.MakeStamp();
-            ishopcart.setStatus(3);
+            if(ishopcart.getStatus()== null)
+                ishopcart.setStatus(CacheService.STATUS_UPDATE);
             
             if(ishopcart.getCatedate() != null){
                 shopcart.setCatedate(ishopcart.getCatedate());
@@ -158,7 +272,7 @@ public class ShopCartServiceImpl implements ShopCartService {
 
     @Override
     public ShopCart selectCartByKey(Integer userid, Integer goodsid) {
-        RefreshDBD(userid);
+        RefreshUserDBD(userid, false, false);
         BDBEnvironmentManager.getInstance();
         ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
         List <ShopCart> shopCart = shopcartDA.findAllShopCartByUGID(userid, goodsid);
@@ -170,59 +284,157 @@ public class ShopCartServiceImpl implements ShopCartService {
     }
 
     @Override
-    public void TickBack() {
+    public void TickBack_extra() {
         BDBEnvironmentManager.getInstance();
-        ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
-        List<ShopCart> lshopcart = shopcartDA.findAllWhitStamp(TimeUtils.getTimeWhitLong() - exprie);
+        ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
+        List<Integer> listid = cacheService.PageOut(classname_extra);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(i);
+                if(shopcartUser != null){
+                    if(null ==  shopcartUser.getStatus()) {
+                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
+                    }
+        
+                    if(CacheService.STATUS_DELETE ==  shopcartUser.getStatus() && 1 == shopcartUserMapper.deleteByPrimaryKey(shopcartUser.getUserid())) {
+                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
+                    }
+        
+                    if(CacheService.STATUS_INSERT ==  shopcartUser.getStatus()  && 1 == shopcartUserMapper.insert(shopcartUser)) {
+                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
+                    } 
 
-        for (ShopCart shopcart : lshopcart) {
-            if(null ==  shopcart.getStatus()) {
-                shopcartDA.removedShopCartById(shopcart.getShopcartid());
+                    if(CacheService.STATUS_UPDATE ==  shopcartUser.getStatus() && 1 == shopcartUserMapper.updateByPrimaryKey(shopcartUser)) {
+                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
+                    }
+                    redisu.del("shopcart_u"+shopcartUser.getUserid().toString());
+                }
             }
-
-            if(1 ==  shopcart.getStatus() && 1 == shopCartMapper.deleteByPrimaryKey(shopcart.getShopcartid  ())) {
-                shopcartDA.removedShopCartById(shopcart.getShopcartid());
-            }
-
-            if(2 ==  shopcart.getStatus()  && 1 == shopCartMapper.insert(shopcart)) {
-                shopcartDA.removedShopCartById(shopcart.getShopcartid());
-            }
-
-            if(3 ==  shopcart.getStatus() && 1 == shopCartMapper.updateByPrimaryKey(shopcart)) {
-                shopcartDA.removedShopCartById(shopcart.getShopcartid());
-            }
+            redisu.hdel(classname_extra+"pageid", pageid.toString());
         }
-
-        if (shopcartDA.IsEmpty()){
+        if (shopcartUserDA.IsEmpty()){
             cacheService.Archive(classname);
         }
     }
 
-    public void RefreshDBD(Integer userid) {
-        ///init
-       if (cacheService.IsCache(classname, userid)) {
-           BDBEnvironmentManager.getInstance();
-           ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
+    @Override
+    public void TickBack() {
+        BDBEnvironmentManager.getInstance();
+        ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
+        List<Integer> listid = cacheService.PageOut(classname);
+        for(Integer pageid : listid){
+            int l = cacheService.PageEnd(pageid);
+            for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
+                ShopCart shopcart = shopcartDA.findShopCartById(i);
+                if(shopcart != null){
+                    if(null ==  shopcart.getStatus()) {
+                        shopcartDA.removedShopCartById(shopcart.getShopcartid());
+                    }
+        
+                    if(CacheService.STATUS_DELETE ==  shopcart.getStatus() && 1 == shopCartMapper.deleteByPrimaryKey(shopcart.getShopcartid())) {
+                        shopcartDA.removedShopCartById(shopcart.getShopcartid());
+                    }
+        
+                    if(CacheService.STATUS_INSERT ==  shopcart.getStatus()  && 1 == shopCartMapper.insert(shopcart)) {
+                        shopcartDA.removedShopCartById(shopcart.getShopcartid());
+                    } 
 
-           Set<Integer> id = new HashSet<Integer>();
-           List<ShopCart> re = new ArrayList<ShopCart>();
+                    if(CacheService.STATUS_UPDATE ==  shopcart.getStatus() && 1 == shopCartMapper.updateByPrimaryKey(shopcart)) {
+                        shopcartDA.removedShopCartById(shopcart.getShopcartid());
+                    }
+                    redisu.hdel(classname, shopcart.getShopcartid().toString());
+                }
+            }
+            redisu.hdel(classname+"pageid", pageid.toString());
+        }
+        if (shopcartDA.IsEmpty()){
+            cacheService.Archive(classname);
+        }
 
-           ShopCartExample shopcartExample = new ShopCartExample();
-           shopcartExample.or().andUseridEqualTo(userid);
-           re = shopCartMapper.selectByExample(shopcartExample);
-           for (ShopCart value : re) {
-               value.MakeStamp();
-               shopcartDA.saveShopCart(value);
+        TickBack_extra();
+    }
 
-               redisu.sAddAndTime("ShopCart_u"+userid.toString(), 0, value.getShopcartid()); 
-               redisu.hset(classname, value.getShopcartid().toString(), value, 0);
-           }
+    @Override
+    public void RefreshDBD(Integer pageID, boolean refresRedis) {
+        if (cacheService.IsCache(classname, pageID)) {
+            BDBEnvironmentManager.getInstance();
+            ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
+            ///init
+            List<ShopCart> re = new ArrayList<ShopCart>();          
+            ShopCartExample shopcartExample = new ShopCartExample();
+            shopcartExample.or().andShopcartidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
+            shopcartExample.or().andShopcartidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
-           BDBEnvironmentManager.getMyEntityStore().sync();
-           
-           if(cacheService.IsCache(classname)){         
-               quartzManager.addJob(classname,classname,classname,classname, ShopCartJob.class, null, job);          
-           }
-       }
-   }
+            re = shopCartMapper.selectByExample(shopcartExample);
+            for (ShopCart value : re) {
+                redisu.hset(classname, value.getShopcartid().toString(), value);
+                shopcartDA.saveShopCart(value);
+            }
+
+            BDBEnvironmentManager.getMyEntityStore().sync();
+            quartzManager.addJob(classname,classname,classname,classname, ShopCartJob.class, null, job);
+            redisu.hincr(classname+"pageid", pageID.toString(), 1);
+        }else if(refresRedis){
+            if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
+                BDBEnvironmentManager.getInstance();
+                ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
+
+                Integer i = cacheService.PageBegin(pageID);
+                Integer l = cacheService.PageEnd(pageID);
+                for(;i < l; i++){
+                    ShopCart r = shopcartDA.findShopCartById(i);
+                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
+                        redisu.hset(classname, i.toString(), r);   
+                    }  
+                }
+                redisu.hincr(classname+"pageid", pageID.toString(), 1);
+            }
+        }    
+    }
+
+    @Override
+    public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
+        BDBEnvironmentManager.getInstance();
+        ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
+        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+            /// init
+            List<ShopcartUser> re = new ArrayList<ShopcartUser>();          
+            ShopcartUserExample shopcartUserExample = new ShopcartUserExample();
+            shopcartUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
+            shopcartUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+
+            re = shopcartUserMapper.selectByExample(shopcartUserExample);
+            for (ShopcartUser value : re) {
+                shopcartUserDA.saveShopcartUser(value);
+
+                List<Integer> shopcartIdList = new ArrayList<>();
+                JSONArray jsonArray = JSONArray.fromObject(value.getShopcartList());
+                shopcartIdList = JSONArray.toList(jsonArray, Integer.class);
+
+                for(Integer shopcartId: shopcartIdList){
+                    redisu.sAdd("shopcart_u"+value.getUserid().toString(), (Object)shopcartId);
+                }
+
+                if(andAll && userID == value.getUserid() && value.getShopcartSize() != 0){  
+                    for(Integer shopcartId: shopcartIdList){
+                        RefreshDBD(cacheService.PageID(shopcartId), refresRedis);
+                    }
+                }
+            }
+            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
+        }else if(refresRedis){
+            if(!redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
+                Integer i = cacheService.PageBegin(cacheService.PageID(userID));
+                Integer l = cacheService.PageEnd(cacheService.PageID(userID));
+                for(;i < l; i++){
+                    ShopcartUser r = shopcartUserDA.findShopcartUserById(i);
+                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
+                        redisu.sAdd("shopcart_u"+r.getUserid().toString(), (Object)r.getShopcartList()); 
+                    }                
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
+            }
+        }
+    }
 }

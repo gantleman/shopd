@@ -1,9 +1,7 @@
 package com.github.gantleman.shopd.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +16,6 @@ import com.github.gantleman.shopd.service.jobs.CategoryJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
-import com.github.gantleman.shopd.util.TimeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,22 +87,19 @@ public class CateServiceImpl implements CateService {
     public List<Category> selectByNameForRead(String cate, String url) {
         List<Category> re = new ArrayList<>();
 
-        if(redisu.hasKey("category_u"+cate)) {
+        if(redisu.hHasKey("category_u", cate)) {
             //read redis
-            Set<Object> ro = redisu.sGet("category_u"+cate);
-            re = new ArrayList<Category>();
-            for (Object id : ro) {
-                Category r =  selectById((Integer)id, url);
-                if (r != null)
-                    re.add(r);
-            }
+            Object id = redisu.hget("category_u", cate);
+            Category r =  selectById((Integer)id, url);
+            if (r != null)
+                re.add(r);
         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/catepagename", cate);
             }else{
                 RefreshDBD(cate, true);
             }
-            if(redisu.hasKey("category_u"+cate)) {
+            if(redisu.hHasKey("category_u", cate)) {
                 //read redis
                 Object id = redisu.hget("category_u", cate);
                 if(id != null){
@@ -147,6 +141,8 @@ public class CateServiceImpl implements CateService {
 
     @Override
     public List<Category> selectByName(String catename) {
+        //Because the name cannot be changed to page id, 
+        //every retrieval failure triggers the retrieval database.
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
         List<Category> category = categoryDA.findAllChatByCategoryName(catename);
@@ -189,12 +185,11 @@ public class CateServiceImpl implements CateService {
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
         Category lcategory = categoryDA.findCategoryById(category.getCateid());
 
-        if(lcategory.getStatus()== null)
+        if(lcategory.getStatus()== null){
             lcategory.setStatus(CacheService.STATUS_UPDATE);
-        
-        if(category.getCatename() != null){
-            lcategory.setCatename(category.getCatename());
         }
+
+        lcategory.setCatename(category.getCatename());
         categoryDA.saveCategory(lcategory);
 
         //Re-publish to redis
@@ -214,6 +209,7 @@ public class CateServiceImpl implements CateService {
             categoryDA.removedCategoryById(categoryid);
             //Re-publish to redis
             redisu.hdel(classname, category.getCateid().toString());
+            redisu.hdel("category_u", category.getCatename());
        } else if (category != null)
        {
             category.setStatus(CacheService.STATUS_DELETE);

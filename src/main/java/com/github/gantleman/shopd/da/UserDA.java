@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,30 +190,6 @@ public class UserDA {
             }
         }
 		return count;
-	}
-
-	public List<User> findAllWhitStamp(long stamp) {
-		List<User> userList = new ArrayList<User>();
-		// 打开游标
-		EntityCursor<User> userCursorList = null;
-		try {
-			//获取游标
-			userCursorList = pIdx.entities();
-			// 遍历游标
-			for (User user : userCursorList) {
-				if(user.getStamp() >= stamp) {
-					userList.add(user);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (userCursorList != null) {
-				// 关闭游标
-				userCursorList.close();
-			}
-		}
-		return userList;
 	}
 
 	public boolean IsEmpty() {

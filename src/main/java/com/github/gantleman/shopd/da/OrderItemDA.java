@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.OrderItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,30 +208,6 @@ public class OrderItemDA {
             }
         }
 		return count;
-	}
-
-	public List<OrderItem> findAllWhitStamp(long stamp) {
-		List<OrderItem> adminList = new ArrayList<OrderItem>();
-		// 打开游标
-		EntityCursor<OrderItem> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (OrderItem orderitem : adminCursorList) {
-				if(orderitem.getStamp() <= stamp) {
-					adminList.add(orderitem);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 
 	public boolean IsEmpty() {

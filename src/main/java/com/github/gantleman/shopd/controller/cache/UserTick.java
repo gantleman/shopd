@@ -13,10 +13,14 @@ public class UserTick {
     private UserService userservice;
 
     @RequestMapping("/usertick")
-    public Msg goodstick(){
+    public Msg usertick(){
+        userservice.TickBack();   
+        return Msg.success("successful");
+    }
 
-        userservice.TickBack();
-        
+    @RequestMapping("/userpage")
+    public Msg userpage(Integer id){
+        userservice.RefreshDBD(id, true);
         return Msg.success("successful");
     }
 }

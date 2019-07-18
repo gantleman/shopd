@@ -13,10 +13,20 @@ public class OrderItemTick {
     private OrderItemService orderitemservice;
 
     @RequestMapping("/orderitemtick")
-    public Msg goodstick(){
+    public Msg orderitemtick(){
+        orderitemservice.TickBack();     
+        return Msg.success("successful");
+    }
 
-        orderitemservice.TickBack();
-        
+    @RequestMapping("/orderitempage")
+    public Msg orderitempage(Integer id){
+        orderitemservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/orderitemuserpage")
+    public Msg orderitemuserpage(Integer id){
+        orderitemservice.RefreshUserDBD(id, true, true);
         return Msg.success("successful");
     }
 }

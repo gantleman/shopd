@@ -1,6 +1,6 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.*;
+import com.github.gantleman.shopd.entity.Activity;
 import java.util.List;
 
 public interface ActivityService {

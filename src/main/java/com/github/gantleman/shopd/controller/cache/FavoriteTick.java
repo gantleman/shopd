@@ -14,9 +14,19 @@ public class FavoriteTick {
 
     @RequestMapping("/favoritetick")
     public Msg activitytick(){
+        favoriteservice.TickBack();     
+        return Msg.success("successful");
+    }
 
-        favoriteservice.TickBack();
-        
+    @RequestMapping("/favoritepage")
+    public Msg favoritepage(Integer id){
+        favoriteservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/favoriteuserpage")
+    public Msg favoriteuserpage(Integer id){
+        favoriteservice.RefreshUserDBD(id, true, true);
         return Msg.success("successful");
     }
 }

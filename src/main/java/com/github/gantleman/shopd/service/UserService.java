@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface UserService {
     //only read
-    public User selectByUserID(Integer userId);
+    public User selectByUserID(Integer userId, String url);
     
-    public List<User> selectByAll();
+    public List<User> selectByAll(Integer pageid, String url);
     
-    public List<User> selectByInList(List<Integer> user);
+    public List<User> selectByInList(List<Integer> user, String url);
 
     //have write
     public List<User> selectByName(String name);
@@ -24,6 +24,5 @@ public interface UserService {
 
     public void TickBack();
 
-    public void RefreshDBD();
-
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
 }

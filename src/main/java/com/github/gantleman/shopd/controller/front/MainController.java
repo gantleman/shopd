@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,9 @@ public class MainController {
 
     @Autowired
     private ImagePathService imagePathService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @RequestMapping("/main")
     public String showAllGoods(Model model, HttpSession session) {
@@ -78,7 +82,7 @@ public class MainController {
             digCateId.add(tmp.getCateid());
         }
 
-        List<Goods> goodsList = goodsService.selectByCateLimit(digCateId);
+        List<Goods> goodsList = goodsService.selectByCateLimit(digCateId, request.getServletPath());
 
         List<Goods> goodsAndImage = new ArrayList<Goods>();
         //获取每个商品的图片
@@ -87,7 +91,7 @@ public class MainController {
             if (userid == null) {
                 goods.setFav(false);
             } else {
-                Favorite favorite = favoriteService.selectFavByKey(userid, goods.getGoodsid());
+                Favorite favorite = favoriteService.selectFavByKey(userid, goods.getGoodsid(), request.getServletPath());
                 if (favorite == null) {
                     goods.setFav(false);
                 } else {
@@ -95,7 +99,7 @@ public class MainController {
                 }
             }
 
-            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
             goods.setImagePaths(imagePathList);
             goodsAndImage.add(goods);
         }

@@ -6,7 +6,7 @@ import java.util.List;
 public interface AddressService {
 
     //only read
-    public List<Address> getAllAddressByUserID(Integer UserID, String url);
+    public List<Address> getAllAddressByUser(Integer UserID, String url);
     
     public Address getAddressByKey(Integer addressid, String url);
      ///have write

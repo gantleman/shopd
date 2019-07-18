@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,30 +208,6 @@ public class ChatDA {
             }
         }
 		return count;
-	}
-
-	public List<Chat> findAllWhitStamp(long stamp) {
-		List<Chat> adminList = new ArrayList<Chat>();
-		// 打开游标
-		EntityCursor<Chat> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Chat chat : adminCursorList) {
-				if(chat.getStamp() <= stamp) {
-					adminList.add(chat);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 
 	public boolean IsEmpty() {

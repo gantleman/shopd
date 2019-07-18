@@ -1,5 +1,5 @@
 package com.github.gantleman.shopd.da;
-import  com.github.gantleman.shopd.entity.*;
+import  com.github.gantleman.shopd.entity.Goods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class GoodsDA {
 	// 辅助键字段类型,主键字段类型,实体类
 	SecondaryIndex<Integer, Integer, Goods> sIdx;// 二级索引
 	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Goods> sIdx2;// 二级索引
+	SecondaryIndex<String, Integer, Goods> sIdx2;// 二级索引
 
 	public GoodsDA(EntityStore entityStore) {
 		// 主键字段类型,实体类
@@ -27,7 +27,7 @@ public class GoodsDA {
 		// 主键索引,辅助键字段类型,辅助键字段名称
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "category");
 		// 主键索引,辅助键字段类型,辅助键字段名称
-		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "activityid");
+		sIdx2 = entityStore.getSecondaryIndex(pIdx, String.class, "goodsname");
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class GoodsDA {
 	/**
 	 * 根据goodsName查找所有的Goods
 	 **/
-	public List<Goods> findAllGoodsByActivityID(Integer activityid) {
+	public List<Goods> findAllGoodsByGoodsname(String name) {
 	    
 		List<Goods> goodsList=new ArrayList<Goods>();
 		
@@ -129,7 +129,7 @@ public class GoodsDA {
 		
 		//获取游标
 		try {
-			entityCursorList=sIdx2.subIndex(activityid).entities();
+			entityCursorList=sIdx2.subIndex(name).entities();
 			//遍历游标
 			for (Goods goods : entityCursorList) {
 				goodsList.add(goods);
@@ -186,51 +186,6 @@ public class GoodsDA {
             }
         }
 		return count;
-	}
-
-	/**
-	 * 统计所有满足用户名的用户总数
-	 *****/
-	public Long findAllGoodsByActivityIDCount(Integer activityid) {
-		Long count = 0L;
-		EntityCursor<Goods> cursor = null;
-        try{
-            cursor = sIdx2.subIndex(activityid).entities();
-            for (Goods goods : cursor) {
-            	if(goods!=null) {
-            		count++;
-            	}
-			}
-        }finally {
-            if(cursor != null){
-                cursor.close();
-            }
-        }
-		return count;
-	}
-
-	public List<Goods> findAllWhitStamp(long stamp) {
-		List<Goods> adminList = new ArrayList<Goods>();
-		// 打开游标
-		EntityCursor<Goods> adminCursorList = null;
-		try {
-			//获取游标
-			adminCursorList = pIdx.entities();
-			// 遍历游标
-			for (Goods goods : adminCursorList) {
-				if(goods.getStamp() <= stamp) {
-					adminList.add(goods);
-				}
-			}
-		} catch (DatabaseException e) {
-			
-		} finally {
-			if (adminCursorList != null) {
-				// 关闭游标
-				adminCursorList.close();
-			}
-		}
-		return adminList;
 	}
 
 	public boolean IsEmpty() {

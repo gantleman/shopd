@@ -31,6 +31,9 @@ public class CartController {
     @Autowired
     private ImagePathService imagePathService;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping("/addCart")
     public String addCart(ShopCart shopCart, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -75,14 +78,14 @@ public class CartController {
         }
 
         //获取当前用户的购物车信息
-        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(), request.getServletPath());
 
         //获取购物车中的商品信息
         List<Goods> goodsAndImage = new ArrayList<Goods>();
         for (ShopCart cart:shopCart) {
-            Goods goods = goodsService.selectById(cart.getGoodsid());
+            Goods goods = goodsService.selectById(cart.getGoodsid(), request.getServletPath());
 
-            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
             goods.setImagePaths(imagePathList);
             goods.setNum(cart.getGoodsnum());
             goodsAndImage.add(goods);

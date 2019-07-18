@@ -6,12 +6,18 @@ import java.util.List;
 public interface ImagePathService {
 
     //only read
-    public List<ImagePath> findImagePath(Integer goodsid);
+    public ImagePath getImagepathByKey(Integer imagePathid, String url);
+    
+    public List<ImagePath> findImagePath(Integer goodsid, String url);
 
     //have write
-    public void insertImagePath(ImagePath imagePath);  
+    public void insertImagePath(ImagePath imagePath);
 
     public void TickBack();
 
-    public void RefreshDBD();
+    public void TickBack_extra();
+
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
+
+    public void RefreshUserDBD(Integer pageID, boolean andAll, boolean refresRedis);
 }

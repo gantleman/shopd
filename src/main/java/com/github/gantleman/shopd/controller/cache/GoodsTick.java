@@ -14,9 +14,19 @@ public class GoodsTick {
 
     @RequestMapping("/goodstick")
     public Msg goodstick(){
+        goodsservice.TickBack(); 
+        return Msg.success("successful");
+    }
 
-        goodsservice.TickBack();
-        
+    @RequestMapping("/goodspage")
+    public Msg goodspage(Integer id){
+        goodsservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/goodspagename")
+    public Msg goodspagename(String name){
+        goodsservice.RefreshDBD(name, true);
         return Msg.success("successful");
     }
 }

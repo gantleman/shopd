@@ -1,22 +1,30 @@
 package com.github.gantleman.shopd.controller.front;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.github.gantleman.shopd.entity.Address;
+import com.github.gantleman.shopd.entity.Favorite;
 import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.ImagePath;
-import com.github.gantleman.shopd.entity.Favorite;
-import com.github.gantleman.shopd.entity.User;
 import com.github.gantleman.shopd.entity.Msg;
-import com.github.gantleman.shopd.entity.Address;
-import com.github.gantleman.shopd.entity.OrderItem;
 import com.github.gantleman.shopd.entity.Order;
+import com.github.gantleman.shopd.entity.OrderItem;
+import com.github.gantleman.shopd.entity.User;
 import com.github.gantleman.shopd.service.AddressService;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.FavoriteService;
 import com.github.gantleman.shopd.service.GoodsService;
-import com.github.gantleman.shopd.service.OrderService;
-import com.github.gantleman.shopd.service.UserService;
 import com.github.gantleman.shopd.service.ImagePathService;
 import com.github.gantleman.shopd.service.OrderItemService;
+import com.github.gantleman.shopd.service.OrderService;
+import com.github.gantleman.shopd.service.UserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,12 +32,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Controller
 public class CustomerController {
@@ -54,6 +56,9 @@ public class CustomerController {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private CacheService cacheService;
 
     @RequestMapping("/login")
     public String loginView(){
@@ -117,7 +122,7 @@ public class CustomerController {
             return "redirect:/login";
         }
         userId=user.getUserid();
-        user=userService.selectByUserID(userId);
+        user=userService.selectByUserID(userId, request.getServletPath());
         userModel.addAttribute("user",user);
         return "information";
     }
@@ -155,7 +160,7 @@ public class CustomerController {
         {
             return "redirect:/login";
         }
-        List<Address> addressList=addressService.getAllAddressByUserID(user.getUserid(),request.getServletPath());
+        List<Address> addressList=addressService.getAllAddressByUser(user.getUserid(),request.getServletPath());
         addressModel.addAttribute("addressList",addressList);
         return "address";
     }
@@ -198,7 +203,7 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        List<Order> orderList=orderService.selectOrderByIUserID(user.getUserid());
+        List<Order> orderList=orderService.selectOrderByIUserID(user.getUserid(), request.getServletPath());
         orderModel.addAttribute("orderList",orderList);
         Order order;
         OrderItem orderItem;
@@ -207,7 +212,7 @@ public class CustomerController {
        for (Integer i=0;i<orderList.size();i++)
        {
            order=orderList.get(i);
-           orderItemList=orderItemService.getOrderItemByOrderId(order.getOrderid());
+           orderItemList=orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
            List<Goods> goodsList=new ArrayList<Goods>();
            List<Integer> goodsIdList=new ArrayList<Integer>();
            for (Integer j=0;j<orderItemList.size();j++)
@@ -215,7 +220,7 @@ public class CustomerController {
                orderItem=orderItemList.get(j);
                goodsIdList.add(orderItem.getGoodsid());
            }
-           goodsList=goodsService.selectByID(goodsIdList);
+           goodsList=goodsService.selectByID(goodsIdList, request.getServletPath());
 
            order.setGoodsInfo(goodsList);
            address=addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
@@ -246,9 +251,9 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        //一页显示几个数据
-        PageHelper.startPage(pn, 16);
-        List<Favorite> favoriteList = favoriteService.selectFavByUser(user.getUserid());
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
+        List<Favorite> favoriteList = favoriteService.selectFavByUser(user.getUserid(), request.getServletPath());
 
         List<Integer> goodsIdList = new ArrayList<Integer>();
         for (Favorite tmp:favoriteList) {
@@ -257,14 +262,14 @@ public class CustomerController {
         
         List<Goods> goodsList = new ArrayList<Goods>();
         if (!goodsIdList.isEmpty()) {
-            goodsList = goodsService.selectByID(goodsIdList);
+            goodsList = goodsService.selectByID(goodsIdList, request.getServletPath());
         }
 
         //获取图片地址
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
-            List<ImagePath> imagePathList = ImagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = ImagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
 
             goods.setImagePaths(imagePathList);
 
@@ -274,7 +279,7 @@ public class CustomerController {
             goodsList.set(i, goods);
         }
 
-        //显示几个页号
+        //Display several page numbers
         PageInfo page = new PageInfo(goodsList,5);
         model.addAttribute("pageInfo", page);
 

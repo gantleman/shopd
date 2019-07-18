@@ -14,9 +14,19 @@ public class ChatTick {
 
     @RequestMapping("/chattick")
     public Msg activitytick(){
+        chatservice.TickBack(); 
+        return Msg.success("successful");
+    }
 
-        chatservice.TickBack();
-        
+    @RequestMapping("/chatpage")
+    public Msg activitypage(Integer id){
+        chatservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/chatuserpage")
+    public Msg chatuserpage(Integer id){
+        chatservice.RefreshUserDBD(id, true, true);
         return Msg.success("successful");
     }
 }

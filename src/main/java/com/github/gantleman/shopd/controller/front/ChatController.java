@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +27,9 @@ public class ChatController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @RequestMapping("/chat")
     public String showChat(HttpSession session, Model model, Integer sendto) {
         User loginuser = (User) session.getAttribute("user");
@@ -34,7 +38,7 @@ public class ChatController {
         }
 
         if (sendto != null) {
-            User user = userService.selectByUserID(sendto);
+            User user = userService.selectByUserID(sendto, request.getServletPath());
             model.addAttribute("sendto", user);
         }
         return "chat";
@@ -49,9 +53,9 @@ public class ChatController {
         if (user == null) {
             return Msg.fail("未登录");
         }
-        List<Chat> chatList1 = chatService.selectChatByReceive(user.getUserid());
+        List<Chat> chatList1 = chatService.selectChatByReceive(user.getUserid(), request.getServletPath());
 
-        List<Chat> chatList2 = chatService.selectChatBySend(user.getUserid());
+        List<Chat> chatList2 = chatService.selectChatBySend(user.getUserid(), request.getServletPath());
 
         //获取userid列表
         List<Integer> useridList = new ArrayList<Integer>();
@@ -67,7 +71,7 @@ public class ChatController {
         }
 
         //获取用户信息
-        List<User> userList = userService.selectByInList(useridList);
+        List<User> userList = userService.selectByInList(useridList, request.getServletPath());
 
         return Msg.success("获取聊天列表成功").add("userlist",userList);
     }
@@ -82,7 +86,7 @@ public class ChatController {
             return Msg.fail("未登录");
         }
 
-        List<Chat> chatList = chatService.selectChatBySendAndReceive(senduser, receiveuser);
+        List<Chat> chatList = chatService.selectChatBySendAndReceive(senduser, receiveuser, request.getServletPath());
 
         return Msg.success("获取消息成功").add("message", chatList);
     }
@@ -96,7 +100,7 @@ public class ChatController {
         }
 
         if (sendto != null) {
-            User user = userService.selectByUserID(sendto);
+            User user = userService.selectByUserID(sendto, request.getServletPath());
             model.addAttribute("sendto", user);
         }
         return "adminChat";
@@ -112,9 +116,9 @@ public class ChatController {
             return Msg.fail("请先登录");
         }
         Integer userid = 5;
-        List<Chat> chatList1 = chatService.selectChatByReceive(userid);
+        List<Chat> chatList1 = chatService.selectChatByReceive(userid, request.getServletPath());
 
-        List<Chat> chatList2 = chatService.selectChatBySend(userid);
+        List<Chat> chatList2 = chatService.selectChatBySend(userid, request.getServletPath());
 
         //获取userid列表
         List<Integer> useridList = new ArrayList<Integer>();
@@ -130,7 +134,7 @@ public class ChatController {
         }
 
         //获取用户信息
-        List<User> userList = userService.selectByInList(useridList);
+        List<User> userList = userService.selectByInList(useridList, request.getServletPath());
 //        model.addAttribute("chatuserlist", userList);
         return Msg.success("获取列表成功").add("userlist",userList);
     }

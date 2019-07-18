@@ -65,13 +65,13 @@ public class OrderController {
         }
 
         //查询当前用户的收货地址
-        List<Address> addressList = addressService.getAllAddressByUserID(user.getUserid(), request.getServletPath());
+        List<Address> addressList = addressService.getAllAddressByUser(user.getUserid(), request.getServletPath());
 
         model.addAttribute("address", addressList);
 
         //订单信息
         //获取当前用户的购物车信息
-        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(),request.getServletPath());
 
         //获取购物车中的商品信息
         List<Goods> goodsAndImage = new ArrayList<Goods>();
@@ -80,9 +80,9 @@ public class OrderController {
         Integer oldTotalPrice = 0;
 
         for (ShopCart cart:shopCart) {
-            Goods goods = goodsService.selectById(cart.getGoodsid());
+            Goods goods = goodsService.selectById(cart.getGoodsid(), request.getServletPath());
 
-            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid());
+            List<ImagePath> imagePathList = imagePathService.findImagePath(goods.getGoodsid(),request.getServletPath());
             goods.setImagePaths(imagePathList);
             goods.setNum(cart.getGoodsnum());
 
@@ -119,7 +119,7 @@ public class OrderController {
         User user = (User) session.getAttribute("user");
 
         //获取订单信息
-        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid());
+        List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(),request.getServletPath());
 
         //删除购物车
         for (ShopCart cart : shopCart) {

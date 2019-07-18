@@ -10,13 +10,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ImagePathTick {
     @Autowired(required = false)
-    private ImagePathService imagepoathservice;
+    private ImagePathService imagepathservice;
 
     @RequestMapping("/imagepathtick")
     public Msg goodstick(){
+        imagepathservice.TickBack();
+        return Msg.success("successful");
+    }
 
-        imagepoathservice.TickBack();
-        
+    @RequestMapping("/imagepathpage")
+    public Msg imagepathpage(Integer id){
+        imagepathservice.RefreshDBD(id, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/imagepathuserpage")
+    public Msg imagepathuserpage(Integer id){
+        imagepathservice.RefreshUserDBD(id, true, true);
         return Msg.success("successful");
     }
 }

@@ -15,6 +15,7 @@ public class Goods {
     @PrimaryKey(sequence = "ID")
     private Integer goodsid;
 
+    @SecondaryKey(relate = Relationship.ONE_TO_ONE)
     private String goodsname;
 
     private Integer price;
@@ -28,7 +29,6 @@ public class Goods {
 
     private String detailcate;
 
-    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Integer activityid;
 
     private String description;
@@ -42,26 +42,6 @@ public class Goods {
     private Float newPrice;
 
     private Integer status;
-
-    private long stamp;
-
-    public void MakeStamp() {
-        setStamp(TimeUtils.getTimeWhitLong());
-    }
-
-    /**
-     * @return the stamp
-     */
-    public long getStamp() {
-        return stamp;
-    }
-
-    /**
-     * @param stamp the stamp to set
-     */
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
-    }
 
     /**
      * @return the status

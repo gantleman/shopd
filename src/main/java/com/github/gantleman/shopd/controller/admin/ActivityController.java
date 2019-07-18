@@ -10,6 +10,7 @@ import com.github.gantleman.shopd.entity.Admin;
 import com.github.gantleman.shopd.entity.Goods;
 import com.github.gantleman.shopd.entity.Msg;
 import com.github.gantleman.shopd.service.ActivityService;
+import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.GoodsService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -27,13 +28,14 @@ public class ActivityController {
     @Autowired
     private HttpServletRequest request;
 
-    private static final int _1 = 1;
-
     @Autowired(required = false)
     ActivityService activityService;
 
     @Autowired(required = false)
     GoodsService goodsService;
+
+    @Autowired
+    private CacheService cacheService;
 
     @RequestMapping("/show")
     public String showActivity(@RequestParam(value = "page",defaultValue = "1") Integer pn, Model model, HttpSession session) {
@@ -43,13 +45,13 @@ public class ActivityController {
             return "redirect:/admin/login";
         }
 
-        //一页显示几个数据
-        PageHelper.startPage(pn, 10);
+        //One page shows several data
+        PageHelper.startPage(pn, cacheService.PageSize());
 
-        List<Activity> activityList = activityService.getAllActivity(pn, request.getServletPath());
+        List<Activity> activityList = activityService.getAllActivity(pn-1, request.getServletPath());
 
-        //显示几个页号
-        PageInfo page = new PageInfo(activityList,_1);
+        //Display several page numbers
+        PageInfo page = new PageInfo(activityList, 5);
         model.addAttribute("pageInfo", page);
 
         return "activity";
@@ -64,7 +66,7 @@ public class ActivityController {
             return Msg.fail("请先登录");
         }
         
-        List<Activity> activityList = activityService.getAllActivity(pn, request.getServletPath());
+        List<Activity> activityList = activityService.getAllActivity(pn-1, request.getServletPath());
 
         return Msg.success("获取活动信息成功").add("activity",activityList);
     }

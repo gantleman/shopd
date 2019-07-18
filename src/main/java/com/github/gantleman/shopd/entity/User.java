@@ -29,12 +29,6 @@ public class User implements Serializable{
     private String telephone;
 
     private Integer status;
-
-    private long stamp;
-
-    public void MakeStamp() {
-        setStamp(TimeUtils.getTimeWhitLong());
-    }
 	
     /**
      * @return the status
@@ -48,20 +42,6 @@ public class User implements Serializable{
      */
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    /**
-     * @return the stamp
-     */
-    public long getStamp() {
-        return stamp;
-    }
-
-    /**
-     * @param stamp the stamp to set
-     */
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
     }
 
 	public Integer getUserid() {

@@ -1,22 +1,23 @@
 package com.github.gantleman.shopd.service;
 
-import com.github.gantleman.shopd.entity.Goods;
 import java.util.List;
+
+import com.github.gantleman.shopd.entity.Goods;
 
 public interface GoodsService {
 
     //only read
-    public List<Goods> selectByAll();
+    public List<Goods> selectByAll(Integer pageid, String url);
     
-    public List<Goods> selectByID(List<Integer> id);
+    public List<Goods> selectByID(List<Integer> id, String url);
     
-    public List<Goods> selectByName(String name);
+    public List<Goods> selectByName(String name, String url);
     
-    public List<Goods> selectByDetailcateAndID(String cat, List<Integer> cateId);
+    public List<Goods> selectByDetailcateAndID(List<Integer> cateId, String url);
 
-    public Goods selectById(Integer goodsid);
+    public Goods selectById(Integer goodsid, String url);
 
-    public List<Goods> selectByCateLimit(List<Integer> digCateId);
+    public List<Goods> selectByCateLimit(List<Integer> digCateId, String url);
 
     //have write
     public Integer insertGoods(Goods goods);
@@ -27,5 +28,7 @@ public interface GoodsService {
 
     public void TickBack();
 
-    public void RefreshDBD();
+    public void RefreshDBD(Integer pageID, boolean refresRedis);
+
+    public void RefreshDBD(String name, boolean refresRedis);
 }

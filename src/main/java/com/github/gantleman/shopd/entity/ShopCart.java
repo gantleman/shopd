@@ -26,26 +26,6 @@ public class ShopCart implements Serializable {
 
     private Integer status;
 
-    private long stamp;
-
-    public void MakeStamp() {
-        setStamp(TimeUtils.getTimeWhitLong());
-    }
-
-    /**
-     * @return the stamp
-     */
-    public long getStamp() {
-        return stamp;
-    }
-
-    /**
-     * @param stamp the stamp to set
-     */
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
-    }
-
     /**
      * @return the status
      */
