@@ -61,12 +61,11 @@ public class AddressServiceImpl implements AddressService {
     
     @Override
     public List<Address> getAllAddressByUser(Integer userID, String url) {
-        List<Address> re = null;
+        List<Address> re = new ArrayList<Address>();
 
         if(redisu.hasKey("address_u"+userID.toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("address_u"+userID.toString());
-            re = new ArrayList<Address>();
             for (Object id : ro) {
                 Address r =  getAddressByKey((Integer)id, url);
                 if (r != null)
@@ -83,7 +82,6 @@ public class AddressServiceImpl implements AddressService {
             if(redisu.hasKey("address_u"+userID.toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("address_u"+userID.toString());
-                re = new ArrayList<Address>();
                 for (Object id : ro) {
                     Address r =  getAddressByKey((Integer)id, url);
                     if (r != null)
@@ -99,7 +97,7 @@ public class AddressServiceImpl implements AddressService {
     public Address getAddressByKey(Integer addressid, String url) {
         Address re = null;
         Integer pageId = cacheService.PageID(addressid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (Address) redisu.hget(classname, addressid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -206,7 +204,7 @@ public class AddressServiceImpl implements AddressService {
              addressDA.saveAddress(address);
 
              //Re-publish to redis
-             redisu.hdel(classname, address.getAddressid().toString(), 0);
+             redisu.hdel(classname, address.getAddressid().toString());
              
              deleteByPrimaryKey_extra(address);
         }   
@@ -249,7 +247,7 @@ public class AddressServiceImpl implements AddressService {
         BDBEnvironmentManager.getInstance();
         AddressDA addressDA=new AddressDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -338,7 +336,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, AddressJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             AddressDA addressDA=new AddressDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -354,7 +352,6 @@ public class AddressServiceImpl implements AddressService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, AddressJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -378,7 +375,7 @@ public class AddressServiceImpl implements AddressService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         AddressUserDA addressUserDA=new AddressUserDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<AddressUser> re = new ArrayList<AddressUser>();          
             AddressUserExample addressUserExample = new AddressUserExample();

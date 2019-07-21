@@ -1,5 +1,11 @@
 package com.github.gantleman.shopd.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import com.github.gantleman.shopd.da.ShopCartDA;
 import com.github.gantleman.shopd.da.ShopcartUserDA;
 import com.github.gantleman.shopd.dao.ShopCartMapper;
@@ -8,26 +14,17 @@ import com.github.gantleman.shopd.entity.ShopCart;
 import com.github.gantleman.shopd.entity.ShopCartExample;
 import com.github.gantleman.shopd.entity.ShopcartUser;
 import com.github.gantleman.shopd.entity.ShopcartUserExample;
-import com.github.gantleman.shopd.service.ShopCartService;
 import com.github.gantleman.shopd.service.CacheService;
+import com.github.gantleman.shopd.service.ShopCartService;
 import com.github.gantleman.shopd.service.jobs.ShopCartJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
-import com.github.gantleman.shopd.util.TimeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import net.sf.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 @Service("addShopCart")
 public class ShopCartServiceImpl implements ShopCartService {
@@ -101,7 +98,7 @@ public class ShopCartServiceImpl implements ShopCartService {
     public ShopCart getShopCartByKey(Integer shopcartid, String url) {
         ShopCart re = null;
         Integer pageId = cacheService.PageID(shopcartid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (ShopCart) redisu.hget(classname, shopcartid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -158,7 +155,7 @@ public class ShopCartServiceImpl implements ShopCartService {
         BDBEnvironmentManager.getInstance();
         ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -357,7 +354,7 @@ public class ShopCartServiceImpl implements ShopCartService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, ShopCartJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -373,7 +370,6 @@ public class ShopCartServiceImpl implements ShopCartService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, ShopCartJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -397,7 +393,7 @@ public class ShopCartServiceImpl implements ShopCartService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<ShopcartUser> re = new ArrayList<ShopcartUser>();          
             ShopcartUserExample shopcartUserExample = new ShopcartUserExample();

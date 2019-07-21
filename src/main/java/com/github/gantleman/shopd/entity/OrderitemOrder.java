@@ -2,6 +2,9 @@ package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
 
+import com.sleepycat.persist.model.Entity;
+
+@Entity
 public class OrderitemOrder implements Serializable {
     private Integer orderid;
 

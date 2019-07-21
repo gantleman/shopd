@@ -3,7 +3,6 @@ package com.github.gantleman.shopd.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.github.gantleman.shopd.util.TimeUtils;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;

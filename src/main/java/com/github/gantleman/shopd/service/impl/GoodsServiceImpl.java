@@ -191,7 +191,7 @@ public class GoodsServiceImpl implements GoodsService {
         BDBEnvironmentManager.getInstance();
         GoodsDA goodsDA=new GoodsDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         goods.setGoodsid(new Long(id).intValue());
         goods.setStatus(CacheService.STATUS_INSERT);
         goodsDA.saveGoods(goods);
@@ -315,7 +315,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, GoodsJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             GoodsDA goodsDA=new GoodsDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -332,7 +332,6 @@ public class GoodsServiceImpl implements GoodsService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, GoodsJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(redisu.hHasKey(classname+"pageid", pageID.toString())) {

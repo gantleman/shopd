@@ -25,7 +25,7 @@ $(document).ready(function (){
 
         $.ajax({
             type: "POST",
-            url: "/shop/saveAddr",
+            url: "/saveAddr",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:saveAddr,
             dateType:"json",
@@ -54,7 +54,7 @@ $(document).ready(function (){
         address.addressid=addresId;
         $.ajax({
             type: "POST",
-            url: "/shop/deleteAddr",
+            url: "/deleteAddr",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:address,
             dateType:"json",
@@ -88,7 +88,7 @@ $(document).ready(function (){
        insertAddr.contel=$("#telephoneInsert").val();
        $.ajax({
            type:"POST",
-           url:"/shop/insertAddr",
+           url:"/insertAddr",
            contentType:"application/x-www-form-urlencoded; charset=utf-8",
            data:insertAddr,
            dataType:"json",

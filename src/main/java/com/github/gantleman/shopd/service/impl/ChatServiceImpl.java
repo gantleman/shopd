@@ -63,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
     public Chat getChatByKey(Integer chatid, String url) {
         Chat re = null;
         Integer pageId = cacheService.PageID(chatid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (Chat) redisu.hget(classname, chatid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -85,12 +85,11 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<Chat> selectChatBySend(Integer UserID, String url) {
-        List<Chat> re = null;
+        List<Chat> re = new ArrayList<Chat>();
 
         if(redisu.hasKey("chat_u"+UserID.toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-            re = new ArrayList<Chat>();
             for (Object id : ro) {
                 Chat r =  getChatByKey((Integer)id, url);
                 if (r != null && r.getSenduser() == UserID)
@@ -121,12 +120,11 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<Chat> selectChatByReceive(Integer UserID, String url) {
-        List<Chat> re = null;
+        List<Chat> re = new ArrayList<Chat>();
 
         if(redisu.hasKey("chat_u"+UserID.toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-            re = new ArrayList<Chat>();
             for (Object id : ro) {
                 Chat r =  getChatByKey((Integer)id, url);
                 if (r != null && r.getReceiveuser() == UserID)
@@ -143,7 +141,6 @@ public class ChatServiceImpl implements ChatService {
             if(redisu.hasKey("chat_u"+UserID.toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-                re = new ArrayList<Chat>();
                 for (Object id : ro) {
                     Chat r =  getChatByKey((Integer)id, url);
                     if (r != null && r.getReceiveuser() == UserID)
@@ -157,7 +154,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<Chat> selectChatBySendAndReceive(Integer Send, Integer Receive, String url) {
-        List<Chat> re = new ArrayList<>();
+        List<Chat> re = new ArrayList<Chat>();
         if(Send != Receive){
             List<Chat> rc = selectChatByReceive(Receive, url);
             for(Chat r: rc){
@@ -235,7 +232,7 @@ public class ChatServiceImpl implements ChatService {
         BDBEnvironmentManager.getInstance();
         ChatDA chatDA=new ChatDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -324,7 +321,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, ChatJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             ChatDA chatDA=new ChatDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -340,7 +337,6 @@ public class ChatServiceImpl implements ChatService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, ChatJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -364,7 +360,7 @@ public class ChatServiceImpl implements ChatService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         ChatUserDA chatUserDA=new ChatUserDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<ChatUser> re = new ArrayList<ChatUser>();          
             ChatUserExample chatUserExample = new ChatUserExample();

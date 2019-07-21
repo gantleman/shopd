@@ -149,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public List<Order> selectOrderByIUserID(Integer userID, String url) {
-        List<Order> re = null;
+        List<Order> re = new ArrayList<Order>();
 
         if(redisu.hasKey("order_u"+userID.toString())) {
             //read redis
@@ -187,7 +187,7 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderByKey(Integer orderid, String url) {
         Order re = null;
         Integer pageId = cacheService.PageID(orderid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (Order) redisu.hget(classname, orderid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -245,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
         BDBEnvironmentManager.getInstance();
         OrderDA orderDA=new OrderDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -462,7 +462,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, OrderJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             OrderDA orderDA=new OrderDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -478,7 +478,6 @@ public class OrderServiceImpl implements OrderService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, OrderJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -502,7 +501,7 @@ public class OrderServiceImpl implements OrderService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         OrderUserDA orderUserDA=new OrderUserDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<OrderUser> re = new ArrayList<OrderUser>();          
             OrderUserExample orderUserExample = new OrderUserExample();
@@ -545,7 +544,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void RefreshIsDBD(boolean refresRedis) {
-        if(cacheService.IsCache(classname_Issend)){
+        if(!cacheService.IsCache(classname_Issend)){
             BDBEnvironmentManager.getInstance();
             OrderissendDA orderissendDA=new OrderissendDA(BDBEnvironmentManager.getMyEntityStore());
            
@@ -576,7 +575,7 @@ public class OrderServiceImpl implements OrderService {
             }          
         }
 
-        if(cacheService.IsCache(classname_Isreceive)){
+        if(!cacheService.IsCache(classname_Isreceive)){
             BDBEnvironmentManager.getInstance();
             OrderisreceiveDA orderisreceiveDA=new OrderisreceiveDA(BDBEnvironmentManager.getMyEntityStore());
            

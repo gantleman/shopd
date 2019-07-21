@@ -13,6 +13,7 @@ import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.HttpUtils;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
+import com.github.gantleman.shopd.util.ServerConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,9 @@ public class DemoApplicationTests {
 
     @Autowired
 	private AdminJob job;
+
+	@Autowired
+    private ServerConfig serverConfig;
 	
 	@Test
 	public void contextLoads() {
@@ -128,7 +132,7 @@ public class DemoApplicationTests {
 	//@Test
 	public void t3() {		
 		//打开数据库和存储环境
-/*		BDBEnvironmentManager.getInstance();
+		/*BDBEnvironmentManager.getInstance();
 		UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
 		long stamp = System.currentTimeMillis();
@@ -185,5 +189,78 @@ public class DemoApplicationTests {
 	@Test
 	public void t6() {
 		ru.sAddAndTime("key", 100, 0);
+		System.out.println("serverurl--------" +serverConfig.getUrl());
+	}
+
+	@Test
+	public void t7() {
+		ru.hset("routeconfig", "/admin/activity/show", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/activity/showjson", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/activity/add", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/activity/addResult", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/activity/update", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/activity/delete", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/order/send", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/order/sendGoods", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/order/receiver", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/order/complete", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/showjson", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/show", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/add", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/update", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/delete", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/addGoodsSuccess", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/addCategory", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/addCategoryResult", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/saveCate", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/deleteCate", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/goods/show", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/login", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/confirmLogin", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/logout", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/user/showjson", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/user/show", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/user/delete", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/addCart", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/showcart", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/cartjson", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/deleteCart", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/update", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/chat", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/chatto", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/getMessage", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/admin/chat", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/adminchat", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/sendMessage", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/chatrobot", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/login", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/register", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/registerresult", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/loginconfirm", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/information", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/saveInfo", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/info/address", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/saveAddr", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/deleteAddr", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/insertAddr", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/info/list", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/deleteList", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/info/favorite", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/savePsw", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/finishList", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/logout", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/detail", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/search", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/collect", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/deleteCollect", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/category", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/comment", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/main", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/order", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/orderFinish", "http://127.0.1.1:8081");
+		ru.hset("routeconfig", "/verificationcodeimg", "http://127.0.1.1:808181");
+
+
+
 	}
 }

@@ -139,7 +139,7 @@ public class ActivityServiceImpl implements ActivityService {
         BDBEnvironmentManager.getInstance();
         ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         activity.setActivityid(new Long(id).intValue());
         activity.setStatus(CacheService.STATUS_INSERT);
         activityDA.saveActivity(activity);
@@ -187,7 +187,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, ActivityJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -203,7 +203,6 @@ public class ActivityServiceImpl implements ActivityService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, ActivityJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(redisu.hHasKey(classname+"pageid", pageID.toString())) {

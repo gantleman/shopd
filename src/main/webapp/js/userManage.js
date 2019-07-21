@@ -27,7 +27,7 @@ $(document).on("click",".templatemo-delete-btn",function () {
         function () {
             /*swal("删除！", "你的虚拟文件已经被删除。", "success");*/
             $.ajax({
-                url: "/shop/admin/user/delete/" + goodsid,
+                url: "/admin/user/delete/" + goodsid,
                 type: "DELETE",
                 success:function (result) {
                     swal(result.msg, "","success");

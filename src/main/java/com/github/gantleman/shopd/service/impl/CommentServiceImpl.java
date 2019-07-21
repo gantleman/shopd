@@ -63,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment getCommentByKey(Integer commentid, String url) {
         Comment re = null;
         Integer pageId = cacheService.PageID(commentid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (Comment) redisu.hget(classname, commentid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -120,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
         BDBEnvironmentManager.getInstance();
         CommentDA commentDA=new CommentDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -245,7 +245,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, CommentJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             CommentDA commentDA=new CommentDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -261,7 +261,6 @@ public class CommentServiceImpl implements CommentService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, CommentJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -285,7 +284,7 @@ public class CommentServiceImpl implements CommentService {
     public void RefreshUserDBD(Integer goodsID, boolean andAll, boolean refresRedis) {
         BDBEnvironmentManager.getInstance();
         CommentGoodsDA commentGoodsDA=new CommentGoodsDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(goodsID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(goodsID))) {
             /// init
             List<CommentGoods> re = new ArrayList<CommentGoods>();          
             CommentGoodsExample commentGoodsExample = new CommentGoodsExample();

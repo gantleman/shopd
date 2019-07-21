@@ -96,7 +96,7 @@ public class ImagePathServiceImpl implements ImagePathService {
         BDBEnvironmentManager.getInstance();
         ImagePathDA imagePathDA=new ImagePathDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -115,7 +115,7 @@ public class ImagePathServiceImpl implements ImagePathService {
     public ImagePath getImagepathByKey(Integer imagePathid, String url) {
         ImagePath re = null;
         Integer pageId = cacheService.PageID(imagePathid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (ImagePath) redisu.hget(classname, imagePathid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -246,7 +246,7 @@ public class ImagePathServiceImpl implements ImagePathService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, ImagePathJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             ImagePathDA imagePathDA=new ImagePathDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -262,7 +262,6 @@ public class ImagePathServiceImpl implements ImagePathService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, ImagePathJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -286,7 +285,7 @@ public class ImagePathServiceImpl implements ImagePathService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         ImagepathGoodsDA imagePathGoodsDA=new ImagepathGoodsDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<ImagepathGoods> re = new ArrayList<ImagepathGoods>();          
             ImagepathGoodsExample imagePathGoodsExample = new ImagepathGoodsExample();

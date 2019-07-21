@@ -18,7 +18,7 @@ $(document).ready(function(){
         saveInfo.telephone=$("#telephone").val();
         $.ajax({
             type: "POST",
-            url: "/shop/saveInfo",
+            url: "/saveInfo",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:saveInfo,
             dateType:"json",
@@ -85,7 +85,7 @@ $(document).ready(function(){
             Psw.Psw=$("#newPsw").val();
             $.ajax({
                 type: "POST",
-                url: "/shop/savePsw",
+                url: "/savePsw",
                 contentType:"application/x-www-form-urlencoded; charset=utf-8",
                 data:Psw,
                 dateType:"json",

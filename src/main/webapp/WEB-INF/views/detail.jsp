@@ -100,7 +100,7 @@
                 if(!$(this).children("i").hasClass('fa-heart')) {
                     //收藏
                     $.ajax({
-                        url:"/shop/collect",
+                        url:"/collect",
                         type:"POST",
                         data:{
                             goodsid:goodsId
@@ -108,7 +108,7 @@
                         success:function (result) {
                             //收藏成功
                             if(result.code === 200){
-                                location.href = "/shop/login";
+                                location.href = "/login";
                                 isChangeBtn = false;
                             }
                         },
@@ -119,7 +119,7 @@
                 } else {
                     //取消收藏
                     $.ajax({
-                        url:"/shop/deleteCollect",
+                        url:"/deleteCollect",
                         type:"POST",
                         data:{
                             goodsid:goodsId
@@ -127,7 +127,7 @@
                         success:function (result) {
                             //取消收藏成功
                             if(result.code === 200){
-                                location.href = "/shop/login";
+                                location.href = "/login";
                                 isChangeBtn = false;
                             }
                         },

@@ -1,9 +1,7 @@
 package com.github.gantleman.shopd.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -17,10 +15,8 @@ import com.github.gantleman.shopd.service.jobs.UserJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
-import com.github.gantleman.shopd.util.TimeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service("userService")
@@ -169,7 +165,7 @@ public class UserServiceImpl implements UserService {
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         user.setUserid(new Long(id).intValue());
         user.setStatus(CacheService.STATUS_INSERT);
         userDA.saveUser(user);
@@ -276,7 +272,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, UserJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -292,7 +288,6 @@ public class UserServiceImpl implements UserService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, UserJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(redisu.hHasKey(classname+"pageid", pageID.toString())) {

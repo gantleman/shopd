@@ -2,7 +2,6 @@ package com.github.gantleman.shopd.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -42,7 +41,7 @@ public class CateServiceImpl implements CateService {
     
     @PostConstruct
     public void init() {
-        if (!cacheService.IsCache(classname)) {
+        if (cacheService.IsCache(classname)) {
             ///create time
             quartzManager.addJob(classname,classname,classname,classname, CategoryJob.class, null, job);
         }
@@ -85,7 +84,7 @@ public class CateServiceImpl implements CateService {
 
     @Override
     public List<Category> selectByNameForRead(String cate, String url) {
-        List<Category> re = new ArrayList<>();
+        List<Category> re = new ArrayList<Category>();
 
         if(redisu.hHasKey("category_u", cate)) {
             //read redis
@@ -165,7 +164,7 @@ public class CateServiceImpl implements CateService {
         BDBEnvironmentManager.getInstance();
         CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         category.setCateid(new Long(id).intValue());
         category.setStatus(CacheService.STATUS_INSERT);
         categoryDA.saveCategory(category);
@@ -260,7 +259,7 @@ public class CateServiceImpl implements CateService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID,classname, CategoryJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -277,7 +276,6 @@ public class CateServiceImpl implements CateService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, CategoryJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(redisu.hHasKey(classname+"pageid", pageID.toString())) {

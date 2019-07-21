@@ -63,7 +63,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     public Favorite getFavoriteByKey(Integer favoriteid, String url) {
         Favorite re = null;
         Integer pageId = cacheService.PageID(favoriteid);
-        if(!redisu.hHasKey(classname+"pageid", pageId.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             re = (Favorite) redisu.hget(classname, favoriteid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -85,12 +85,11 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<Favorite> selectFavByUser(Integer userID, String url) {
-        List<Favorite> re = null;
+        List<Favorite> re = new ArrayList<Favorite>();
 
         if(redisu.hasKey("favorite_u"+userID.toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("favorite_u"+userID.toString());
-            re = new ArrayList<Favorite>();
             for (Object id : ro) {
                 Favorite r =  getFavoriteByKey((Integer)id, url);
                 if (r != null)
@@ -168,7 +167,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         BDBEnvironmentManager.getInstance();
         FavoriteDA favoriteDA=new FavoriteDA(BDBEnvironmentManager.getMyEntityStore());
 
-        long id = cacheService.eventCteate(classname);
+        long id = cacheService.EventCteate(classname);
         Integer iid = (int) id;
         RefreshDBD(cacheService.PageID(iid), false);
 
@@ -324,7 +323,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID, classname, FavoriteJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             FavoriteDA favoriteDA=new FavoriteDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -340,7 +339,6 @@ public class FavoriteServiceImpl implements FavoriteService {
             }
 
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, FavoriteJob.class, null, job);
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
@@ -364,7 +362,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     public void RefreshUserDBD(Integer userID, boolean andAll, boolean refresRedis){
         BDBEnvironmentManager.getInstance();
         FavoriteUserDA favoriteUserDA=new FavoriteUserDA(BDBEnvironmentManager.getMyEntityStore());
-        if (cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
+        if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
             List<FavoriteUser> re = new ArrayList<FavoriteUser>();          
             FavoriteUserExample favoriteUserExample = new FavoriteUserExample();

@@ -5,7 +5,7 @@ $(document).ready(function (){
        order.orderid= parseInt(orderid);
        $.ajax({
            type:"POST",
-           url:"/shop/deleteList",
+           url:"/deleteList",
            contentType:"application/x-www-form-urlencoded; charset=utf-8",
            data:order,
            dataType:"json",
@@ -27,7 +27,7 @@ $(document).ready(function (){
         order.orderid=orderid;
         $.ajax({
             type:"POST",
-            url:"/shop/finishList",
+            url:"/finishList",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:order,
             dataType:"json",
@@ -66,7 +66,7 @@ $(document).ready(function (){
         comment.content=content;
         $.ajax({
             type:"POST",
-            url:"/shop/comment",
+            url:"/comment",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:comment,
             dataType:"json",

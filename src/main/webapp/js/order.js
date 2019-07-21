@@ -13,7 +13,7 @@ $(document).ready(function () {
         var oldPrice = $('#total-old').text();
         var newPrice = $('#total-new').text();
         $.ajax({
-            url: "/shop/orderFinish",
+            url: "/orderFinish",
             type: "POST",
             data: {
                 oldPrice: oldPrice,
@@ -23,7 +23,7 @@ $(document).ready(function () {
             },
             success: function () {
                 swal("购买成功", "", "success");
-                location.href = "/shop/info/list"
+                location.href = "/info/list"
             },
             error: function () {
                 swal("购买失败，无法连接到服务器！");

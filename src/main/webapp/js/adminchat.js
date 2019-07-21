@@ -228,7 +228,7 @@ $(document).ready(function () {
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
             $.ajax({
-                url: "/shop/sendMessage/", //把表单数据发送到ajax.jsp
+                url: "/sendMessage/", //把表单数据发送到ajax.jsp
                 type: "POST",
                 data: {
                     senduser: clientID,
@@ -279,7 +279,7 @@ $(document).ready(function () {
 
         //发异步请求查聊天消息
         $.ajax({
-            url: "/shop/getMessage/", //把表单数据发送到ajax.jsp
+            url: "/getMessage/", //把表单数据发送到ajax.jsp
             type: "POST",
             data: {
                 senduser: $("#sendId").text(),
@@ -318,7 +318,7 @@ function userListClick() {
 
     //发异步请求查聊天消息
     $.ajax({
-        url: "/shop/getMessage/", //把表单数据发送到ajax.jsp
+        url: "/getMessage/", //把表单数据发送到ajax.jsp
         type: "POST",
         data: {
             senduser: $("#sendId").text(),
@@ -398,7 +398,7 @@ function getChatList(id) {
 //重新获取列表
 function reGetChatUser(sendto) {
     $.ajax({
-        url: "/shop/adminchat/", //把表单数据发送到ajax.jsp
+        url: "/adminchat/", //把表单数据发送到ajax.jsp
         type: "POST",
         data: {
             sendto: sendto

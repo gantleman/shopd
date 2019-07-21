@@ -1,0 +1,2 @@
+http -v --form POST http://localhost:8081/admin/confirmLogin adminname=sur password=123456
+http get http://localhost:8081/main

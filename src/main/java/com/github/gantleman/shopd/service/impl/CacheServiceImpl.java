@@ -19,6 +19,7 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import com.github.gantleman.shopd.util.ServerConfig;
 import com.github.gantleman.shopd.util.TimeUtils;
 
+import org.quartz.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -78,24 +79,20 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public long eventCteate(String tablename){
+    public long EventCteate(String tablename){
         ///create new
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
         if(ra == null)
         {
-            CacheExample ce = new CacheExample();;
+            CacheExample ce = new CacheExample();
             ce.or().andCNameEqualTo(tablename);
             List<Cache> sqlra = cacheMapper.selectByExample(ce);
 
-            if(sqlra != null)
-            {
+            if(sqlra != null) {
                 ///set host
                 Cache sqlhost = sqlra.get(0);
-                if(!sqlhost.getcHost().equals(sc.getUrl()) && !sqlhost.getcHost().equals(sqlhost.getcHost2())) {
-
-                } 
 
                 sqlhost.setcIndex(0L);
                 sqlhost.setcHost(sc.getUrl());
@@ -112,10 +109,47 @@ public class CacheServiceImpl implements CacheService {
         if (ra == null)
          return ri;
 
-        ri = ra.getcIndex() + 1;
-        ra.setcIndex(ri);
+        ri = ra.getcIndex() ;
+        ra.setcIndex(ri+ 1);
         cacheDA.saveCache(ra);
         return ri;
+    }
+
+    @Override
+    public Boolean IsCache(String tablename, Integer pageID, String classname, Class jobClass, Job job) {
+
+        BDBEnvironmentManager.getInstance();
+        CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
+        Cache ra = cacheDA.findCacheByName(tablename);
+
+        if(ra == null ){
+            CacheExample cacheExample = new CacheExample();
+            cacheExample.or().andCNameEqualTo(tablename);
+            List<Cache> lc = cacheMapper.selectByExample(cacheExample);
+
+            if(!lc.isEmpty())
+               ra = lc.get(0);
+
+               quartzManager.addJob(classname,classname,classname,classname, jobClass, null, job);
+        }
+
+        if (ra != null) {
+            Map<Integer, Integer> ruserid = ra.getUserid();
+            if (ruserid == null)
+                ruserid = new HashMap<Integer, Integer>();
+
+            if(ruserid.containsKey(pageID)){
+                Integer value = ruserid.get(pageID);
+                ruserid.put(pageID, value+1);
+            }else{
+                ruserid.put(pageID, 1);
+            }
+
+            ra.setUserid(ruserid);
+            cacheDA.saveCache(ra);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -136,15 +170,19 @@ public class CacheServiceImpl implements CacheService {
 
         if (ra != null) {
             Map<Integer, Integer> ruserid = ra.getUserid();
-            if (ruserid != null)
-                if(ruserid.containsKey(pageID)){
-                    Integer value = ruserid.get(pageID);
-                    ruserid.put(pageID, value+1);
+            if (ruserid == null)
+                ruserid = new HashMap<Integer, Integer>();
 
-                    ra.setUserid(ruserid);
-                    cacheDA.saveCache(ra);
-                    return true;
-                }
+            if(ruserid.containsKey(pageID)){
+                Integer value = ruserid.get(pageID);
+                ruserid.put(pageID, value+1);
+            }else{
+                ruserid.put(pageID, 1);
+            }
+
+            ra.setUserid(ruserid);
+            cacheDA.saveCache(ra);
+            return true;
         }
         return false;
     }
@@ -156,10 +194,10 @@ public class CacheServiceImpl implements CacheService {
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
 
-        if (ra != null) {
+        if (ra == null)
+            return false;
+        else
             return true;
-        }
-        return false;
     }
 
     @Override
@@ -224,7 +262,8 @@ public class CacheServiceImpl implements CacheService {
     
     @Override
     public boolean IsLocal(String url) {
-        String host = (String)redisu.get(url);
+        String host = (String)redisu.hget("routeconfig", url);
+        String host2 = serverConfig.getUrl();
         if(!host.equals(serverConfig.getUrl()))
         return false;
         else
@@ -236,9 +275,11 @@ public class CacheServiceImpl implements CacheService {
         Map<String, String> headers = new HashMap<>(); 
         Map<String, String> querys = new HashMap<>();                
         querys.put("id", Id.toString());
-
+        String host = (String)redisu.hget("routeconfig", url);
         try {
-            httputils.doGet(serverConfig.getUrl(), url, headers, querys);
+            if(host == null)
+                throw new RuntimeException("Value for condition cannot be null");
+            httputils.doGet(host, url, headers, querys);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -249,9 +290,11 @@ public class CacheServiceImpl implements CacheService {
         Map<String, String> headers = new HashMap<>(); 
         Map<String, String> querys = new HashMap<>();                
         querys.put("name", name);
-
+        String host = (String)redisu.hget("routeconfig", url);
         try {
-            httputils.doGet(serverConfig.getUrl(), url, headers, querys);
+            if(host == null)
+                throw new RuntimeException("Value for condition cannot be null");
+            httputils.doGet(host, url, headers, querys);
         } catch (Exception e) {
             e.printStackTrace();
         }      

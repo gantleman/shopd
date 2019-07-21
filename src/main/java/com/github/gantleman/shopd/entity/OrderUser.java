@@ -2,8 +2,10 @@ package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
 
+import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
+@Entity
 public class OrderUser implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer userid;

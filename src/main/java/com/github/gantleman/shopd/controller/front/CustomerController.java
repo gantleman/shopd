@@ -92,12 +92,12 @@ public class CustomerController {
     public String loginConfirm(User user,Model loginResult,HttpServletRequest request,@RequestParam("confirmlogo") String confirmlogo){
         HttpSession session=request.getSession();
         String verificationCode = (String) session.getAttribute("certCode");
-        if (!confirmlogo.equals(verificationCode))
+       /* if (!confirmlogo.equals(verificationCode))
         {
             loginResult.addAttribute("errorMsg","验证码错误");
             return "login";
 
-        }
+        }*/
         List<User> userList=new ArrayList<User>();
         userList=userService.selectByNameAndPasswrod(user.getUsername(), user.getPassword());
         if (!userList.isEmpty())

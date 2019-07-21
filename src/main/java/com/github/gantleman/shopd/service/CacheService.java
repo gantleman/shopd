@@ -2,6 +2,8 @@ package com.github.gantleman.shopd.service;
 
 import java.util.List;
 
+import org.quartz.Job;
+
 public interface CacheService {
 
     public static final int STATUS_INSERT = 1;
@@ -10,9 +12,11 @@ public interface CacheService {
 
     public static final int STATUS_UPDATE = 3;
 
-    public long eventCteate(String tablename);
+    public long EventCteate(String tablename);
 
     public void Archive(String tablename);
+
+    public Boolean IsCache(String tablename, Integer pageID, String classname, Class jobClass, Job job);
 
     public Boolean IsCache(String tablename, Integer pageID);
 

@@ -63,7 +63,7 @@ $(document).on("click","#saveUpdate",function () {
     $("#update-goods").ajaxForm(option);*/
 
     $.ajax({
-        url:"/shop/admin/goods/update/",
+        url:"/admin/goods/update/",
         type:"POST",
         data:{
             goodsid:ugoodsid,
@@ -117,7 +117,7 @@ $(document).on("click",".templatemo-delete-btn",function () {
         function () {
             /*swal("删除！", "你的虚拟文件已经被删除。", "success");*/
             $.ajax({
-                url: "/shop/admin/goods/delete/" + goodsid,
+                url: "/admin/goods/delete/" + goodsid,
                 type: "DELETE",
                 success:function (result) {
                     swal(result.msg, "","success");
@@ -151,7 +151,7 @@ $("#activity-id").change(function () {
 
 function getActivity() {
     $.ajax({
-        url: "/shop/admin/activity/showjson",
+        url: "/admin/activity/showjson",
         type: "post",
         success: function (result) {
             if(result.code==100) {
@@ -174,7 +174,7 @@ $(document).on("click","#saveActivity",function () {
     var activityid = $("#activity-id").val();
 
     $.ajax({
-        url:"/shop/admin/activity/update/",
+        url:"/admin/activity/update/",
         type:"POST",
         data:{
             goodsid:goodsid,
@@ -228,7 +228,7 @@ function build_goods_table(path,result) {
 
         detailBtn = detailBtn.attr("data-content",item.description);
 
-        var detailA = $("<a></a>").addClass("templatemo-link").attr("href","/shop/detail?goodsid="+item.goodsid).append("详情");
+        var detailA = $("<a></a>").addClass("templatemo-link").attr("href","/detail?goodsid="+item.goodsid).append("详情");
 
         var editBtn = $("<button></button>").addClass("templatemo-edit-btn").append("编辑");
         var deleteBtn = $("<button></button>").addClass("templatemo-delete-btn").append("删除");

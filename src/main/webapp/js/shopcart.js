@@ -50,7 +50,7 @@ $(document).ready(function () {
 
 function deleteCartGoods(goodsid) {
     $.ajax({
-        url: "/shop/deleteCart/" + goodsid,
+        url: "/deleteCart/" + goodsid,
         type: "DELETE",
         success: function (result) {
             // swal(result.msg, "","success");
@@ -67,7 +67,7 @@ function updateCart(goodsid, newNum) {
     //获取当前数量
     // var newNum = $(".num").val();
     $.ajax({
-        url: "/shop/update",
+        url: "/update",
         data: {
             goodsid: goodsid,
             num:newNum
@@ -104,7 +104,7 @@ function build_cart_table(result) {
     var totalMoney = 0;
 
     if(goods.length === 0) {
-        var spareTd = $('<tr> <td colspan="6"> <div class="coupon" style="margin-left:37%;">购物车还是空的，快去<a href="/shop/main" style="color:red;">首页</a>看看吧！ </div> </td> </tr>');
+        var spareTd = $('<tr> <td colspan="6"> <div class="coupon" style="margin-left:37%;">购物车还是空的，快去<a href="/main" style="color:red;">首页</a>看看吧！ </div> </td> </tr>');
         spareTd.appendTo("#cart-table tbody");
     } else {
         $.each(goods, function (index,item) {
@@ -119,11 +119,11 @@ function build_cart_table(result) {
             });
 
             var shopimage = $("<td></td>").addClass("product-thumbnail product-thumbnail-2")
-                .append($("<a></a>").attr("href","/shop/detail?goodsid="+item.goodsid)
+                .append($("<a></a>").attr("href","/detail?goodsid="+item.goodsid)
                     .append($("<img/>").attr("src","/shopimage/"+item.imagePaths[0].path)));
 
             var goodsname = $("<td></td>").addClass("product-name product-name_2")
-                .append($("<a></a>").attr("href","/shop/detail?goodsid="+item.goodsid).append(item.goodsname));
+                .append($("<a></a>").attr("href","/detail?goodsid="+item.goodsid).append(item.goodsname));
 
             var goodsprice = $("<td></td>").addClass("product-price")
                 .append($("<span></span>").addClass("amount-list amount-list-2").append("￥"+item.price));

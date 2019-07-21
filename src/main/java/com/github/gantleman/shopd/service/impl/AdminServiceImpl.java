@@ -14,7 +14,6 @@ import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.jobs.AdminJob;
 import com.github.gantleman.shopd.util.BDBEnvironmentManager;
 import com.github.gantleman.shopd.util.QuartzManager;
-import com.github.gantleman.shopd.util.RedisUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,9 +28,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private CacheService cacheService;
-
-    @Autowired
-    private RedisUtil redisu;
 
     @Autowired
     private QuartzManager quartzManager;
@@ -56,7 +52,7 @@ public class AdminServiceImpl implements AdminService {
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
         List<Admin> lra = adminDA.findAllChatByAdminNameAndPassword( admin.getAdminname(), admin.getPassword());
-        if(lra != null){
+        if(!lra.isEmpty()){
             ra = lra.get(0);
         }else{
             ///second
@@ -68,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
                 RefreshDBD(cacheService.PageID(sqlra.get(0).getAdminid()), false);
 
                 //third
-                if(sqlra.get(0).getPassword() == admin.getPassword())
+                if(sqlra.get(0).getPassword().equals(admin.getPassword()))
                     ra = sqlra.get(0);
             }
         }
@@ -99,7 +95,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (cacheService.IsCache(classname, pageID)) {
+        if (!cacheService.IsCache(classname, pageID,classname, AdminJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
             ///init
@@ -112,9 +108,7 @@ public class AdminServiceImpl implements AdminService {
             for (Admin value : re) {
                 adminDA.saveAdmin(value);
             }
-
             BDBEnvironmentManager.getMyEntityStore().sync();
-            quartzManager.addJob(classname,classname,classname,classname, AdminJob.class, null, job);
-        }
+       }
     }  
 }

@@ -15,7 +15,7 @@ $(document).ready(function (){
        category.catename=$("#categoryName").val();
        $.ajax({
            type:"POST",
-           url:"/shop/admin/goods/saveCate",
+           url:"/admin/goods/saveCate",
            contentType:"application/x-www-form-urlencoded; charset=utf-8",
            data:category,
            dataType:"json",
@@ -41,7 +41,7 @@ $(document).ready(function (){
         category.cateid=$(this).parent().prev().prev().children().attr("cateId");
         $.ajax({
             type:"POST",
-            url:"/shop/admin/goods/deleteCate",
+            url:"/admin/goods/deleteCate",
             contentType:"application/x-www-form-urlencoded; charset=utf-8",
             data:category,
             dataType:"json",
