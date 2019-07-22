@@ -63,3 +63,24 @@ https://go.microsoft.com/fwlink/?linkid=830387
 \]
 
 }
+
+
+This is also a distributed introduction to the example project in
+Chapter 5 of the series. You can also click on the links below to find
+relevant articles.
+
+[[ITDSD-1. Splitting in Microservice
+Architecture]{.underline}](https://www.codeproject.com/Articles/3507113/Introduc
+tion-to-Distributed-System-Design-1-Splitt)
+
+[[ITDSD-2. Practice of Splitting in Microservice
+Architecture]{.underline}](https://www.codeproject.com/Articles/4051345/Introduc
+tion-to-Distributed-System-Design-2-Practi)
+
+[[ITDSD- 3. Overview of Distributed Software
+Engineering]{.underline}](https://www.codeproject.com/Articles/4406321/ITDSD-3-O
+verview-of-Distributed-Software-Engineeri)
+
+[[ITDSD - 4. Quantitative Analysis of Distributed
+Software]{.underline}](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quan
+titative-Analysis-of-Distributed-Softw)
