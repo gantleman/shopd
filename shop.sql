@@ -72,6 +72,9 @@ CREATE TABLE `admin` (
   KEY `adminName` (`adminName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `admin` (`adminId`, `adminName`, `password`) VALUES
+(1, 'admin', '123456');
+
 /*Table structure for table `cache` */
 
 DROP TABLE IF EXISTS `cache`;
@@ -97,6 +100,13 @@ CREATE TABLE `category` (
   PRIMARY KEY (`cateId`),
   UNIQUE KEY `cateName` (`cateName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+INSERT INTO `category` (`cateId`, `cateName`) VALUES
+(1, 'Digital'),
+(2, 'Clothes'),
+(3, 'Appliances'),
+(4, 'Book');
 
 /*Table structure for table `chat` */
 
