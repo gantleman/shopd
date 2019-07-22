@@ -42,21 +42,21 @@ public class CartController {
             return "redirect:/login";
         }
 
-        //判断是否已经加入购物车
+        //Determine whether you have joined the shopping cart
         ShopCart shopCart1 = shopCartService.selectCartByKey(user.getUserid(), shopCart.getGoodsid());
         if (shopCart1 != null) {
             return "redirect:/showcart";
         }
 
-        //用户
+        //user
         shopCart.setUserid(user.getUserid());
 
-        //加入时间
+        //data
         shopCart.setCatedate(new Date());
 
         shopCartService.addShopCart(shopCart);
 
-        //返回到购物车页面
+        //Return to the shopping cart page
         return "redirect:/showcart";
     }
 
@@ -74,13 +74,13 @@ public class CartController {
     public Msg getCart(HttpSession session) {
         User user = (User) session.getAttribute("user");
         if(user == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
 
-        //获取当前用户的购物车信息
+        //Get the current user's shopping cart information
         List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(), request.getServletPath());
 
-        //获取购物车中的商品信息
+        //Getting information about goods in shopping carts
         List<Goods> goodsAndImage = new ArrayList<Goods>();
         for (ShopCart cart:shopCart) {
             Goods goods = goodsService.selectById(cart.getGoodsid(), request.getServletPath());
@@ -91,7 +91,7 @@ public class CartController {
             goodsAndImage.add(goods);
         }
 
-        return Msg.success("查询成功").add("shopcart",goodsAndImage);
+        return Msg.success("query was successful").add("shopcart",goodsAndImage);
     }
 
     @RequestMapping(value = "/deleteCart/{goodsid}", method = RequestMethod.DELETE)
@@ -99,11 +99,11 @@ public class CartController {
     public Msg deleteCart(@PathVariable("goodsid")Integer goodsid, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if(user == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
 
         shopCartService.deleteByKey(user.getUserid(), goodsid);
-        return Msg.success("删除成功");
+        return Msg.success("Successful deletion");
     }
 
     @RequestMapping("/update")
@@ -111,13 +111,13 @@ public class CartController {
     public Msg updateCart(Integer goodsid,Integer num,HttpSession session) {
         User user = (User) session.getAttribute("user");
         if(user == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
         ShopCart shopCart = new ShopCart();
         shopCart.setUserid(user.getUserid());
         shopCart.setGoodsid(goodsid);
         shopCart.setGoodsnum(num);
         shopCartService.updateCartByKey(shopCart);
-        return Msg.success("更新购物车成功");
+        return Msg.success("Successful updating of shopping carts");
     }
 }

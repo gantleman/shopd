@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class OrderitemOrderDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, OrderitemOrder> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, OrderitemOrder> pIdx;// Primary Index
 
 	public OrderitemOrderDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, OrderitemOrder.class);
 	}
 
 	/**
-	 * 添加一个OrderitemOrder
+* Add a OrderitemOrder
 	 */
 	public void saveOrderitemOrder(OrderitemOrder orderitemorder) {
 		pIdx.put(orderitemorder);
 	}
 
 	/**
-	 * 根据用户Id删除一个OrderitemOrder
+	 * Delete one based on user ID OrderitemOrder
 	 **/
 	public void removedOrderitemOrderById(Integer orderitemorderId) {
 		pIdx.delete(orderitemorderId);
 	}
 
 	/**
-	 * 根据用户Id查找一个OrderitemOrder
+	 * Find one based on user IDOrderitemOrder
 	 **/
 	public OrderitemOrder findOrderitemOrderById(Integer orderitemorderId) {
 		return pIdx.get(orderitemorderId);
 	}
 
 	/**
-	 * 查找所有的OrderitemOrder
+	 * Find all OrderitemOrder
 	 **/
 	public List<OrderitemOrder> findAllOrderitemOrder() {
 		List<OrderitemOrder> orderitemorderList = new ArrayList<OrderitemOrder>();
-		// 打开游标
+		// open cursor
 		EntityCursor<OrderitemOrder> orderitemorderCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			orderitemorderCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (OrderitemOrder orderitemorder : orderitemorderCursorList) {
 				orderitemorderList.add(orderitemorder);
 			}
@@ -58,7 +58,7 @@ public class OrderitemOrderDA {
 			
 		} finally {
 			if (orderitemorderCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				orderitemorderCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class OrderitemOrderDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllOrderitemOrderCount() {
 		Long count = 0L;

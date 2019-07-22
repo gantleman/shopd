@@ -121,6 +121,7 @@ public class CacheServiceImpl implements CacheService {
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
+        boolean re = false;
 
         if(ra == null ){
             CacheExample cacheExample = new CacheExample();
@@ -130,26 +131,25 @@ public class CacheServiceImpl implements CacheService {
             if(!lc.isEmpty())
                ra = lc.get(0);
 
-               quartzManager.addJob(classname,classname,classname,classname, jobClass, null, job);
+            quartzManager.addJob(classname,classname,classname,classname, jobClass, null, job);
+        }
+        
+        Map<Integer, Integer> ruserid = ra.getUserid();
+        if (ruserid == null)
+            ruserid = new HashMap<Integer, Integer>();
+
+        if(ruserid.containsKey(pageID)){
+            Integer value = ruserid.get(pageID);
+            ruserid.put(pageID, value+1);
+            re = false;
+        }else{
+            ruserid.put(pageID, 1);
+            re = true;
         }
 
-        if (ra != null) {
-            Map<Integer, Integer> ruserid = ra.getUserid();
-            if (ruserid == null)
-                ruserid = new HashMap<Integer, Integer>();
-
-            if(ruserid.containsKey(pageID)){
-                Integer value = ruserid.get(pageID);
-                ruserid.put(pageID, value+1);
-            }else{
-                ruserid.put(pageID, 1);
-            }
-
-            ra.setUserid(ruserid);
-            cacheDA.saveCache(ra);
-            return true;
-        }
-        return false;
+        ra.setUserid(ruserid);
+        cacheDA.saveCache(ra);
+        return re;
     }
 
     @Override
@@ -158,7 +158,8 @@ public class CacheServiceImpl implements CacheService {
         BDBEnvironmentManager.getInstance();
         CacheDA cacheDA=new CacheDA(BDBEnvironmentManager.getMyEntityStore());
         Cache ra = cacheDA.findCacheByName(tablename);
-
+        boolean re = false;
+        
         if(ra == null ){
             CacheExample cacheExample = new CacheExample();
             cacheExample.or().andCNameEqualTo(tablename);
@@ -168,23 +169,22 @@ public class CacheServiceImpl implements CacheService {
                ra = lc.get(0);
         }
 
-        if (ra != null) {
-            Map<Integer, Integer> ruserid = ra.getUserid();
-            if (ruserid == null)
-                ruserid = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> ruserid = ra.getUserid();
+        if (ruserid == null)
+            ruserid = new HashMap<Integer, Integer>();
 
-            if(ruserid.containsKey(pageID)){
-                Integer value = ruserid.get(pageID);
-                ruserid.put(pageID, value+1);
-            }else{
-                ruserid.put(pageID, 1);
-            }
-
-            ra.setUserid(ruserid);
-            cacheDA.saveCache(ra);
-            return true;
+        if(ruserid.containsKey(pageID)){
+            Integer value = ruserid.get(pageID);
+            ruserid.put(pageID, value+1);
+            re = false;
+        }else{
+            ruserid.put(pageID, 1);
+            re = true;
         }
-        return false;
+
+        ra.setUserid(ruserid);
+        cacheDA.saveCache(ra);
+        return re;
     }
 
     @Override
@@ -263,11 +263,10 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public boolean IsLocal(String url) {
         String host = (String)redisu.hget("routeconfig", url);
-        String host2 = serverConfig.getUrl();
-        if(!host.equals(serverConfig.getUrl()))
-        return false;
-        else
+        if(host == null || host.equals(serverConfig.getUrl()))
         return true;
+        else
+        return false;
     }
 
     @Override

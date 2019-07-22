@@ -86,25 +86,28 @@ public class ActivityServiceImpl implements ActivityService {
     public Activity selectByKey(Integer activityid, String url) {
         Activity re = null;
         Integer pageId = cacheService.PageID(activityid);
-        if(redisu.hHasKey(classname, activityid.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             Object o = redisu.hget(classname, activityid.toString());
             if(o != null){
-                re = (Activity) o;
-                redisu.hincr(classname+"pageid", pageId.toString(), 1);
+                re = (Activity) o;    
             }
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/activitypage", pageId);
             }else{
                 RefreshDBD(pageId, true);
             }
-
-            Object o = redisu.hget(classname, activityid.toString());
-            if(o != null){
-                re = (Activity) o;
+            
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
+                //read redis
+                Object o = redisu.hget(classname, activityid.toString());
+                if(o != null){
+                    re = (Activity) o;    
+                }
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
-            }     
+            }
         }
         return re;
     }
@@ -205,7 +208,7 @@ public class ActivityServiceImpl implements ActivityService {
             BDBEnvironmentManager.getMyEntityStore().sync();
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
-            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+            if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
                 BDBEnvironmentManager.getInstance();
                 ActivityDA activityDA=new ActivityDA(BDBEnvironmentManager.getMyEntityStore());
 

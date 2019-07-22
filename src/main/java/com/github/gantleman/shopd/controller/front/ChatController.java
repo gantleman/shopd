@@ -48,16 +48,16 @@ public class ChatController {
     @RequestMapping("/chatto")
     @ResponseBody
     public Msg getChatTo(HttpSession session, Model model, Integer sendto) {
-        //查询历史消息聊天对象
+        //Query History Message Chat Object
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return Msg.fail("未登录");
+            return Msg.fail("no login");
         }
         List<Chat> chatList1 = chatService.selectChatByReceive(user.getUserid(), request.getServletPath());
 
         List<Chat> chatList2 = chatService.selectChatBySend(user.getUserid(), request.getServletPath());
 
-        //获取userid列表
+        //Get the userid list
         List<Integer> useridList = new ArrayList<Integer>();
         for (Chat chat : chatList1) {
             useridList.add(chat.getSenduser());
@@ -70,10 +70,10 @@ public class ChatController {
             useridList.add(sendto);
         }
 
-        //获取用户信息
+        //Getting User Information
         List<User> userList = userService.selectByInList(useridList, request.getServletPath());
 
-        return Msg.success("获取聊天列表成功").add("userlist",userList);
+        return Msg.success("Success in getting chat lists").add("userlist",userList);
     }
 
 
@@ -83,12 +83,12 @@ public class ChatController {
 
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return Msg.fail("未登录");
+            return Msg.fail("no login");
         }
 
         List<Chat> chatList = chatService.selectChatBySendAndReceive(senduser, receiveuser, request.getServletPath());
 
-        return Msg.success("获取消息成功").add("message", chatList);
+        return Msg.success("Successful message acquisition").add("message", chatList);
     }
 
     @RequestMapping("/admin/chat")
@@ -110,17 +110,17 @@ public class ChatController {
     @ResponseBody
     public Msg adminChat(HttpSession session, Model model, Integer sendto) {
 
-        //查询历史消息聊天对象
+        //Query History Message Chat Object
         Admin adminuser = (Admin) session.getAttribute("admin");
         if (adminuser == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
         Integer userid = 5;
         List<Chat> chatList1 = chatService.selectChatByReceive(userid, request.getServletPath());
 
         List<Chat> chatList2 = chatService.selectChatBySend(userid, request.getServletPath());
 
-        //获取userid列表
+        //Get the userid list
         List<Integer> useridList = new ArrayList<Integer>();
         for (Chat chat : chatList1) {
             useridList.add(chat.getSenduser());
@@ -133,10 +133,10 @@ public class ChatController {
             useridList.add(sendto);
         }
 
-        //获取用户信息
+        //Getting User Information
         List<User> userList = userService.selectByInList(useridList, request.getServletPath());
 //        model.addAttribute("chatuserlist", userList);
-        return Msg.success("获取列表成功").add("userlist",userList);
+        return Msg.success("Successful message acquisition").add("userlist",userList);
     }
 
     @RequestMapping("/sendMessage")
@@ -145,7 +145,7 @@ public class ChatController {
 //        System.out.println(chat.getMsgcontent());
         chat.setMsgtime(new Date());
         chatService.insertChatSelective(chat);
-        return Msg.success("保存成功");
+        return Msg.success("Successful Preservation");
     }
 
     @RequestMapping("/chatrobot")

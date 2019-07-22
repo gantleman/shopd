@@ -13,33 +13,33 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class ChatDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Chat> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Chat> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Chat> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Chat> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Chat> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Chat> sIdx2;// Secondary index
 
 	public ChatDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Chat.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "senduser");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "receiveuser");
 	}
 
 	/**
-	 * 添加一个Chat
+* Add a Chat
 	 */
 	public void saveChat(Chat chat) {
 		pIdx.put(chat);
 	}
 
 	/**
-	 * 根据用户Id删除一个recode
+	 * Delete one based on user ID recode
 	 **/
 	public void removedChatById(Integer chatId) {
 		pIdx.delete(chatId);
@@ -60,30 +60,30 @@ public class ChatDA {
 	}
 	
 	/**
-	 * 根据用户Id查找一个Chat
+	 * Find one based on user IDChat
 	 **/
 	public Chat findChatById(Integer chatId) {
 		return pIdx.get(chatId);
 	}
 
 	/**
-	 * 查找所有的Chat
+	 * Find all Chat
 	 **/
 	public List<Chat> findAllChat() {
 		List<Chat> chatList = new ArrayList<Chat>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Chat> chatCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			chatCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Chat chat : chatCursorList) {
 				chatList.add(chat);
 			}
 		} catch (DatabaseException e) {
 		} finally {
 			if (chatCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				chatCursorList.close();
 			}
 		}
@@ -99,10 +99,10 @@ public class ChatDA {
 		
 		EntityCursor<Chat> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Chat chat : entityCursorList) {
 				chatList.add(chat);
 			}
@@ -111,7 +111,7 @@ public class ChatDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -128,10 +128,10 @@ public class ChatDA {
 		
 		EntityCursor<Chat> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Chat chat : entityCursorList) {
 				chatList.add(chat);
 			}
@@ -140,7 +140,7 @@ public class ChatDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -148,7 +148,7 @@ public class ChatDA {
 	}
 
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllChatCount() {
 		Long count = 0L;
@@ -169,7 +169,7 @@ public class ChatDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllChatBySendUserIDCount(Integer userid) {
 		Long count = 0L;
@@ -190,7 +190,7 @@ public class ChatDA {
 	} 
 
 		/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllChatByReceiveUserCount(Integer userid) {
 		Long count = 0L;

@@ -13,70 +13,70 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class OrderItemDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, OrderItem> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, OrderItem> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, OrderItem> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, OrderItem> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, OrderItem> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, OrderItem> sIdx2;// Secondary index
 
 	public OrderItemDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, OrderItem.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "orderid");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
 	}
 
 	/**
-	 * 添加一个OrderItem
+* Add a OrderItem
 	 */
 	public void saveOrderItem(OrderItem orderitem) {
 		pIdx.put(orderitem);
 	}
 
 	/**
-	 * 根据用户Id删除一个OrderItem
+	 * Delete one based on user ID OrderItem
 	 **/
 	public void removedOrderItemById(Integer orderitemId) {
 		pIdx.delete(orderitemId);
 	}
 
 	/**
-	 * 根据用户名称删除一个OrderItem
+	 * Delete one by user nameOrderItem
 	 **/
 	public void removedOrderItemByOrderID(Integer orderid) {
 		sIdx.delete(orderid);
 	}
 
 	/**
-	 * 根据用户名称删除一个OrderItem
+	 * Delete one by user nameOrderItem
 	 **/
 	public void removedOrderItemByGoodsID(Integer goodsid) {
 		sIdx2.delete(goodsid);
 	}
 
 	/**
-	 * 根据用户Id查找一个OrderItem
+	 * Find one based on user IDOrderItem
 	 **/
 	public OrderItem findOrderItemById(Integer orderitemId) {
 		return pIdx.get(orderitemId);
 	}
 
 	/**
-	 * 查找所有的OrderItem
+	 * Find all OrderItem
 	 **/
 	public List<OrderItem> findAllOrderItem() {
 		List<OrderItem> orderitemList = new ArrayList<OrderItem>();
-		// 打开游标
+		// open cursor
 		EntityCursor<OrderItem> orderitemCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			orderitemCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (OrderItem orderitem : orderitemCursorList) {
 				orderitemList.add(orderitem);
 			}
@@ -84,7 +84,7 @@ public class OrderItemDA {
 			
 		} finally {
 			if (orderitemCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				orderitemCursorList.close();
 			}
 		}
@@ -100,10 +100,10 @@ public class OrderItemDA {
 		
 		EntityCursor<OrderItem> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(orderid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (OrderItem orderitem : entityCursorList) {
 				orderitemList.add(orderitem);
 			}
@@ -112,7 +112,7 @@ public class OrderItemDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -128,10 +128,10 @@ public class OrderItemDA {
 		
 		EntityCursor<OrderItem> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(goodsid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (OrderItem orderitem : entityCursorList) {
 				orderitemList.add(orderitem);
 			}
@@ -140,7 +140,7 @@ public class OrderItemDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -148,7 +148,7 @@ public class OrderItemDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllOrderItemCount() {
 		Long count = 0L;
@@ -169,7 +169,7 @@ public class OrderItemDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllOrderItemByOrderIDCount(Integer orderid) {
 		Long count = 0L;
@@ -190,7 +190,7 @@ public class OrderItemDA {
 	}
 
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllOrderItemByGoodsIDCount(Integer goodsid) {
 		Long count = 0L;

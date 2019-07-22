@@ -13,69 +13,69 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class GoodsDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Goods> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Goods> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Goods> sIdx;// 二级索引
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<String, Integer, Goods> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Goods> sIdx;// Secondary index
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<String, Integer, Goods> sIdx2;// Secondary index
 
 	public GoodsDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Goods.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "category");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, String.class, "goodsname");
 	}
 
 	/**
-	 * 添加一个Goods
+* Add a Goods
 	 */
 	public void saveGoods(Goods goods) {
 		pIdx.put(goods);
 	}
 
 	/**
-	 * 根据用户Id删除一个Goods
+	 * Delete one based on user ID Goods
 	 **/
 	public void removedGoodsById(Integer goodsId) {
 		pIdx.delete(goodsId);
 	}
 
 	/**
-	 * 根据用户名称删除一个Goods
+	 * Delete one by user nameGoods
 	 **/
 	public void removedGoodsByActivityID(Integer activityid) {
 		sIdx.delete(activityid);
 	}
 	
 	/**
-	 * 根据用户名称删除一个Goods
+	 * Delete one by user nameGoods
 	 **/
 	public void removedGoodsByCategory(Integer category) {
 		sIdx.delete(category);
 	}
 
 	/**
-	 * 根据用户Id查找一个Goods
+	 * Find one based on user IDGoods
 	 **/
 	public Goods findGoodsById(Integer goodsId) {
 		return pIdx.get(goodsId);
 	}
 
 	/**
-	 * 查找所有的Goods
+	 * Find all Goods
 	 **/
 	public List<Goods> findAllGoods() {
 		List<Goods> goodsList = new ArrayList<Goods>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Goods> goodsCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			goodsCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Goods goods : goodsCursorList) {
 				goodsList.add(goods);
 			}
@@ -83,7 +83,7 @@ public class GoodsDA {
 			
 		} finally {
 			if (goodsCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				goodsCursorList.close();
 			}
 		}
@@ -99,10 +99,10 @@ public class GoodsDA {
 		
 		EntityCursor<Goods> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(category).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Goods goods : entityCursorList) {
 				goodsList.add(goods);
 			}
@@ -111,7 +111,7 @@ public class GoodsDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -127,10 +127,10 @@ public class GoodsDA {
 		
 		EntityCursor<Goods> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(name).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Goods goods : entityCursorList) {
 				goodsList.add(goods);
 			}
@@ -139,7 +139,7 @@ public class GoodsDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -147,7 +147,7 @@ public class GoodsDA {
 	}
 
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllGoodsCount() {
 		Long count = 0L;
@@ -168,7 +168,7 @@ public class GoodsDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllGoodsByCategoryCount(Integer category) {
 		Long count = 0L;

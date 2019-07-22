@@ -58,13 +58,13 @@ public class AdminOrderController {
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
 
-        //查询未发货订单
+        //Inquiry for Unshipped Orders
         List<Order> orderList = orderService.selectOrderByIssend(request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
-        //查询该订单中的商品
+        //Query the goods in the order
         for (int i = 0; i < orderList.size(); i++) {
-            //获取订单项中的goodsid
+            //Get goodsid in the order item
             Order order = orderList.get(i);
             List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
@@ -74,10 +74,10 @@ public class AdminOrderController {
                 goodsList.add(goods);
             }
 
-            //根据goodsid查询商品
+            //Search for merchandise based on goodsid
             order.setGoodsInfo(goodsList);
 
-            //查询地址
+            //Query Address
             Address address = addressService.getAddressByKey(order.getAddressid(),request.getServletPath());
             order.setAddress(address);
 
@@ -113,13 +113,13 @@ public class AdminOrderController {
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
 
-        //查询未收货订单
+        //Inquiry for uncollected orders
         List<Order> orderList = orderService.selectOrderByIssendAndIsreceive(request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
-        //查询该订单中的商品
+        //Query the goods in the order
         for (int i = 0; i < orderList.size(); i++) {
-            //获取订单项中的goodsid
+            //Query the goods in the order
             Order order = orderList.get(i);
             List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
@@ -128,10 +128,10 @@ public class AdminOrderController {
                 goods.setNum(orderItem.getNum());
                 goodsList.add(goods);
             }
-            //根据goodsid查询商品
+            //Search for merchandise based on goodsid
             order.setGoodsInfo(goodsList);
 
-            //查询地址
+            //Query Address
             Address address = addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
             order.setAddress(address);
 
@@ -154,13 +154,13 @@ public class AdminOrderController {
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
 
-        //查询已完成订单
+        //Query completed orders
         List<Order> orderList = orderService.selectOrderByAll(pn -1, request.getServletPath());
         model.addAttribute("sendOrder", orderList);
 
-        //查询该订单中的商品
+        //Query the goods in the order
         for (int i = 0; i < orderList.size(); i++) {
-            //获取订单项中的goodsid
+            //Get goodsid in the order item
             Order order = orderList.get(i);
             List<OrderItem> orderItemList = orderItemService.getOrderItemByOrderId(order.getOrderid(), request.getServletPath());
             List<Goods> goodsList = new ArrayList<Goods>();
@@ -170,10 +170,10 @@ public class AdminOrderController {
                 goodsList.add(goods);
             }
 
-            //根据goodsid查询商品
+            //Search for merchandise based on goodsid
             order.setGoodsInfo(goodsList);
 
-            //查询地址
+            //Query Address
             Address address = addressService.getAddressByKey(order.getAddressid(), request.getServletPath());
             order.setAddress(address);
 

@@ -62,16 +62,17 @@ public class ShopCartServiceImpl implements ShopCartService {
     @Override
     public List<ShopCart> selectByID(Integer userID, String url) {
         List<ShopCart> re = new  ArrayList<ShopCart>();
-        if(redisu.hasKey("shopcart_u"+userID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("shopcart_u"+userID.toString());
-            re = new ArrayList<ShopCart>();
-            for (Object id : ro) {
-                ShopCart r =  getShopCartByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
+            if(ro != null) {
+                for (Object id : ro) {
+                    ShopCart r =  getShopCartByKey((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/shopcartuserpage", userID);
@@ -79,16 +80,17 @@ public class ShopCartServiceImpl implements ShopCartService {
                 RefreshUserDBD(userID, true, true);
             }
 
-            if(redisu.hasKey("shopcart_u"+userID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("shopcart_u"+userID.toString());
-                re = new ArrayList<ShopCart>();
-                for (Object id : ro) {
-                    ShopCart r =  getShopCartByKey((Integer)id, url);
-                    if (r != null)
-                        re.add(r);
+                if(ro != null) {
+                    for (Object id : ro) {
+                        ShopCart r =  getShopCartByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
             }
         }
         return re;
@@ -108,8 +110,8 @@ public class ShopCartServiceImpl implements ShopCartService {
             }else{
                 RefreshDBD(pageId, true);
             }
-
-            if(redisu.hHasKey(classname, shopcartid.toString())) {
+            
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
                 //read redis
                 re = (ShopCart) redisu.hget(classname, shopcartid.toString());
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);

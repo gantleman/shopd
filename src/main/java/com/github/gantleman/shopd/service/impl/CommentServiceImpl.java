@@ -74,7 +74,7 @@ public class CommentServiceImpl implements CommentService {
                 RefreshDBD(pageId, true);
             }
 
-            if(redisu.hHasKey(classname, commentid.toString())) {
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
                 //read redis
                 re = (Comment) redisu.hget(classname, commentid.toString());
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -137,9 +137,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> selectByGoodsID(Integer goodsid, String url) {
-        List<Comment> re = null;
+        List<Comment> re = new ArrayList<Comment>();
 
-        if(redisu.hasKey("comment_g"+goodsid.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(goodsid).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("comment_g"+goodsid.toString());
             re = new ArrayList<Comment>();
@@ -156,7 +156,7 @@ public class CommentServiceImpl implements CommentService {
                 RefreshUserDBD(goodsid, true, true);
             }
 
-            if(redisu.hasKey("comment_g"+goodsid.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(goodsid).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("comment_g"+goodsid.toString());
                 re = new ArrayList<Comment>();

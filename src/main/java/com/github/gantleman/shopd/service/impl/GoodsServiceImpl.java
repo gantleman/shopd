@@ -87,25 +87,28 @@ public class GoodsServiceImpl implements GoodsService {
     public Goods selectById(Integer goodsid, String url) {
         Goods re = null;
         Integer pageId = cacheService.PageID(goodsid);
-        if(redisu.hHasKey(classname, goodsid.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             Object o = redisu.hget(classname, goodsid.toString());
             if(o != null){
                 re = (Goods) o;
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
             }
-        }else {
+        } else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/goodspage", pageId);
             }else{
                 RefreshDBD(pageId, true);
             }
 
-            Object o = redisu.hget(classname, goodsid.toString());
-            if(o != null){
-                re = (Goods) o;
-                redisu.hincr(classname+"pageid", pageId.toString(), 1);
-            }     
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
+                //read redis
+                Object o = redisu.hget(classname, goodsid.toString());
+                if(o != null){
+                    re = (Goods) o;
+                    redisu.hincr(classname+"pageid", pageId.toString(), 1);
+                }
+            }   
         }
         return re;
     }
@@ -334,7 +337,7 @@ public class GoodsServiceImpl implements GoodsService {
             BDBEnvironmentManager.getMyEntityStore().sync();
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
-            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+            if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
                 BDBEnvironmentManager.getInstance();
                 GoodsDA goodsDA=new GoodsDA(BDBEnvironmentManager.getMyEntityStore());
 

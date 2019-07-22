@@ -10,16 +10,16 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class ActivityDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Activity> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Activity> pIdx;// Primary Index
 
 	public ActivityDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Activity.class);
 	}
 
 	/**
-	 * 添加一个activity
+* Add a activity
 	 */
 	public void saveActivity(Activity activity) {
 		pIdx.put(activity);
@@ -32,37 +32,37 @@ public class ActivityDA {
 	}
 
 	/**
-	 * 根据用户Id删除一个activity
+	 * Delete one based on user ID activity
 	 **/
 	public boolean removedActivityById(Integer activityId) {
 		return pIdx.delete(activityId);
 	}
 
 	/**
-	 * 根据用户Id查找一个activity
+	 * Find one based on user ID activity
 	 **/
 	public Activity findActivityById(Integer activityId) {
 		return pIdx.get(activityId);
 	}
 
 	/**
-	 * 查找所有的activity
+	 * Find all activity
 	 **/
 	public List<Activity> findAllActivity() {
 		List<Activity> activityList = new ArrayList<Activity>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Activity> activityCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			activityCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Activity activity : activityCursorList) {
 				activityList.add(activity);
 			}
 		} catch (DatabaseException e) {
 		} finally {
 			if (activityCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				activityCursorList.close();
 			}
 		}
@@ -70,7 +70,7 @@ public class ActivityDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllActivityCount() {
 		Long count = 0L;

@@ -63,33 +63,35 @@ public class OrderItemServiceImpl implements OrderItemService {
     public List<OrderItem> getOrderItemByOrderId(Integer orderid, String url) {
         List<OrderItem> re = new ArrayList<OrderItem>();
 
-        if(redisu.hasKey("orderitem_u"+orderid.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(orderid).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("orderitem_u"+orderid.toString());
-            re = new ArrayList<OrderItem>();
-            for (Object id : ro) {
-                OrderItem r =  getOrderItemByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
-            }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(orderid).toString(), 1);
-        }else {
-            if(!cacheService.IsLocal(url)){
-                cacheService.RemoteRefresh("/orderitemuserpage", orderid);
-            }else{
-                RefreshUserDBD(orderid, true, true);
-            }
-
-            if(redisu.hasKey("orderitem_u"+orderid.toString())) {
-                //read redis
-                Set<Object> ro = redisu.sGet("orderitem_u"+orderid.toString());
-                re = new ArrayList<OrderItem>();
+            if(ro != null){
                 for (Object id : ro) {
                     OrderItem r =  getOrderItemByKey((Integer)id, url);
                     if (r != null)
                         re.add(r);
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(orderid).toString(), 1);
+            }
+        } else {
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/orderitemuserpage", orderid);
+            }else{
+                RefreshUserDBD(orderid, true, true);
+            }
+
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(orderid).toString())) {
+                //read redis
+                Set<Object> ro = redisu.sGet("orderitem_u"+orderid.toString());
+                if(ro != null){
+                    for (Object id : ro) {
+                        OrderItem r =  getOrderItemByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(orderid).toString(), 1);
+                }
             }
         }
         return re;

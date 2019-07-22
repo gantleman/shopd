@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class AddressUserDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, AddressUser> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, AddressUser> pIdx;// Primary Index
 
 	public AddressUserDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, AddressUser.class);
 	}
 
 	/**
-	 * 添加一个AddressUser
+* Add a AddressUser
 	 */
 	public void saveAddressUser(AddressUser addressuser) {
 		pIdx.put(addressuser);
 	}
 
 	/**
-	 * 根据用户Id删除一个AddressUser
+	 * Delete one based on user ID AddressUser
 	 **/
 	public void removedAddressUserById(Integer addressuserId) {
 		pIdx.delete(addressuserId);
 	}
 
 	/**
-	 * 根据用户Id查找一个AddressUser
+	 * Find one based on user IDAddressUser
 	 **/
 	public AddressUser findAddressUserById(Integer addressuserId) {
 		return pIdx.get(addressuserId);
 	}
 
 	/**
-	 * 查找所有的AddressUser
+	 * Find all AddressUser
 	 **/
 	public List<AddressUser> findAllAddressUser() {
 		List<AddressUser> addressuserList = new ArrayList<AddressUser>();
-		// 打开游标
+		// open cursor
 		EntityCursor<AddressUser> addressuserCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			addressuserCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (AddressUser addressuser : addressuserCursorList) {
 				addressuserList.add(addressuser);
 			}
@@ -58,7 +58,7 @@ public class AddressUserDA {
 			
 		} finally {
 			if (addressuserCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				addressuserCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class AddressUserDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllAddressUserCount() {
 		Long count = 0L;

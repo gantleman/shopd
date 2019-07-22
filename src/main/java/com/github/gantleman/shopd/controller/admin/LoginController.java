@@ -26,13 +26,13 @@ public class LoginController {
     @RequestMapping("/confirmLogin")
     public String confirmLogin(Admin admin, Model model, HttpServletRequest request) {
         if (admin.getAdminname() == null){
-            model.addAttribute("errorMsg", "用户名或密码错误");
+            model.addAttribute("errorMsg", "ERROR Incorrect username or password");
             return "adminLogin";
         }
 
         Admin selectAdmin = adminService.selectByName(admin);
         if (selectAdmin == null) {
-            model.addAttribute("errorMsg", "用户名或密码错误");
+            model.addAttribute("errorMsg", "ERROR Incorrect username or password");
             return "adminLogin";
         } else {
             HttpSession session = request.getSession();

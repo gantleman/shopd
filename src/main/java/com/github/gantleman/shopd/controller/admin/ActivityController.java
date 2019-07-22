@@ -63,12 +63,12 @@ public class ActivityController {
 
         Admin admin = (Admin) session.getAttribute("admin");
         if (admin == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
         
         List<Activity> activityList = activityService.getAllActivity(pn-1, request.getServletPath());
 
-        return Msg.success("获取活动信息成功").add("activity",activityList);
+        return Msg.success("Access to Activity Information Successfully").add("activity",activityList);
     }
 
     @RequestMapping("/add")
@@ -93,13 +93,13 @@ public class ActivityController {
     public Msg updateActivity(Integer goodsid, Integer activityid, HttpSession session) {
         Admin admin = (Admin) session.getAttribute("admin");
         if (admin == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
         Goods goods = new Goods();
         goods.setActivityid(activityid);
         goods.setGoodsid(goodsid);
         goodsService.updateGoodsById(goods);
-        return Msg.success("更新商品活动成功");
+        return Msg.success("Successful Renewal of Commodity Activities");
     }
 
     @RequestMapping("delete")

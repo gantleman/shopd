@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class ImagepathGoodsDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, ImagepathGoods> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, ImagepathGoods> pIdx;// Primary Index
 
 	public ImagepathGoodsDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, ImagepathGoods.class);
 	}
 
 	/**
-	 * 添加一个ImagepathGoods
+* Add a ImagepathGoods
 	 */
 	public void saveImagepathGoods(ImagepathGoods imagepathgoods) {
 		pIdx.put(imagepathgoods);
 	}
 
 	/**
-	 * 根据用户Id删除一个ImagepathGoods
+	 * Delete one based on user ID ImagepathGoods
 	 **/
 	public void removedImagepathGoodsById(Integer imagepathgoodsId) {
 		pIdx.delete(imagepathgoodsId);
 	}
 
 	/**
-	 * 根据用户Id查找一个ImagepathGoods
+	 * Find one based on user IDImagepathGoods
 	 **/
 	public ImagepathGoods findImagepathGoodsById(Integer imagepathgoodsId) {
 		return pIdx.get(imagepathgoodsId);
 	}
 
 	/**
-	 * 查找所有的ImagepathGoods
+	 * Find all ImagepathGoods
 	 **/
 	public List<ImagepathGoods> findAllImagepathGoods() {
 		List<ImagepathGoods> imagepathgoodsList = new ArrayList<ImagepathGoods>();
-		// 打开游标
+		// open cursor
 		EntityCursor<ImagepathGoods> imagepathgoodsCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			imagepathgoodsCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (ImagepathGoods imagepathgoods : imagepathgoodsCursorList) {
 				imagepathgoodsList.add(imagepathgoods);
 			}
@@ -58,7 +58,7 @@ public class ImagepathGoodsDA {
 			
 		} finally {
 			if (imagepathgoodsCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				imagepathgoodsCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class ImagepathGoodsDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllImagepathGoodsCount() {
 		Long count = 0L;

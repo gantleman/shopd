@@ -12,36 +12,36 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class CategoryDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Category> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Category> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<String, Integer, Category> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<String, Integer, Category> sIdx;// Secondary index
 
 	public CategoryDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Category.class);
 
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, String.class, "catename");
 	}
 
 	/**
-	 * 添加一个Category
+* Add a Category
 	 */
 	public void saveCategory(Category category) {
 		pIdx.put(category);
 	}
 
 	/**
-	 * 根据用户Id删除一个Category
+	 * Delete one based on user ID Category
 	 **/
 	public void removedCategoryById(Integer categoryId) {
 		pIdx.delete(categoryId);
 	}
 
 	/**
-	 * 根据用户Id查找一个Category
+	 * Find one based on user IDCategory
 	 **/
 	public Category findCategoryById(Integer categoryId) {
 		return pIdx.get(categoryId);
@@ -56,10 +56,10 @@ public class CategoryDA {
 		
 		EntityCursor<Category> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(categoryname).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Category category : entityCursorList) {
 				categoryList.add(category);
 			}
@@ -67,7 +67,7 @@ public class CategoryDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -75,23 +75,23 @@ public class CategoryDA {
 	}
 
 	/**
-	 * 查找所有的Category
+	 * Find all Category
 	 **/
 	public List<Category> findAllCategory() {
 		List<Category> categoryList = new ArrayList<Category>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Category> categoryCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			categoryCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Category category : categoryCursorList) {
 				categoryList.add(category);
 			}
 		} catch (DatabaseException e) {
 		} finally {
 			if (categoryCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				categoryCursorList.close();
 			}
 		}
@@ -99,7 +99,7 @@ public class CategoryDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllCategoryCount() {
 		Long count = 0L;

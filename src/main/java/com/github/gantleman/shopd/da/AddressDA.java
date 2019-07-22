@@ -13,28 +13,28 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class AddressDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Address> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Address> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Address> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Address> sIdx;// Secondary index
 
 	public AddressDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Address.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
 	}
 
 	/**
-	 * 添加一个Address
+* Add a Address
 	 */
 	public void saveAddress(Address address) {
 		pIdx.put(address);
 	}
 
 	/**
-	 * 根据用户Id删除一个Address
+	 * Delete one based on user ID Address
 	 **/
 	public void removedAddressById(Integer addressId) {
 		pIdx.delete(addressId);
@@ -48,23 +48,23 @@ public class AddressDA {
 	}
 
 	/**
-	 * 根据用户Id查找一个Address
+	 * Find one based on user IDAddress
 	 **/
 	public Address findAddressById(Integer addressId) {
 		return pIdx.get(addressId);
 	}
 
 	/**
-	 * 查找所有的Address
+	 * Find all Address
 	 **/
 	public List<Address> findAllAddress() {
 		List<Address> addressList = new ArrayList<Address>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Address> addressCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			addressCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Address address : addressCursorList) {
 				addressList.add(address);
 			}
@@ -72,7 +72,7 @@ public class AddressDA {
 			
 		} finally {
 			if (addressCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				addressCursorList.close();
 			}
 		}
@@ -88,10 +88,10 @@ public class AddressDA {
 		
 		EntityCursor<Address> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Address address : entityCursorList) {				
 				addressList.add(address);
 			}
@@ -100,7 +100,7 @@ public class AddressDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -108,7 +108,7 @@ public class AddressDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllAddressCount() {
 		Long count = 0L;

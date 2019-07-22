@@ -56,7 +56,7 @@ public class GoodsController {
     public Msg getAllGoods(@RequestParam(value = "page", defaultValue = "1") Integer pn, HttpServletResponse response, Model model, HttpSession session) {
         Admin admin = (Admin) session.getAttribute("admin");
         if (admin == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
@@ -66,7 +66,7 @@ public class GoodsController {
         //Display several page numbers
         PageInfo page = new PageInfo(employees, 5);
         model.addAttribute("pageInfo", page);
-        return Msg.success("查询成功!").add("pageInfo", page);
+        return Msg.success("query was successful!").add("pageInfo", page);
     }
 
     @RequestMapping("/show")
@@ -95,7 +95,7 @@ public class GoodsController {
         List<Category> categoryList = cateService.selectByAll(0, request.getServletPath());
         model.addAttribute("categoryList",categoryList);
 
-        //还需要查询分类传给addGoods页面
+        //You also need to query categories to pass to the addGoods page
         return "addGoods";
     }
 
@@ -104,7 +104,7 @@ public class GoodsController {
     public Msg updateGoods(Goods goods, HttpSession session) {
         Admin admin = (Admin) session.getAttribute("admin");
         if (admin == null) {
-            return Msg.fail("请先登录");
+            return Msg.fail("Please login first");
         }
        /* goods.setGoodsid(goodsid);*/
         goodsService.updateGoodsById(goods);
@@ -115,7 +115,7 @@ public class GoodsController {
     @ResponseBody
     public Msg deleteGoods(@PathVariable("goodsid")Integer goodsid) {
         goodsService.deleteGoodsById(goodsid);
-        return Msg.success("删除成功!");
+        return Msg.success("Successful deletion!");
     }
 
     @RequestMapping("/addGoodsSuccess")
@@ -134,17 +134,17 @@ public class GoodsController {
             if (multipartFile != null){
 
                 String realPath = request.getSession().getServletContext().getRealPath("/");
-                //图片路径=项目在本地磁盘的路径\shop\target\shop\shopimage
+                //Picture path = project path on local diskshoptargetshopshopimage
                 String imageName = UUID.randomUUID().toString().replace("-", "") + multipartFile.getOriginalFilename();
                 String imagePath = realPath.substring(0,realPath.indexOf("shop")) + "shopimage" + File.separatorChar + imageName;
-                //把图片路径存入数据库中
+                //Store the picture path in the database
                 imagePathService.insertImagePath(new ImagePath(null, goods.getGoodsid(),imageName));
-                //存图片
+                //Save pictures
                 multipartFile.transferTo(new File(imagePath));
             }
         }
 
-        redirectAttributes.addFlashAttribute("succeseMsg","商品添加成功!");
+        redirectAttributes.addFlashAttribute("succeseMsg","Successful merchandise addition!");
 
         return "redirect:/admin/goods/add";
     }
@@ -174,12 +174,12 @@ public class GoodsController {
         categoryList=cateService.selectByName(category.getCatename());
         if (!categoryList.isEmpty())
         {
-            redirectAttributes.addAttribute("succeseMsg","分类已存在");
+            redirectAttributes.addAttribute("succeseMsg","Category already exists");
             return "redirect:/admin/goods/addCategory";
         }
         else {
             cateService.insertSelective(category);
-            redirectAttributes.addFlashAttribute("succeseMsg","分类添加成功!");
+            redirectAttributes.addFlashAttribute("succeseMsg","Category Added Successfully!");
             return "redirect:/admin/goods/addCategory";
         }
     }
@@ -193,13 +193,13 @@ public class GoodsController {
             cateService.updateByPrimaryKeySelective(category);
             return Msg.success("successful");
         }
-        else return Msg.success("名字已经存在");
+        else return Msg.success("Names already exist");
     }
 
     @RequestMapping("/deleteCate")
     @ResponseBody
     public Msg deleteCate(Category category){
         cateService.deleteByPrimaryKey(category.getCateid());
-        return Msg.success("删除成功");
+        return Msg.success("Successful deletion");
     }
 }

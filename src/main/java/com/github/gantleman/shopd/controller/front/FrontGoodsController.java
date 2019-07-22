@@ -75,10 +75,10 @@ public class FrontGoodsController {
 
         User user = (User) session.getAttribute("user");
 
-        //要传回的数据存在HashMap中
+        //The data to be returned exists in HashMap
         Map<String,Object> goodsInfo = new HashMap<String,Object>();
 
-        //查询商品的基本信息
+        //Inquire about the basic information of commodities
         Goods goods = goodsService.selectById(goodsid, request.getServletPath());
 
         if (user == null) {
@@ -92,25 +92,25 @@ public class FrontGoodsController {
             }
         }
 
-        //查询商品类别
+        //Search for Categories of Goods
         Category category = cateService.selectById(goods.getCategory(), request.getServletPath());
 
-        //商品图片
+        //Merchandise Pictures
         List<ImagePath> imagePath = imagePathService.findImagePath(goodsid,request.getServletPath());
 
-        //商品评论
+        //Comments on Commodities
 
-        //商品折扣信息
+        //Commodity Discount Information
         Activity activity = activityService.selectByKey(goods.getActivityid(), request.getServletPath());
         goods.setActivity(activity);
 
-        //返回数据
+        //Return data
         goodsInfo.put("goods", goods);
         goodsInfo.put("cate", category);
         goodsInfo.put("image", imagePath);
         model.addAttribute("goodsInfo",goodsInfo);
 
-        //评论信息
+        //Comment information
         List<Comment> commentList=commentService.selectByGoodsID(goods.getGoodsid(), request.getServletPath());
         for (Integer i=0;i<commentList.size();i++)
         {
@@ -131,10 +131,10 @@ public class FrontGoodsController {
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
 
-        //查询数据
+        //Query data
         List<Goods> goodsList = goodsService.selectByName(keyword, request.getServletPath());
 
-        //获取图片地址
+        //Get the picture address
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
@@ -142,7 +142,7 @@ public class FrontGoodsController {
 
             goods.setImagePaths(imagePathList);
 
-            //判断是否收藏
+            //Judging whether to collect or not
             if (user == null) {
                 goods.setFav(false);
             } else {
@@ -169,10 +169,10 @@ public class FrontGoodsController {
     @RequestMapping("/collect")
     @ResponseBody
     public Msg collectGoods(Integer goodsid, HttpSession session) {
-        //取登录用户信息,未登录重定向至登录页面
+        //取登录用户信息,no login重定向至登录页面
         User user = (User) session.getAttribute("user");
         if(user == null) {
-            return Msg.fail("收藏失败");
+            return Msg.fail("Collection failure");
         }
 
         //添加收藏
@@ -183,7 +183,7 @@ public class FrontGoodsController {
 
         favoriteService.insertFavorite(favorite);
 
-        return Msg.success("收藏成功");
+        return Msg.success("Successful collection");
     }
 
     @RequestMapping("/deleteCollect")
@@ -191,13 +191,13 @@ public class FrontGoodsController {
     public Msg deleteFavGoods(Integer goodsid, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return Msg.fail("取消收藏失败");
+            return Msg.fail("Failure to Cancel Collection");
         }
 
         //删除收藏
         favoriteService.deleteFavByKey(user.getUserid(),goodsid);
 
-        return Msg.success("取消收藏成功");
+        return Msg.success("Successful Cancellation of Collection");
     }
 
     @RequestMapping("/category")
@@ -207,19 +207,19 @@ public class FrontGoodsController {
         //One page shows several data
         PageHelper.startPage(pn, cacheService.PageSize());
 
-        //查询分类id
+        //Query classification ID
         List<Category> categoryList = cateService.selectByNameForRead(cate, request.getServletPath());
 
-        //获取查出的类别id
+        //Get the identified category ID
         List<Integer> cateId = new ArrayList<Integer>();
         for (Category category : categoryList) {
             cateId.add(category.getCateid());
         }
 
-        //查询数据
+        //Query data
         List<Goods> goodsList = goodsService.selectByDetailcateAndID(cateId, request.getServletPath());
 
-        //获取图片地址
+        //Get the picture address
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
@@ -227,7 +227,7 @@ public class FrontGoodsController {
 
             goods.setImagePaths(imagePathList);
 
-            //判断是否收藏
+            //Judging whether to collect or not
             if (user == null) {
                 goods.setFav(false);
             } else {
@@ -258,12 +258,12 @@ public class FrontGoodsController {
         HttpSession session=request.getSession();
         User user=(User) session.getAttribute("user");
         if (user == null) {
-            return Msg.fail("评论失败");
+            return Msg.fail("Comment Failure");
         }
         comment.setUserid(user.getUserid());
         Date date=new Date();
         comment.setCommenttime(date);
         commentService.insertSelective(comment);
-        return Msg.success("评论成功");
+        return Msg.success("comment Successful");
     }
 }

@@ -51,14 +51,11 @@ public class UserServiceImpl implements UserService {
     public User selectByUserID(Integer userid, String url) {
         User re = null;
         Integer pageId = cacheService.PageID(userid);
-        if(redisu.hHasKey(classname, userid.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
-            Object o = redisu.hget(classname, userid.toString());
-            if(o != null){
-                re = (User) o;
-                redisu.hincr(classname+"pageid", pageId.toString(), 1);
-            }
-        }else {
+            re = (User) redisu.hget(classname, userid.toString());
+            redisu.hincr(classname+"pageid", pageId.toString(), 1);
+         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/userpage", pageId);
             }else{
@@ -290,7 +287,7 @@ public class UserServiceImpl implements UserService {
             BDBEnvironmentManager.getMyEntityStore().sync();
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
-            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+            if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
                 BDBEnvironmentManager.getInstance();
                 UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
 

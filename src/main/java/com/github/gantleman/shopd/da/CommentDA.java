@@ -13,33 +13,33 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class CommentDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Comment> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Comment> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Comment> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Comment> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Comment> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Comment> sIdx2;// Secondary index
 
 	public CommentDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Comment.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
 	}
 
 	/**
-	 * 添加一个Comment
+* Add a Comment
 	 */
 	public void saveComment(Comment comment) {
 		pIdx.put(comment);
 	}
 
 	/**
-	 * 根据用户Id删除一个Comment
+	 * Delete one based on user ID Comment
 	 **/
 	public void removedCommentById(Integer commentId) {
 		pIdx.delete(commentId);
@@ -60,23 +60,23 @@ public class CommentDA {
 	}
 	
 	/**
-	 * 根据用户Id查找一个Comment
+	 * Find one based on user IDComment
 	 **/
 	public Comment findCommentById(Integer commentId) {
 		return pIdx.get(commentId);
 	}
 
 	/**
-	 * 查找所有的Comment
+	 * Find all Comment
 	 **/
 	public List<Comment> findAllComment() {
 		List<Comment> commentList = new ArrayList<Comment>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Comment> commentCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			commentCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Comment comment : commentCursorList) {
 				commentList.add(comment);
 			}
@@ -84,7 +84,7 @@ public class CommentDA {
 			
 		} finally {
 			if (commentCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				commentCursorList.close();
 			}
 		}
@@ -100,10 +100,10 @@ public class CommentDA {
 		
 		EntityCursor<Comment> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Comment comment : entityCursorList) {
 				commentList.add(comment);
 			}
@@ -112,7 +112,7 @@ public class CommentDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -128,10 +128,10 @@ public class CommentDA {
 		
 		EntityCursor<Comment> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(goodsid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Comment comment : entityCursorList) {
 				commentList.add(comment);
 			}
@@ -140,7 +140,7 @@ public class CommentDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -148,7 +148,7 @@ public class CommentDA {
 	}
 
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllCommentCount() {
 		Long count = 0L;
@@ -169,7 +169,7 @@ public class CommentDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllCommentByByUserIDCount(Integer userid) {
 		Long count = 0L;
@@ -190,7 +190,7 @@ public class CommentDA {
 	}
 
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllCommentByByGoodsIDCount(Integer goodsid) {
 		Long count = 0L;

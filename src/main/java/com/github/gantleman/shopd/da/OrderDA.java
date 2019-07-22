@@ -14,38 +14,38 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class OrderDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Order> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Order> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Order> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Order> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Date, Integer, Order> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Date, Integer, Order> sIdx2;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Order> sIdx3;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Order> sIdx3;// Secondary index
 
 	public OrderDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Order.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Date.class, "ordertime");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx3 = entityStore.getSecondaryIndex(pIdx, Integer.class, "addressid");
 	}
 
 	/**
-	 * 添加一个Order
+* Add a Order
 	 */
 	public void saveOrder(Order order) {
 		pIdx.put(order);
 	}
 
 	/**
-	 * 根据用户Id删除一个Order
+	 * Delete one based on user ID Order
 	 **/
 	public void removedOrderById(Integer orderId) {
 		pIdx.delete(orderId);
@@ -73,23 +73,23 @@ public class OrderDA {
 	}
 	
 	/**
-	 * 根据用户Id查找一个Order
+	 * Find one based on user IDOrder
 	 **/
 	public Order findOrderById(Integer orderId) {
 		return pIdx.get(orderId);
 	}
 
 	/**
-	 * 查找所有的Order
+	 * Find all Order
 	 **/
 	public List<Order> findAllOrder() {
 		List<Order> orderList = new ArrayList<Order>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Order> orderCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			orderCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Order order : orderCursorList) {
 				orderList.add(order);
 			}
@@ -97,7 +97,7 @@ public class OrderDA {
 			
 		} finally {
 			if (orderCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				orderCursorList.close();
 			}
 		}
@@ -113,10 +113,10 @@ public class OrderDA {
 		
 		EntityCursor<Order> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Order order : entityCursorList) {
 				orderList.add(order);
 			}
@@ -125,7 +125,7 @@ public class OrderDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -141,10 +141,10 @@ public class OrderDA {
 		
 		EntityCursor<Order> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(ordertime).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Order order : entityCursorList) {
 				orderList.add(order);
 			}
@@ -153,7 +153,7 @@ public class OrderDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -169,10 +169,10 @@ public class OrderDA {
 		
 		EntityCursor<Order> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx3.subIndex(addressid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Order order : entityCursorList) {
 				orderList.add(order);
 			}
@@ -181,7 +181,7 @@ public class OrderDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -189,7 +189,7 @@ public class OrderDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllOrderCount() {
 		Long count = 0L;
@@ -210,7 +210,7 @@ public class OrderDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllOrderByUserIDCount(Integer userid) {
 		Long count = 0L;
@@ -231,7 +231,7 @@ public class OrderDA {
 	} 
 
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllOrderByOrderTimeCount(Date ordertime) {
 		Long count = 0L;
@@ -252,7 +252,7 @@ public class OrderDA {
 	} 
 
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllOrderByAddressIDCount(Integer addressid) {
 		Long count = 0L;

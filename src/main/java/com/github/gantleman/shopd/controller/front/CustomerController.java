@@ -55,9 +55,6 @@ public class CustomerController {
     private OrderItemService orderItemService;
 
     @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
     private CacheService cacheService;
 
     @RequestMapping("/login")
@@ -76,7 +73,7 @@ public class CustomerController {
         userList=userService.selectByName(user.getUsername());
         if (!userList.isEmpty())
         {
-            registerResult.addAttribute("errorMsg","用户名被占用");
+            registerResult.addAttribute("errorMsg","User name occupied");
             return "register";
         }
         else {
@@ -106,7 +103,7 @@ public class CustomerController {
             return "redirect:/main";
         }
         else {
-            loginResult.addAttribute("errorMsg","用户名与密码不匹配");
+            loginResult.addAttribute("errorMsg","User name does not match password");
             return "login";
         }
     }
@@ -146,7 +143,7 @@ public class CustomerController {
             userService.updateByPrimaryKeySelective(updateUser);
             return Msg.success("successful");
         }
-        else  {return Msg.fail("更新失败");}
+        else  {return Msg.fail("Update failed");}
     }
 
     @Autowired
@@ -170,14 +167,14 @@ public class CustomerController {
     public Msg saveAddr(Address address){
 
         addressService.updateByPrimaryKeySelective(address);
-        return Msg.success("修改成功");
+        return Msg.success("Successful revision");
     }
 
     @RequestMapping("/deleteAddr")
     @ResponseBody
     public Msg deleteAddr(Address address){
         addressService.deleteByPrimaryKey(address.getAddressid());
-        return Msg.success("删除成功");
+        return Msg.success("Successful deletion");
     }
 
     @RequestMapping("/insertAddr")
@@ -188,18 +185,15 @@ public class CustomerController {
        user=(User) session.getAttribute("user");
        address.setUserid(user.getUserid());
         addressService.insertSelective(address);
-        return Msg.success("添加成功");
+        return Msg.success("Added Successfully");
     }
 
     @RequestMapping("/info/list")
     public String list(HttpServletRequest request,Model orderModel){
-
         HttpSession session=request.getSession();
         User user;
         user=(User)session.getAttribute("user");
-
-        if (user==null)
-        {
+        if (user==null){
             return "redirect:/login";
         }
 
@@ -233,13 +227,11 @@ public class CustomerController {
         return "list";
     }
 
-   
-
     @RequestMapping("/deleteList")
     @ResponseBody
     public Msg deleteList(Order order){
         orderService.deleteById(order.getOrderid());
-        return Msg.success("删除成功");
+        return Msg.success("Successful deletion");
     }
 
 
@@ -265,7 +257,7 @@ public class CustomerController {
             goodsList = goodsService.selectByID(goodsIdList, request.getServletPath());
         }
 
-        //获取图片地址
+        //Get the picture address
         for (int i = 0; i < goodsList.size(); i++) {
             Goods goods = goodsList.get(i);
 
@@ -273,7 +265,7 @@ public class CustomerController {
 
             goods.setImagePaths(imagePathList);
 
-            //判断是否收藏
+            //Judging whether to collect or not
             goods.setFav(true);
 
             goodsList.set(i, goods);
@@ -292,9 +284,12 @@ public class CustomerController {
     {
         HttpSession session=request.getSession();
         User user=(User) session.getAttribute("user");
+        if (user==null){
+            return Msg.success("failed");
+        }
         user.setPassword(Psw);
         userService.updateByPrimaryKeySelective(user);
-        return Msg.success("修改密码成功");
+        return Msg.success("Successful password modification");
     }
 
     @RequestMapping("/finishList")
@@ -305,7 +300,7 @@ public class CustomerController {
         order.setIsreceive(true);
         order.setIscomplete(true);
         orderService.updateOrderByKey(order);
-        return Msg.success("完成订单成功");
+        return Msg.success("Successful completion of the order");
     }
 
     @RequestMapping("/logout")

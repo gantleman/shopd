@@ -63,15 +63,17 @@ public class AddressServiceImpl implements AddressService {
     public List<Address> getAllAddressByUser(Integer userID, String url) {
         List<Address> re = new ArrayList<Address>();
 
-        if(redisu.hasKey("address_u"+userID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("address_u"+userID.toString());
-            for (Object id : ro) {
-                Address r =  getAddressByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
+            if(ro != null){
+                for (Object id : ro) {
+                    Address r =  getAddressByKey((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);               
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/addressuserpage", userID);
@@ -79,15 +81,17 @@ public class AddressServiceImpl implements AddressService {
                 RefreshUserDBD(userID, true, true);
             }
 
-            if(redisu.hasKey("address_u"+userID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("address_u"+userID.toString());
-                for (Object id : ro) {
-                    Address r =  getAddressByKey((Integer)id, url);
-                    if (r != null)
-                        re.add(r);
+                if(ro != null){
+                    for (Object id : ro) {
+                        Address r =  getAddressByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);               
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
             }
         }
         return re;
@@ -108,7 +112,7 @@ public class AddressServiceImpl implements AddressService {
                 RefreshDBD(pageId, true);
             }
 
-            if(redisu.hHasKey(classname, addressid.toString())) {
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
                 //read redis
                 re = (Address) redisu.hget(classname, addressid.toString());
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);

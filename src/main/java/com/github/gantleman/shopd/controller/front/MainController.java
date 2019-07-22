@@ -49,34 +49,34 @@ public class MainController {
             userid = user.getUserid();
         }
 
-        //数码分类
-        List<Goods> digGoods = getCateGoods("数码", userid);
+        //Digital Classification
+        List<Goods> digGoods = getCateGoods("Digital", userid);
         model.addAttribute("digGoods", digGoods);
 
-        //家电
-        List<Goods> houseGoods = getCateGoods("家电", userid);
+        //household electrical appliances
+        List<Goods> houseGoods = getCateGoods("Appliances", userid);
         model.addAttribute("houseGoods", houseGoods);
 
-        //服饰
-        List<Goods> colGoods = getCateGoods("服饰", userid);
+        //Clothes Accessories
+        List<Goods> colGoods = getCateGoods("Clothes", userid);
         model.addAttribute("colGoods", colGoods);
 
-        //书籍
-        List<Goods> bookGoods = getCateGoods("书籍", userid);
+        //book
+        List<Goods> bookGoods = getCateGoods("Book", userid);
         model.addAttribute("bookGoods", bookGoods);
 
         return "main";
     }
 
     public List<Goods> getCateGoods(String cate, Integer userid) {
-        //查询分类
+        //Query classification
         List<Category> digCategoryList = cateService.selectByName(cate);
 
         if (digCategoryList.size() == 0) {
             return null;
         }
 
-        //查询属于刚查到的分类的商品
+        //Search for goods that belong to the category just found
         List<Integer> digCateId = new ArrayList<Integer>();
         for (Category tmp:digCategoryList) {
             digCateId.add(tmp.getCateid());
@@ -85,9 +85,9 @@ public class MainController {
         List<Goods> goodsList = goodsService.selectByCateLimit(digCateId, request.getServletPath());
 
         List<Goods> goodsAndImage = new ArrayList<Goods>();
-        //获取每个商品的图片
+        //Get a picture of each item
         for (Goods goods:goodsList) {
-            //判断是否为登录状态
+            //Determine whether it is a login state
             if (userid == null) {
                 goods.setFav(false);
             } else {

@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class ChatUserDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, ChatUser> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, ChatUser> pIdx;// Primary Index
 
 	public ChatUserDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, ChatUser.class);
 	}
 
 	/**
-	 * 添加一个ChatUser
+* Add a ChatUser
 	 */
 	public void saveChatUser(ChatUser chatuser) {
 		pIdx.put(chatuser);
 	}
 
 	/**
-	 * 根据用户Id删除一个ChatUser
+	 * Delete one based on user ID ChatUser
 	 **/
 	public void removedChatUserById(Integer chatuserId) {
 		pIdx.delete(chatuserId);
 	}
 
 	/**
-	 * 根据用户Id查找一个ChatUser
+	 * Find one based on user IDChatUser
 	 **/
 	public ChatUser findChatUserById(Integer chatuserId) {
 		return pIdx.get(chatuserId);
 	}
 
 	/**
-	 * 查找所有的ChatUser
+	 * Find all ChatUser
 	 **/
 	public List<ChatUser> findAllChatUser() {
 		List<ChatUser> chatuserList = new ArrayList<ChatUser>();
-		// 打开游标
+		// open cursor
 		EntityCursor<ChatUser> chatuserCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			chatuserCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (ChatUser chatuser : chatuserCursorList) {
 				chatuserList.add(chatuser);
 			}
@@ -58,7 +58,7 @@ public class ChatUserDA {
 			
 		} finally {
 			if (chatuserCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				chatuserCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class ChatUserDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllChatUserCount() {
 		Long count = 0L;

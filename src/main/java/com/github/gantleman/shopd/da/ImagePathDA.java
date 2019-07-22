@@ -13,58 +13,58 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class ImagePathDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, ImagePath> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, ImagePath> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, ImagePath> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, ImagePath> sIdx;// Secondary index
 
 	public ImagePathDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, ImagePath.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodid");
 	}
 
 	/**
-	 * 添加一个ImagePath
+* Add a ImagePath
 	 */
 	public void saveImagePath(ImagePath imagepath) {
 		pIdx.put(imagepath);
 	}
 
 	/**
-	 * 根据用户Id删除一个ImagePath
+	 * Delete one based on user ID ImagePath
 	 **/
 	public void removedImagePathById(Integer imagepathId) {
 		pIdx.delete(imagepathId);
 	}
 
 	/**
-	 * 根据用户名称删除一个ImagePath
+	 * Delete one by user nameImagePath
 	 **/
 	public void removedImagePathByImagePathName(Integer pathID) {
 		sIdx.delete(pathID);
 	}
 
 	/**
-	 * 根据用户Id查找一个ImagePath
+	 * Find one based on user IDImagePath
 	 **/
 	public ImagePath findImagePathById(Integer pathId) {
 		return pIdx.get(pathId);
 	}
 
 	/**
-	 * 查找所有的ImagePath
+	 * Find all ImagePath
 	 **/
 	public List<ImagePath> findAllImagePath() {
 		List<ImagePath> imagepathList = new ArrayList<ImagePath>();
-		// 打开游标
+		// open cursor
 		EntityCursor<ImagePath> imagepathCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			imagepathCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (ImagePath imagepath : imagepathCursorList) {
 				imagepathList.add(imagepath);
 			}
@@ -72,7 +72,7 @@ public class ImagePathDA {
 			
 		} finally {
 			if (imagepathCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				imagepathCursorList.close();
 			}
 		}
@@ -88,10 +88,10 @@ public class ImagePathDA {
 		
 		EntityCursor<ImagePath> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(goodID).entities();
-			//遍历游标
+			//Traversal cursor
 			for (ImagePath imagepath : entityCursorList) {
 				imagepathList.add(imagepath);
 			}
@@ -100,7 +100,7 @@ public class ImagePathDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -108,7 +108,7 @@ public class ImagePathDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllImagePathCount() {
 		Long count = 0L;
@@ -129,7 +129,7 @@ public class ImagePathDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllImagePathByImageGoodIDCount(Integer goodID) {
 		Long count = 0L;

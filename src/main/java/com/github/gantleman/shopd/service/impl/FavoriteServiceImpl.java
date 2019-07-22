@@ -87,15 +87,17 @@ public class FavoriteServiceImpl implements FavoriteService {
     public List<Favorite> selectFavByUser(Integer userID, String url) {
         List<Favorite> re = new ArrayList<Favorite>();
 
-        if(redisu.hasKey("favorite_u"+userID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("favorite_u"+userID.toString());
-            for (Object id : ro) {
-                Favorite r =  getFavoriteByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
+            if(ro != null){
+                for (Object id : ro) {
+                    Favorite r =  getFavoriteByKey((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/favoriteuserpage", userID);
@@ -103,16 +105,17 @@ public class FavoriteServiceImpl implements FavoriteService {
                 RefreshUserDBD(userID, true, true);
             }
 
-            if(redisu.hasKey("favorite_u"+userID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("favorite_u"+userID.toString());
-                re = new ArrayList<Favorite>();
-                for (Object id : ro) {
-                    Favorite r =  getFavoriteByKey((Integer)id, url);
-                    if (r != null)
-                        re.add(r);
+                if(ro != null){
+                    for (Object id : ro) {
+                        Favorite r =  getFavoriteByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
             }
         }
         return re;

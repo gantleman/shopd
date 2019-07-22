@@ -13,28 +13,28 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class CacheDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Cache> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Cache> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<String, Integer, Cache> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<String, Integer, Cache> sIdx;// Secondary index
 
 	public CacheDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Cache.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, String.class, "cName");
 	}
 
 	/**
-	 * 添加一个Cache
+* Add a Cache
 	 */
 	public void saveCache(Cache cache) {
 		pIdx.put(cache);
 	}
 
 	/**
-	 * 根据用户Id删除一个Cache
+	 * Delete one based on user ID Cache
 	 **/
 	public void removedCacheById(Integer cacheId) {
 		pIdx.delete(cacheId);
@@ -49,37 +49,37 @@ public class CacheDA {
 
 
 	/**
-	 * 根据用户Id查找一个Cache
+	 * Find one based on user IDCache
 	 **/
 	public Cache findCacheById(Integer cacheId) {
 		return pIdx.get(cacheId);
 	}
 
 	/**
-	 * 根据用户Id查找一个Cache
+	 * Find one based on user IDCache
 	 **/
 	public Cache findCacheByName(String name) {
 		return sIdx.get(name);
 	}
 
 	/**
-	 * 查找所有的Cache
+	 * Find all Cache
 	 **/
 	public List<Cache> findAllCache() {
 		List<Cache> cacheList = new ArrayList<Cache>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Cache> cacheCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			cacheCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Cache cache : cacheCursorList) {
 				cacheList.add(cache);
 			}
 		} catch (DatabaseException e) {
 		} finally {
 			if (cacheCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				cacheCursorList.close();
 			}
 		}
@@ -95,10 +95,10 @@ public class CacheDA {
 		
 		EntityCursor<Cache> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(name).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Cache address : entityCursorList) {
 				nameList.add(address);
 			}
@@ -106,7 +106,7 @@ public class CacheDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -114,7 +114,7 @@ public class CacheDA {
 	}
 
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllCacheCount() {
 		Long count = 0L;

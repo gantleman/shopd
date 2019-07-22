@@ -12,29 +12,29 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class AdminDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Admin> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Admin> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<String, Integer, Admin> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<String, Integer, Admin> sIdx;// Secondary index
 
 	public AdminDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Admin.class);
 
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, String.class, "adminname");
 	}
 
 	/**
-	 * 添加一个Admin
+* Add a Admin
 	 */
 	public void saveAdmin(Admin admin) {
 		pIdx.put(admin);
 	}
 
 	/**
-	 * 根据用户Id删除一个Admin
+	 * Delete one based on user ID Admin
 	 **/
 	public void removedAdminById(Integer adminId) {
 		pIdx.delete(adminId);
@@ -48,30 +48,30 @@ public class AdminDA {
 	}
 
 	/**
-	 * 根据用户Id查找一个Admin
+	 * Find one based on user IDAdmin
 	 **/
 	public Admin findAdminById(Integer adminId) {
 		return pIdx.get(adminId);
 	}
 
 	/**
-	 * 查找所有的Admin
+	 * Find all Admin
 	 **/
 	public List<Admin> findAllAdmin() {
 		List<Admin> adminList = new ArrayList<Admin>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Admin> adminCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			adminCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Admin admin : adminCursorList) {
 				adminList.add(admin);
 			}
 		} catch (DatabaseException e) {
 		} finally {
 			if (adminCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				adminCursorList.close();
 			}
 		}
@@ -79,7 +79,7 @@ public class AdminDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllAdminCount() {
 		Long count = 0L;
@@ -108,10 +108,10 @@ public class AdminDA {
 		
 		EntityCursor<Admin> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(adminname).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Admin admin : entityCursorList) {
 
 				if( admin.getPassword().equals(passwrod)) {
@@ -122,7 +122,7 @@ public class AdminDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}

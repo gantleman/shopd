@@ -74,7 +74,7 @@ public class ChatServiceImpl implements ChatService {
                 RefreshDBD(pageId, true);
             }
 
-            if(redisu.hHasKey(classname, chatid.toString())) {
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
                 //read redis
                 re = (Chat) redisu.hget(classname, chatid.toString());
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
@@ -87,32 +87,35 @@ public class ChatServiceImpl implements ChatService {
     public List<Chat> selectChatBySend(Integer UserID, String url) {
         List<Chat> re = new ArrayList<Chat>();
 
-        if(redisu.hasKey("chat_u"+UserID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(UserID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-            for (Object id : ro) {
-                Chat r =  getChatByKey((Integer)id, url);
-                if (r != null && r.getSenduser() == UserID)
-                    re.add(r);
+            if(ro!=null){
+                for (Object id : ro) {
+                    Chat r =  getChatByKey((Integer)id, url);
+                    if (r != null && r.getSenduser() == UserID)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);                
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);
-        }else {
+        } else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/chatuserpage", UserID);
             }else{
                 RefreshUserDBD(UserID, true, true);
             }
 
-            if(redisu.hasKey("chat_u"+UserID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(UserID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-                re = new ArrayList<Chat>();
-                for (Object id : ro) {
-                    Chat r =  getChatByKey((Integer)id, url);
-                    if (r != null && r.getSenduser() == UserID)
-                        re.add(r);
+                if(ro!=null){
+                    for (Object id : ro) {
+                        Chat r =  getChatByKey((Integer)id, url);
+                        if (r != null && r.getSenduser() == UserID)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);                
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);
             }
         }
         return re;
@@ -122,31 +125,35 @@ public class ChatServiceImpl implements ChatService {
     public List<Chat> selectChatByReceive(Integer UserID, String url) {
         List<Chat> re = new ArrayList<Chat>();
 
-        if(redisu.hasKey("chat_u"+UserID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(UserID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-            for (Object id : ro) {
-                Chat r =  getChatByKey((Integer)id, url);
-                if (r != null && r.getReceiveuser() == UserID)
-                    re.add(r);
+            if(ro!=null){
+                for (Object id : ro) {
+                    Chat r =  getChatByKey((Integer)id, url);
+                    if (r != null && r.getReceiveuser() == UserID)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);                
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);
-        }else {
+        } else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/chatuserpage", UserID);
             }else{
                 RefreshUserDBD(UserID, true, true);
             }
 
-            if(redisu.hasKey("chat_u"+UserID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(UserID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("chat_u"+UserID.toString());
-                for (Object id : ro) {
-                    Chat r =  getChatByKey((Integer)id, url);
-                    if (r != null && r.getReceiveuser() == UserID)
-                        re.add(r);
+                if(ro!=null){
+                    for (Object id : ro) {
+                        Chat r =  getChatByKey((Integer)id, url);
+                        if (r != null && r.getReceiveuser() == UserID)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);                
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(UserID).toString(), 1);
             }
         }
         return re;

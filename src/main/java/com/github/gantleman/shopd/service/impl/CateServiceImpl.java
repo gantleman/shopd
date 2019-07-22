@@ -69,15 +69,18 @@ public class CateServiceImpl implements CateService {
                 RefreshDBD(pageId, true);
             }
 
-            Integer i = cacheService.PageBegin(pageId);
-            Integer l = cacheService.PageEnd(pageId);
-            for(;i < l; i++){
-                Category r = (Category) redisu.hget(classname, i.toString());
-                if(r != null)
-                    re.add(r);
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
+                //read redis
+                Integer i = cacheService.PageBegin(pageId);
+                Integer l = cacheService.PageEnd(pageId);
+                for(;i < l; i++){
+                    Category r = (Category) redisu.hget(classname, pageId.toString());
+                    if(r != null)
+                        re.add(r);
+                }
+    
+                redisu.hincr(classname+"pageid", pageId.toString(), 1);
             }
-
-            redisu.hincr(classname+"pageid", pageId.toString(), 1);
         }
         return re;
     }
@@ -115,7 +118,7 @@ public class CateServiceImpl implements CateService {
     public Category selectById(Integer categoryid, String url) {
         Category re = null;
         Integer pageId = cacheService.PageID(categoryid);
-        if(redisu.hHasKey(classname, categoryid.toString())) {
+        if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
             //read redis
             Object o = redisu.hget(classname, categoryid.toString());
             if(o != null){
@@ -129,11 +132,14 @@ public class CateServiceImpl implements CateService {
                 RefreshDBD(pageId, true);
             }
 
-            Object o = redisu.hget(classname, categoryid.toString());
-            if(o != null){
-                re = (Category) o;
-                redisu.hincr(classname+"pageid", pageId.toString(), 1);
-            }     
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
+                //read redis
+                Object o = redisu.hget(classname, categoryid.toString());
+                if(o != null){
+                    re = (Category) o;
+                    redisu.hincr(classname+"pageid", pageId.toString(), 1);
+                }
+            }    
         }
         return re;
     }
@@ -278,7 +284,7 @@ public class CateServiceImpl implements CateService {
             BDBEnvironmentManager.getMyEntityStore().sync();
             redisu.hincr(classname+"pageid", pageID.toString(), 1);
         }else if(refresRedis){
-            if(redisu.hHasKey(classname+"pageid", pageID.toString())) {
+            if(!redisu.hHasKey(classname+"pageid", pageID.toString())) {
                 BDBEnvironmentManager.getInstance();
                 CategoryDA categoryDA=new CategoryDA(BDBEnvironmentManager.getMyEntityStore());
 

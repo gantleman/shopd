@@ -47,6 +47,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin selectByName(Admin admin) {
+        //Repeated queries for non-existent accounts can lead to drastic performance degradation
+        //Only blacklists can be used to shield malicious attacks
         Admin ra = new Admin();
         ///first check localDB
         BDBEnvironmentManager.getInstance();
@@ -95,7 +97,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void RefreshDBD(Integer pageID, boolean refresRedis) {
-        if (!cacheService.IsCache(classname, pageID,classname, AdminJob.class, job)) {
+        if (!cacheService.IsCache(classname, pageID, classname, AdminJob.class, job)) {
             BDBEnvironmentManager.getInstance();
             AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
             ///init

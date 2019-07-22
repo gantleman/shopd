@@ -13,63 +13,63 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class ShopCartDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, ShopCart> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, ShopCart> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, ShopCart> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, ShopCart> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, ShopCart> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, ShopCart> sIdx2;// Secondary index
 
 	public ShopCartDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, ShopCart.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
 	}
 
 	/**
-	 * 添加一个ShopCart
+* Add a ShopCart
 	 */
 	public void saveShopCart(ShopCart shopcart) {
 		pIdx.put(shopcart);
 	}
 
 	/**
-	 * 根据用户Id删除一个ShopCart
+	 * Delete one based on user ID ShopCart
 	 **/
 	public void removedShopCartById(Integer shopcartId) {
 		pIdx.delete(shopcartId);
 	}
 
 	/**
-	 * 根据用户名称删除一个ShopCart
+	 * Delete one by user nameShopCart
 	 **/
 	public void removedShopCartByGoodsID(Integer goodsid) {
 		sIdx.delete(goodsid);
 	}
 
 	/**
-	 * 根据用户Id查找一个ShopCart
+	 * Find one based on user IDShopCart
 	 **/
 	public ShopCart findShopCartById(Integer shopcartId) {
 		return pIdx.get(shopcartId);
 	}
 
 	/**
-	 * 查找所有的ShopCart
+	 * Find all ShopCart
 	 **/
 	public List<ShopCart> findAllShopCart() {
 		List<ShopCart> shopcartList = new ArrayList<ShopCart>();
-		// 打开游标
+		// open cursor
 		EntityCursor<ShopCart> shopcartCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			shopcartCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (ShopCart shopcart : shopcartCursorList) {
 				shopcartList.add(shopcart);
 			}
@@ -77,7 +77,7 @@ public class ShopCartDA {
 			
 		} finally {
 			if (shopcartCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				shopcartCursorList.close();
 			}
 		}
@@ -93,10 +93,10 @@ public class ShopCartDA {
 		
 		EntityCursor<ShopCart> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(goodsid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (ShopCart shopcart : entityCursorList) {
 				shopcartList.add(shopcart);
 			}
@@ -105,7 +105,7 @@ public class ShopCartDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -121,10 +121,10 @@ public class ShopCartDA {
 		
 		EntityCursor<ShopCart> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (ShopCart shopcart : entityCursorList) {
 				if(shopcart.getGoodsid() == goodsid)
 					shopcartList.add(shopcart);
@@ -134,7 +134,7 @@ public class ShopCartDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -142,7 +142,7 @@ public class ShopCartDA {
 	}
 
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllShopCartCount() {
 		Long count = 0L;
@@ -163,7 +163,7 @@ public class ShopCartDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllShopCartByGoodsIDCount(Integer goodsid) {
 		Long count = 0L;

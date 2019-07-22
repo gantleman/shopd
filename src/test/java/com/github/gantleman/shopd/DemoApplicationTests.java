@@ -3,7 +3,9 @@ package com.github.gantleman.shopd;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.github.gantleman.shopd.da.UserDA;
 import com.github.gantleman.shopd.entity.Admin;
@@ -259,8 +261,19 @@ public class DemoApplicationTests {
 		ru.hset("routeconfig", "/order", "http://127.0.1.1:8081");
 		ru.hset("routeconfig", "/orderFinish", "http://127.0.1.1:8081");
 		ru.hset("routeconfig", "/verificationcodeimg", "http://127.0.1.1:808181");
-
-
-
 	}
+
+
+	//@Test
+	public void t8() {
+		Map<String, String> headers = new HashMap<>(); 
+		Map<String, String> querys = new HashMap<>();                
+		querys.put("id", "1");
+		try {
+			httputils.doGet("http://127.0.1.1:8081", "/activitypage", headers, querys);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

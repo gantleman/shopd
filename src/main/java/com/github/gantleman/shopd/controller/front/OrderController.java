@@ -64,16 +64,16 @@ public class OrderController {
             return "redirect:/login";
         }
 
-        //查询当前用户的收货地址
+        //Query the Receiving Address of the Current User
         List<Address> addressList = addressService.getAllAddressByUser(user.getUserid(), request.getServletPath());
 
         model.addAttribute("address", addressList);
 
-        //订单信息
-        //获取当前用户的购物车信息
+        //Order information
+        //Get the current user's shopping cart information
         List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(),request.getServletPath());
 
-        //获取购物车中的商品信息
+        //Getting information about goods in shopping carts
         List<Goods> goodsAndImage = new ArrayList<Goods>();
 
         Float totalPrice = new Float(0);
@@ -86,7 +86,7 @@ public class OrderController {
             goods.setImagePaths(imagePathList);
             goods.setNum(cart.getGoodsnum());
 
-            //活动信息
+            //Activity information
             Activity activity = activityService.selectByKey(goods.getActivityid(), request.getServletPath());
             goods.setActivity(activity);
 
@@ -118,27 +118,27 @@ public class OrderController {
     public Msg orderFinish(Float oldPrice, Float newPrice, Boolean isPay, Integer addressid,HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        //获取订单信息
+        //Get order information
         List<ShopCart> shopCart = shopCartService.selectByID(user.getUserid(),request.getServletPath());
 
-        //删除购物车
+        //Delete shopping carts
         for (ShopCart cart : shopCart) {
             shopCartService.deleteByKey(cart.getUserid(),cart.getGoodsid());
         }
 
-        //把订单信息写入数据库
+        //Write order information to database
         Order order = new Order(null, user.getUserid(), new Date(), oldPrice, newPrice, isPay, false, false, false, addressid,null,null);
         orderService.insertOrder(order);
         
-        //插入的订单号
+        //Inserted Order Number
         Integer orderId = order.getOrderid();
 
-        //把订单项写入orderitem表中
+        //Write the order item into the order item table
         for (ShopCart cart : shopCart) {
             orderItemService.insertOrderItem(new OrderItem(null, orderId, cart.getGoodsid(), cart.getGoodsnum()));
         }
 
-        return Msg.success("购买成功");
+        return Msg.success("Successful Purchase");
     }
 
 }

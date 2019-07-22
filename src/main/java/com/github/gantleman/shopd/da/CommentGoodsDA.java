@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class CommentGoodsDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, CommentGoods> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, CommentGoods> pIdx;// Primary Index
 
 	public CommentGoodsDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, CommentGoods.class);
 	}
 
 	/**
-	 * 添加一个CommentGoods
+* Add a CommentGoods
 	 */
 	public void saveCommentGoods(CommentGoods commentgoods) {
 		pIdx.put(commentgoods);
 	}
 
 	/**
-	 * 根据用户Id删除一个CommentGoods
+	 * Delete one based on user ID CommentGoods
 	 **/
 	public void removedCommentGoodsById(Integer commentgoodsId) {
 		pIdx.delete(commentgoodsId);
 	}
 
 	/**
-	 * 根据用户Id查找一个CommentGoods
+	 * Find one based on user IDCommentGoods
 	 **/
 	public CommentGoods findCommentGoodsById(Integer commentgoodsId) {
 		return pIdx.get(commentgoodsId);
 	}
 
 	/**
-	 * 查找所有的CommentGoods
+	 * Find all CommentGoods
 	 **/
 	public List<CommentGoods> findAllCommentGoods() {
 		List<CommentGoods> commentgoodsList = new ArrayList<CommentGoods>();
-		// 打开游标
+		// open cursor
 		EntityCursor<CommentGoods> commentgoodsCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			commentgoodsCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (CommentGoods commentgoods : commentgoodsCursorList) {
 				commentgoodsList.add(commentgoods);
 			}
@@ -58,7 +58,7 @@ public class CommentGoodsDA {
 			
 		} finally {
 			if (commentgoodsCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				commentgoodsCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class CommentGoodsDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllCommentGoodsCount() {
 		Long count = 0L;

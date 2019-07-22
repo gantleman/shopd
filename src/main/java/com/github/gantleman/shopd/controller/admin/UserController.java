@@ -46,7 +46,7 @@ public class UserController {
         PageInfo page = new PageInfo(userList,5);
         //model.addAttribute("pageInfo", page);
 
-        return Msg.success("查询成功!").add("pageInfo", page);
+        return Msg.success("query was successful!").add("pageInfo", page);
     }
 
     @RequestMapping("/show")
@@ -59,6 +59,6 @@ public class UserController {
     public Msg deleteUser(@PathVariable("userid")Integer userid) {
 //        goodsService.deleteGoodsById(goodsid);
         userService.deleteUserById(userid);
-        return Msg.success("删除成功!");
+        return Msg.success("Successful deletion!");
     }
 }

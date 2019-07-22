@@ -151,33 +151,35 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> selectOrderByIUserID(Integer userID, String url) {
         List<Order> re = new ArrayList<Order>();
 
-        if(redisu.hasKey("order_u"+userID.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("order_u"+userID.toString());
-            re = new ArrayList<Order>();
-            for (Object id : ro) {
-                Order r =  getOrderByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
+            if(ro != null) {
+                for (Object id : ro) {
+                    Order r =  getOrderByKey((Integer)id, url);
+                    if (r != null)
+                        re.add(r);
+                }
+                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
             }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
-        }else {
+        } else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/orderuserpage", userID);
             }else{
                 RefreshUserDBD(userID, true, true);
             }
 
-            if(redisu.hasKey("order_u"+userID.toString())) {
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
                 //read redis
                 Set<Object> ro = redisu.sGet("order_u"+userID.toString());
-                re = new ArrayList<Order>();
-                for (Object id : ro) {
-                    Order r =  getOrderByKey((Integer)id, url);
-                    if (r != null)
-                        re.add(r);
+                if(ro != null) {
+                    for (Object id : ro) {
+                        Order r =  getOrderByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);                
                 }
-                redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
             }
         }
         return re;

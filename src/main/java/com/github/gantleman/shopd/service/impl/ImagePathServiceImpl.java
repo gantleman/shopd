@@ -139,26 +139,10 @@ public class ImagePathServiceImpl implements ImagePathService {
     public List<ImagePath> findImagePath(Integer goodsid, String url) {
         List<ImagePath> re = null;
 
-        if(redisu.hasKey("imagepath_g"+goodsid.toString())) {
+        if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(goodsid).toString())) {
             //read redis
             Set<Object> ro = redisu.sGet("imagepath_g"+goodsid.toString());
-            re = new ArrayList<ImagePath>();
-            for (Object id : ro) {
-                ImagePath r =  getImagepathByKey((Integer)id, url);
-                if (r != null)
-                    re.add(r);
-            }
-            redisu.hincr(classname_extra+"pageid", cacheService.PageID(goodsid).toString(), 1);
-        }else {
-            if(!cacheService.IsLocal(url)){
-                cacheService.RemoteRefresh("/imagepathuserpage", goodsid);
-            }else{
-                RefreshUserDBD(goodsid, true, true);
-            }
-
-            if(redisu.hasKey("imagepath_g"+goodsid.toString())) {
-                //read redis
-                Set<Object> ro = redisu.sGet("imagepath_g"+goodsid.toString());
+            if(ro != null){
                 re = new ArrayList<ImagePath>();
                 for (Object id : ro) {
                     ImagePath r =  getImagepathByKey((Integer)id, url);
@@ -166,6 +150,26 @@ public class ImagePathServiceImpl implements ImagePathService {
                         re.add(r);
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(goodsid).toString(), 1);
+            }
+        } else {
+            if(!cacheService.IsLocal(url)){
+                cacheService.RemoteRefresh("/imagepathuserpage", goodsid);
+            }else{
+                RefreshUserDBD(goodsid, true, true);
+            }
+
+            if(redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(goodsid).toString())) {
+                //read redis
+                Set<Object> ro = redisu.sGet("imagepath_g"+goodsid.toString());
+                if(ro != null){
+                    re = new ArrayList<ImagePath>();
+                    for (Object id : ro) {
+                        ImagePath r =  getImagepathByKey((Integer)id, url);
+                        if (r != null)
+                            re.add(r);
+                    }
+                    redisu.hincr(classname_extra+"pageid", cacheService.PageID(goodsid).toString(), 1);
+                }
             }
         }
         return re;

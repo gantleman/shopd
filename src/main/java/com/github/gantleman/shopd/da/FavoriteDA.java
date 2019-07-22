@@ -13,70 +13,70 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class FavoriteDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, Favorite> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, Favorite> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Favorite> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Favorite> sIdx;// Secondary index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<Integer, Integer, Favorite> sIdx2;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<Integer, Integer, Favorite> sIdx2;// Secondary index
 
 	public FavoriteDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, Favorite.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, Integer.class, "goodsid");
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx2 = entityStore.getSecondaryIndex(pIdx, Integer.class, "userid");
 	}
 
 	/**
-	 * 添加一个Favorite
+* Add a Favorite
 	 */
 	public void saveFavorite(Favorite favorite) {
 		pIdx.put(favorite);
 	}
 
 	/**
-	 * 根据用户Id删除一个Favorite
+	 * Delete one based on user ID Favorite
 	 **/
 	public void removedFavoriteById(Integer favoriteId) {
 		pIdx.delete(favoriteId);
 	}
 
 	/**
-	 * 根据用户名称删除一个Favorite
+	 * Delete one by user nameFavorite
 	 **/
 	public void removedFavoriteByGoodsID(Integer goodsid) {
 		sIdx.delete(goodsid);
 	}
 
 		/**
-	 * 根据用户名称删除一个Favorite
+	 * Delete one by user nameFavorite
 	 **/
 	public void removedFavoriteByUserID(Integer Userid) {
 		sIdx2.delete(Userid);
 	}
 
 	/**
-	 * 根据用户Id查找一个Favorite
+	 * Find one based on user IDFavorite
 	 **/
 	public Favorite findFavoriteById(Integer favoriteId) {
 		return pIdx.get(favoriteId);
 	}
 
 	/**
-	 * 查找所有的Favorite
+	 * Find all Favorite
 	 **/
 	public List<Favorite> findAllFavorite() {
 		List<Favorite> favoriteList = new ArrayList<Favorite>();
-		// 打开游标
+		// open cursor
 		EntityCursor<Favorite> favoriteCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			favoriteCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (Favorite favorite : favoriteCursorList) {
 				favoriteList.add(favorite);
 			}
@@ -84,7 +84,7 @@ public class FavoriteDA {
 			
 		} finally {
 			if (favoriteCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				favoriteCursorList.close();
 			}
 		}
@@ -100,10 +100,10 @@ public class FavoriteDA {
 		
 		EntityCursor<Favorite> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx2.subIndex(userid).entities();
-			//遍历游标
+			//Traversal cursor
 			for (Favorite favorite : entityCursorList) {
 				favoriteList.add(favorite);
 			}
@@ -112,7 +112,7 @@ public class FavoriteDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -120,7 +120,7 @@ public class FavoriteDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllFavoriteCount() {
 		Long count = 0L;
@@ -141,7 +141,7 @@ public class FavoriteDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllFavoriteByGoodsIDCount(Integer goodsid) {
 		Long count = 0L;

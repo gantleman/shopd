@@ -11,46 +11,46 @@ import com.sleepycat.persist.PrimaryIndex;
 
 public class FavoriteUserDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, FavoriteUser> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, FavoriteUser> pIdx;// Primary Index
 
 	public FavoriteUserDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, FavoriteUser.class);
 	}
 
 	/**
-	 * 添加一个FavoriteUser
+* Add a FavoriteUser
 	 */
 	public void saveFavoriteUser(FavoriteUser favoriteuser) {
 		pIdx.put(favoriteuser);
 	}
 
 	/**
-	 * 根据用户Id删除一个FavoriteUser
+	 * Delete one based on user ID FavoriteUser
 	 **/
 	public void removedFavoriteUserById(Integer favoriteuserId) {
 		pIdx.delete(favoriteuserId);
 	}
 
 	/**
-	 * 根据用户Id查找一个FavoriteUser
+	 * Find one based on user IDFavoriteUser
 	 **/
 	public FavoriteUser findFavoriteUserById(Integer favoriteuserId) {
 		return pIdx.get(favoriteuserId);
 	}
 
 	/**
-	 * 查找所有的FavoriteUser
+	 * Find all FavoriteUser
 	 **/
 	public List<FavoriteUser> findAllFavoriteUser() {
 		List<FavoriteUser> favoriteuserList = new ArrayList<FavoriteUser>();
-		// 打开游标
+		// open cursor
 		EntityCursor<FavoriteUser> favoriteuserCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			favoriteuserCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (FavoriteUser favoriteuser : favoriteuserCursorList) {
 				favoriteuserList.add(favoriteuser);
 			}
@@ -58,7 +58,7 @@ public class FavoriteUserDA {
 			
 		} finally {
 			if (favoriteuserCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				favoriteuserCursorList.close();
 			}
 		}
@@ -67,7 +67,7 @@ public class FavoriteUserDA {
 	
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllFavoriteUserCount() {
 		Long count = 0L;

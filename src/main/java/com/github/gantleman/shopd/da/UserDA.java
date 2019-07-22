@@ -13,42 +13,42 @@ import com.sleepycat.persist.SecondaryIndex;
 
 public class UserDA {
 
-	// 主键字段类型,实体类
-	PrimaryIndex<Integer, User> pIdx;// 一级索引
+	// Primary key field type, entity class
+	PrimaryIndex<Integer, User> pIdx;// Primary Index
 
-	// 辅助键字段类型,主键字段类型,实体类
-	SecondaryIndex<String, Integer, User> sIdx;// 二级索引
+	// Auxiliary key field type,Primary key field type, entity class
+	SecondaryIndex<String, Integer, User> sIdx;// Secondary index
 
 	public UserDA(EntityStore entityStore) {
-		// 主键字段类型,实体类
+		// Primary key field type, entity class
 		pIdx = entityStore.getPrimaryIndex(Integer.class, User.class);
-		// 主键索引,辅助键字段类型,辅助键字段名称
+		// primary key,Auxiliary key field type,Auxiliary key field name
 		sIdx = entityStore.getSecondaryIndex(pIdx, String.class, "username");
 	}
 
 	/**
-	 * 添加一个User
+* Add a User
 	 */
 	public void saveUser(User user) {
 		pIdx.put(user);
 	}
 
 	/**
-	 * 根据用户Id删除一个User
+	 * Delete one based on user ID User
 	 **/
 	public void removedUserById(Integer userId) {
 		pIdx.delete(userId);
 	}
 
 	/**
-	 * 根据用户名称删除一个User
+	 * Delete one by user name User
 	 **/
 	public void removedUserByUserName(String userName) {
 		sIdx.delete(userName);
 	}
 	
 	/**
-	 *  根据用户Id修改单个用户
+	 *  Modify a single user according to user ID
 	 **/
 	public User modifyUserById(User user) {
 		
@@ -62,23 +62,23 @@ public class UserDA {
 	}
 
 	/**
-	 * 根据用户Id查找一个User
+	 * Find one based on user IDUser
 	 **/
 	public User findUserById(Integer userId) {
 		return pIdx.get(userId);
 	}
 
 	/**
-	 * 查找所有的User
+	 * Find all User
 	 **/
 	public List<User> findAllUser() {
 		List<User> userList = new ArrayList<User>();
-		// 打开游标
+		// open cursor
 		EntityCursor<User> userCursorList = null;
 		try {
-			//获取游标
+			//Get the cursor
 			userCursorList = pIdx.entities();
-			// 遍历游标
+			// Traversal cursor
 			for (User user : userCursorList) {
 				userList.add(user);
 			}
@@ -86,7 +86,7 @@ public class UserDA {
 			
 		} finally {
 			if (userCursorList != null) {
-				// 关闭游标
+				// Close the cursor
 				userCursorList.close();
 			}
 		}
@@ -94,7 +94,7 @@ public class UserDA {
 	}
 	
 	/**
-	 * 根据userName查找所有的User
+	 * Find all Users based on userName
 	 **/
 	public List<User> findAllUserByUserName(String userName) {
 	    
@@ -102,10 +102,10 @@ public class UserDA {
 		
 		EntityCursor<User> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userName).entities();
-			//遍历游标
+			//Traversal cursor
 			for (User user : entityCursorList) {
 				userList.add(user);
 			}
@@ -114,15 +114,15 @@ public class UserDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
 		return userList;
 	}
 
-		/**
-	 * 根据userName查找所有的User
+	/**
+	 *Find all Users based on userName
 	 **/
 	public List<User> findAllUserByUserNameAndPassword(String userName, String passWord) {
 	    
@@ -130,10 +130,10 @@ public class UserDA {
 		
 		EntityCursor<User> entityCursorList=null;
 		
-		//获取游标
+		//Get the cursor
 		try {
 			entityCursorList=sIdx.subIndex(userName).entities();
-			//遍历游标
+			//Traversal cursor
 			for (User user : entityCursorList) {
 				if(user.getPassword().equals(passWord))
 					userList.add(user);
@@ -143,7 +143,7 @@ public class UserDA {
 			e.printStackTrace();
 		}finally {
 			if(entityCursorList!=null) {
-				//关闭游标
+				//Close the cursor
 				entityCursorList.close();
 			}
 		}
@@ -151,7 +151,7 @@ public class UserDA {
 	}
 	
 	/**
-	 * 统计所有用户数
+	 * Statistics of all users
 	**/
 	public Long findAllUserCount() {
 		Long count = 0L;
@@ -172,7 +172,7 @@ public class UserDA {
 	} 
 	
 	/**
-	 * 统计所有满足用户名的用户总数
+	 *Statistics the total number of users who satisfy the username
 	 *****/
 	public Long findAllUserByUserNameCount(String userName) {
 		Long count = 0L;
