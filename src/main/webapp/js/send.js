@@ -12,7 +12,7 @@ $(document).ready(function () {
     clientID = $('#sendId').text();
     client = new Messaging.Client('127.0.0.1', 61614, clientID);
     client.onConnectionLost = function () {
-        alert("连接已断开");
+        alert("connection dropped");
     };
     //收到消息
     client.onMessageArrived = function (message) {
@@ -27,7 +27,7 @@ $(document).ready(function () {
             var element_float = '<div class="clear-float"></div>';
             $(".chat-content-body").append(element, element_float);
 
-            //始终保持滚动条滚动到最下方
+            //Always keep the scroll bar scrolling to the bottom
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
             /*$('#message').append("<font color=red>"+msgObj.from+":"+msgObj.body+"</font></br>");*/
         } else if (msgObj.to === clientID && !getChatList(msgObj.from)) {
@@ -71,11 +71,11 @@ $(document).ready(function () {
             $(".chat-content-body").append(element, element_float);
 
 
-            //始终保持滚动条滚动到最下方
+            //Always keep the scroll bar scrolling to the bottom
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
             $.ajax({
-                url: "/sendMessage/", //把表单数据发送到ajax.jsp
+                url: "/sendMessage/", //Send form data to ajax.jsp
                 type: "POST",
                 data: {
                     senduser: clientID,
@@ -83,10 +83,10 @@ $(document).ready(function () {
                     msgcontent: msg.body
                 },
                 error: function (request) {
-                    alert("保存消息失败");
+                    alert("Failed to save message");
                 },
                 success: function (data) {
-                    // alert("success!"); //将返回的结果显示到ajaxDiv中
+                    // alert("success!"); //Display the returned results in ajaxDiv
                 }
             });
             var receive = $("#receiveId").text();
@@ -126,19 +126,19 @@ $(document).ready(function () {
 
         //发异步请求查聊天消息
         $.ajax({
-            url: "/getMessage/", //把表单数据发送到ajax.jsp
+            url: "/getMessage/", //Send form data to ajax.jsp
             type: "POST",
             data: {
                 senduser: $("#sendId").text(),
                 receiveuser: userid,
             },
             error: function (request) {
-                alert("保存消息失败");
+                alert("Failed to save message");
             },
             success: function (result) {
                 $('.chat-content-body').empty();
                 showMessage(result.info.message);
-                // alert("success!"); //将返回的结果显示到ajaxDiv中
+                // alert("success!"); //Display the returned results in ajaxDiv
             }
         });
     });
@@ -165,19 +165,19 @@ function userListClick() {
 
     //发异步请求查聊天消息
     $.ajax({
-        url: "/getMessage/", //把表单数据发送到ajax.jsp
+        url: "/getMessage/", //Send form data to ajax.jsp
         type: "POST",
         data: {
             senduser: $("#sendId").text(),
             receiveuser: $("#receiveId").text(),
         },
         error: function (request) {
-            alert("保存消息失败");
+            alert("Failed to save message");
         },
         success: function (result) {
             $('.chat-content-body').empty();
             showMessage(result.info.message);
-            // alert("success!"); //将返回的结果显示到ajaxDiv中
+            // alert("success!"); //Display the returned results in ajaxDiv
         }
     });
 }
@@ -217,12 +217,12 @@ function showMessage(message) {
         }
     });
 
-    //始终保持滚动条滚动到最下方
+    //Always keep the scroll bar scrolling to the bottom
     $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }
 
-//获取所有聊天列表
+//Get all chat lists
 function getChatList(id) {
     var chatList = [];
     $('.a-far>a').each(function () {
@@ -245,7 +245,7 @@ function getChatList(id) {
 //重新获取列表
 function reGetChatUser(sendto) {
     $.ajax({
-        url: "/chatto/", //把表单数据发送到ajax.jsp
+        url: "/chatto/", //Send form data to ajax.jsp
         type: "POST",
         data: {
             sendto: sendto

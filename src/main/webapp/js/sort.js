@@ -52,7 +52,7 @@ $(document).ready(function(){
                     }
                 },
                 error:function () {
-                    alert("收藏失败");
+                    alert("Collection failure");
                 }
             })
         } else {
@@ -71,7 +71,7 @@ $(document).ready(function(){
                     }
                 },
                 error:function () {
-                    alert("取消收藏失败");
+                    alert("Failure to Cancel Collection");
                 }
             })
         }

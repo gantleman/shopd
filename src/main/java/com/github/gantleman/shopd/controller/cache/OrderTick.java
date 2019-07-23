@@ -14,7 +14,7 @@ public class OrderTick {
 
     @RequestMapping("/ordertick")
     public Msg goodstick(){
-        orderservice.TickBack();
+        orderservice.Clean(false) ;
         return Msg.success("successful");
     }
 
@@ -33,6 +33,12 @@ public class OrderTick {
     @RequestMapping("/orderispage")
     public Msg orderispage(Integer id){
         orderservice.RefreshIsDBD(true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/orderclean")
+    public Msg orderclean(){
+        orderservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

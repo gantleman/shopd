@@ -14,7 +14,7 @@ public class ChatTick {
 
     @RequestMapping("/chattick")
     public Msg activitytick(){
-        chatservice.TickBack(); 
+        chatservice.Clean(false) ; 
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class ChatTick {
     @RequestMapping("/chatuserpage")
     public Msg chatuserpage(Integer id){
         chatservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/chatclean")
+    public Msg chatclean(){
+        chatservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

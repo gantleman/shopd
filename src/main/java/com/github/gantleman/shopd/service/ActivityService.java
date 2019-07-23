@@ -15,7 +15,7 @@ public interface ActivityService {
 
     void deleteByActivityId(Integer activityid);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 }

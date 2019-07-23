@@ -16,7 +16,7 @@ $(document).ready(function (){
                });
            },
            error:function (){
-               alert("删除失败");
+               alert("Delete failed");
            }
        });
    });
@@ -38,7 +38,7 @@ $(document).ready(function (){
                 });
             },
             error:function (){
-                alert("点击失败");
+                alert("Click Failure");
             }
         });
     })
@@ -75,7 +75,7 @@ $(document).ready(function (){
                 swal(result.msg);
             },
             error:function (){
-                alert("评论失败");
+                alert("Comment Failure");
             }
         });
 

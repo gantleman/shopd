@@ -14,7 +14,7 @@ public class OrderItemTick {
 
     @RequestMapping("/orderitemtick")
     public Msg orderitemtick(){
-        orderitemservice.TickBack();     
+        orderitemservice.Clean(false) ;     
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class OrderItemTick {
     @RequestMapping("/orderitemuserpage")
     public Msg orderitemuserpage(Integer id){
         orderitemservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/orderitemclean")
+    public Msg orderitemclean(){
+        orderitemservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

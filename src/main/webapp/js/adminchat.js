@@ -12,7 +12,7 @@ $(document).ready(function() {
     clientID=$('#sendId').text();
     client = new Messaging.Client('127.0.0.1',61614,clientID);
     client.onConnectionLost = function(){
-        alert("连接已断开");
+        alert("connection dropped");
     };
     //收到消息
     client.onMessageArrived = function(message){
@@ -61,11 +61,11 @@ $(document).ready(function() {
             $(".chat-content-body").append(element, element_float);
 
 
-            //始终保持滚动条滚动到最下方
+            //Always keep the scroll bar scrolling to the bottom
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
             $.ajax({
-                url: "/shop/sendMessage/", //把表单数据发送到ajax.jsp
+                url: "/shop/sendMessage/", //Send form data to ajax.jsp
                 type: "POST",
                 data: {
                     senduser: clientID,
@@ -76,7 +76,7 @@ $(document).ready(function() {
                     alert("保存消息失败");
                 },
                 success: function(data) {
-                    // alert("success!"); //将返回的结果显示到ajaxDiv中
+                    // alert("success!"); //Display the returned results in ajaxDiv
                 }
             });
 
@@ -101,7 +101,7 @@ $(document).ready(function() {
 
         //发异步请求查聊天消息
         $.ajax({
-            url: "/shop/getMessage/", //把表单数据发送到ajax.jsp
+            url: "/shop/getMessage/", //Send form data to ajax.jsp
             type: "POST",
             data: {
                 senduser: $("#sendId").text(),
@@ -113,7 +113,7 @@ $(document).ready(function() {
             success: function(result) {
                 $('.chat-content-body').empty();
                 showMessage(result.info.message);
-                // alert("success!"); //将返回的结果显示到ajaxDiv中
+                // alert("success!"); //Display the returned results in ajaxDiv
             }
         });
     });
@@ -143,7 +143,7 @@ function showMessage(message) {
         }
     });
 
-    //始终保持滚动条滚动到最下方
+    //Always keep the scroll bar scrolling to the bottom
     $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }
@@ -165,9 +165,9 @@ $(document).ready(function () {
     clientID = $('#sendId').text();
     client = new Messaging.Client('127.0.0.1', 61614, clientID);
     client.onConnectionLost = function () {
-        alert("连接已断开");
+        alert("connection dropped");
     };
-    //收到消息
+    //Receive the message
     client.onMessageArrived = function (message) {
         clientID = $('#sendId').text();
         var userid = $("#receiveId").text();
@@ -180,18 +180,18 @@ $(document).ready(function () {
             var element_float = '<div class="clear-float"></div>';
             $(".chat-content-body").append(element, element_float);
 
-            //始终保持滚动条滚动到最下方
+            //Always keep the scroll bar scrolling to the bottom
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
             /*$('#message').append("<font color=red>"+msgObj.from+":"+msgObj.body+"</font></br>");*/
         } else if (msgObj.to === clientID && !getChatList(msgObj.from)) {
-            //重新获取聊天列表
+            //Retrieve the chat list
             reGetChatUser(msgObj.from);
             // reGetChatUser(null);
             /* var chatlistitem = '<a class="a-card" data-userid="' + msgObj.from + '"> <div class="card">' + msgObj.from + '</div> </a>';
              $('.a-far').prepend(chatlistitem);*/
         }
     };
-    //建立连接和订阅
+    //Establish connections and subscriptions
     client.connect({
         onSuccess: function () {
             //订阅topic
@@ -203,7 +203,7 @@ $(document).ready(function () {
     //var loadList = setInterval(refreshList,1000);
     //receive();
     // refreshList();
-    //点击发送按钮
+    //Click the Send button
     $("#send-message").click(function () {
 
         var message = $("#input-message").val();
@@ -224,11 +224,11 @@ $(document).ready(function () {
             $(".chat-content-body").append(element, element_float);
 
 
-            //始终保持滚动条滚动到最下方
+            //Always keep the scroll bar scrolling to the bottom
             $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
             $.ajax({
-                url: "/sendMessage/", //把表单数据发送到ajax.jsp
+                url: "/sendMessage/", //Send form data to ajax.jsp
                 type: "POST",
                 data: {
                     senduser: clientID,
@@ -239,7 +239,7 @@ $(document).ready(function () {
                     alert("保存消息失败");
                 },
                 success: function (data) {
-                    // alert("success!"); //将返回的结果显示到ajaxDiv中
+                    // alert("success!"); //Display the returned results in ajaxDiv
                 }
             });
             var receive = $("#receiveId").text();
@@ -277,9 +277,9 @@ $(document).ready(function () {
         $("#receive").text(username);
         $("#receiveId").text(userid);
 
-        //发异步请求查聊天消息
+        //Asynchronous request for chat messages
         $.ajax({
-            url: "/getMessage/", //把表单数据发送到ajax.jsp
+            url: "/getMessage/", //Send form data to ajax.jsp
             type: "POST",
             data: {
                 senduser: $("#sendId").text(),
@@ -291,7 +291,7 @@ $(document).ready(function () {
             success: function (result) {
                 $('.chat-content-body').empty();
                 showMessage(result.info.message);
-                // alert("success!"); //将返回的结果显示到ajaxDiv中
+                // alert("success!"); //Display the returned results in ajaxDiv
             }
         });
     });
@@ -316,9 +316,9 @@ $(document).ready(function () {
 
 function userListClick() {
 
-    //发异步请求查聊天消息
+    //Asynchronous request for chat messages
     $.ajax({
-        url: "/getMessage/", //把表单数据发送到ajax.jsp
+        url: "/getMessage/", //Send form data to ajax.jsp
         type: "POST",
         data: {
             senduser: $("#sendId").text(),
@@ -330,7 +330,7 @@ function userListClick() {
         success: function (result) {
             $('.chat-content-body').empty();
             showMessage(result.info.message);
-            // alert("success!"); //将返回的结果显示到ajaxDiv中
+            // alert("success!"); //Display the returned results in ajaxDiv
         }
     });
 }
@@ -370,12 +370,12 @@ function showMessage(message) {
         }
     });
 
-    //始终保持滚动条滚动到最下方
+    //Always keep the scroll bar scrolling to the bottom
     $(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }
 
-//获取所有聊天列表
+//Get all chat lists
 function getChatList(id) {
     var chatList = [];
     $('.a-far>a').each(function () {
@@ -395,10 +395,10 @@ function getChatList(id) {
 
 }
 
-//重新获取列表
+//Retrieve the list
 function reGetChatUser(sendto) {
     $.ajax({
-        url: "/adminchat/", //把表单数据发送到ajax.jsp
+        url: "/adminchat/", //Send form data to ajax.jsp
         type: "POST",
         data: {
             sendto: sendto

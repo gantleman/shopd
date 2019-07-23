@@ -26,7 +26,7 @@ public interface GoodsService {
 
     public void updateGoodsById(Goods goods);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 

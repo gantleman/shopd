@@ -283,10 +283,10 @@ public class ShopCartServiceImpl implements ShopCartService {
     }
 
     @Override
-    public void TickBack_extra() {
+    public void Clean_extra(Boolean all) {
         BDBEnvironmentManager.getInstance();
         ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname_extra);
+        List<Integer> listid = all?cacheService.PageGetAll(classname_extra):cacheService.PageOut(classname_extra);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
@@ -318,10 +318,10 @@ public class ShopCartServiceImpl implements ShopCartService {
     }
 
     @Override
-    public void TickBack() {
+    public void Clean(Boolean all) {
         BDBEnvironmentManager.getInstance();
         ShopCartDA shopcartDA=new ShopCartDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname);
+        List<Integer> listid = all?cacheService.PageGetAll(classname):cacheService.PageOut(classname);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
@@ -351,7 +351,7 @@ public class ShopCartServiceImpl implements ShopCartService {
             cacheService.Archive(classname);
         }
 
-        TickBack_extra();
+        Clean_extra(all);
     }
 
     @Override

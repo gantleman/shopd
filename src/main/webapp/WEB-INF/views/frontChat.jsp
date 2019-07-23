@@ -26,7 +26,7 @@
             clientID=$('#clientID').val();
             client = new Messaging.Client('127.0.0.1',61614,clientID);
             client.onConnectionLost = function(){
-                $('#message').append('连接已断开');
+                $('#message').append('connection dropped');
             };
             //收到消息
             client.onMessageArrived = function(message){

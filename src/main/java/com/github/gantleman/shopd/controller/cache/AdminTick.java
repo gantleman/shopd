@@ -15,7 +15,13 @@ public class AdminTick {
 
     @RequestMapping("/admintick")
     public Msg admintick(){
-        adminservice.TickBack();
+        adminservice.Clean(false) ;
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/adminclean")
+    public Msg adminclean(){
+        adminservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

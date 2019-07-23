@@ -20,9 +20,9 @@ public interface ShopCartService {
 
     public void deleteByKey(Integer userid, Integer goodsid);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
-    public void TickBack_extra();
+    public void Clean_extra(Boolean all);
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 

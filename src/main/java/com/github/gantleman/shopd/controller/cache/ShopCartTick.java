@@ -14,8 +14,7 @@ public class ShopCartTick {
 
     @RequestMapping("/shopcarttick")
     public Msg shopcarttick(){
-
-        shopcartservice.TickBack();
+        shopcartservice.Clean(false) ;
         return Msg.success("successful");
     }
 
@@ -29,6 +28,12 @@ public class ShopCartTick {
     @RequestMapping("/shopcartuserpage")
     public Msg shopcartuserpage(Integer id){
         shopcartservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/shopcartclean")
+    public Msg shopcartclean(){
+        shopcartservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

@@ -38,7 +38,7 @@ $(document).ready(function () {
             },
             error:function () {
                 /!*to_page('/shop',currentPage);*!/
-                swal("删除失败");
+                swal("Delete failed");
             }
         })
     });*/
@@ -57,7 +57,7 @@ function deleteCartGoods(goodsid) {
             showcart();
         },
         error:function () {
-            swal("删除失败");
+            swal("Delete failed");
         }
     })
 }
@@ -78,7 +78,7 @@ function updateCart(goodsid, newNum) {
             showcart();
         },
         error: function (result) {
-            swal("更新购物车失败");
+            swal("Failed to update shopping cart");
         }
     });
 }
@@ -92,7 +92,7 @@ function showcart() {
             build_cart_table(result);
         },
         error: function (result) {
-            swal("获取购物车失败");
+            swal("Failure to get shopping cart");
         }
     });
 }
@@ -104,7 +104,7 @@ function build_cart_table(result) {
     var totalMoney = 0;
 
     if(goods.length === 0) {
-        var spareTd = $('<tr> <td colspan="6"> <div class="coupon" style="margin-left:37%;">购物车还是空的，快去<a href="/main" style="color:red;">首页</a>看看吧！ </div> </td> </tr>');
+        var spareTd = $('<tr> <td colspan="6"> <div class="coupon" style="margin-left:37%;">The shopping cart is still empty. Go ahead.<a href="/main" style="color:red;">home page</a>Look at it! </div> </td> </tr>');
         spareTd.appendTo("#cart-table tbody");
     } else {
         $.each(goods, function (index,item) {

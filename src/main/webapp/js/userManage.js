@@ -16,12 +16,12 @@ $(document).on("click",".templatemo-delete-btn",function () {
     var goodsname = $(this).parents("tr").find("td:eq(1)").text();
     var goodsid = $(this).parents("tr").find("td:eq(0)").text();
     swal({
-            title: "确定删除" + goodsname + "吗？",
+            title: "Determine deletion " + goodsname + " ？",
             type: "warning",
             showCancelButton: true,
-            cancelButtonText:"取消",
+            cancelButtonText:"cancel",
             confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定删除！",
+            confirmButtonText: "Make sure to delete!",
             closeOnConfirm: false,
         },
         function () {
@@ -70,7 +70,7 @@ function build_user_table(path,result) {
         var email = $("<td></td>").append(item.email);
         var telephone = $("<td></td>").append(item.telephone);
 
-        var deleteBtn = $("<button></button>").addClass("templatemo-delete-btn").append("删除");
+        var deleteBtn = $("<button></button>").addClass("templatemo-delete-btn").append("delete");
 
         var deleteTd = $("<td></td>").append(deleteBtn);
 
@@ -85,7 +85,7 @@ function build_user_table(path,result) {
 
 function build_page_info(path,result) {
     $("#page-info-area").empty();
-    $("#page-info-area").append("当前第"+ result.info.pageInfo.pageNum +"页，总共"+ result.info.pageInfo.pages +"页，总共"+ result.info.pageInfo.total +"记录")
+    $("#page-info-area").append("Current "+ result.info.pageInfo.pageNum +" Pages, total "+ result.info.pageInfo.pages +" Pages, total "+ result.info.pageInfo.total +" Record")
 }
 
 function build_page_nav(path,result) {
@@ -94,7 +94,7 @@ function build_page_nav(path,result) {
 
     var firstPage = $("<li></li>").append($("<a aria-label=\"Next\"></a>")
         .append($("<span aria-hidden=\"true\"></span>")
-            .append("首页")));
+            .append("first page")));
 
     var prePage = $("<li></li>").append($("<a aria-label=\"Next\"></a>")
         .append($("<span aria-hidden=\"true\"><i class=\"fa fa-backward\"></i></span>")));
@@ -117,7 +117,7 @@ function build_page_nav(path,result) {
 
     var lastPage = $("<li></li>").append($("<a aria-label=\"Next\"></a>")
         .append($("<span aria-hidden=\"true\"></span>")
-            .append("末页")));
+            .append("Last")));
 
     if(!result.info.pageInfo.hasNextPage) {
         nextPage.addClass("li-none");

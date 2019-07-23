@@ -23,20 +23,20 @@ $(document).ready(function(){
             data:saveInfo,
             dateType:"json",
             success: function(result){
-                if (result.msg=="更新失败")
+                if (result.msg=="Update failed")
                 {
                     swal(result.msg);
                 }
                 else {
                     $("#update-info").modal('hide');
-                    swal("修改成功", "", "success");
+                    swal("Successful revision", "", "success");
                     $("button").click(function (){
                         location.reload();
                     });
                 }
             },
             error:function (){
-                alert("更新失败");
+                alert("Update failed");
             }
         });
     });
@@ -90,7 +90,7 @@ $(document).ready(function(){
                 data:Psw,
                 dateType:"json",
                 success: function(result){
-                    if (result.msg=="更新失败")
+                    if (result.msg=="Update failed")
                     {
                         swal(result.msg);
                     }
@@ -103,7 +103,7 @@ $(document).ready(function(){
                     }
                 },
                 error:function (){
-                    alert("更新失败");
+                    alert("Update failed");
                 }
             });
         }

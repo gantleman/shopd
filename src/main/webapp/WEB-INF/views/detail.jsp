@@ -80,7 +80,7 @@
 
             /*$("#chatto").click(function () {
                 $.ajax({
-                    url: "/shop/chat/", //把表单数据发送到ajax.jsp
+                    url: "/shop/chat/", //Send form data to ajax.jsp
                     type: "POST",
                     data: {
                         sendto: 5

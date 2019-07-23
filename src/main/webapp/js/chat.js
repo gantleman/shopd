@@ -8,7 +8,7 @@ $(document).ready(function(){
 			var element_float = '<div class="clear-float"></div>';
 			$(".chat-content-body").append(element, element_float);
 			send(message, '123456');
-			//始终保持滚动条滚动到最下方
+			//Always keep the scroll bar scrolling to the bottom
 			$(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 		}
@@ -87,7 +87,7 @@ function showMessage(receiveName, message) {
 	var element_float = '<div class="clear-float"></div>';
 	$(".chat-content-body").append(element, element_float);
 
-	//始终保持滚动条滚动到最下方
+	//Always keep the scroll bar scrolling to the bottom
 	$(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }
@@ -97,7 +97,7 @@ function showUrl(message, url) {
 	var element_float = '<div class="clear-float"></div>';
 	$(".chat-content-body").append(element, element_float);
 
-	//始终保持滚动条滚动到最下方
+	//Always keep the scroll bar scrolling to the bottom
 	$(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }
@@ -107,7 +107,7 @@ function showNews(article, source, detailurl) {
 	var element_float = '<div class="clear-float"></div>';
 	$(".chat-content-body").append(element, element_float);
 
-	//始终保持滚动条滚动到最下方
+	//Always keep the scroll bar scrolling to the bottom
 	$(".chat-content").scrollTop($(".chat-content")[0].scrollHeight);
 
 }

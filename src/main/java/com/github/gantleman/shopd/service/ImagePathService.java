@@ -13,9 +13,9 @@ public interface ImagePathService {
     //have write
     public void insertImagePath(ImagePath imagePath);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
-    public void TickBack_extra();
+    public void Clean_extra(Boolean all);
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 

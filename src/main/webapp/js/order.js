@@ -6,7 +6,7 @@ $(document).ready(function () {
         // alert("safd");
         var selectAddr =  $('input:radio[name="addressid"]:checked').val();
         if(selectAddr == null) {
-            swal("请先添加地址");
+            swal("Please add the address first.");
             return;
         }
         var isPay = $('#pay-select').val();
@@ -22,11 +22,11 @@ $(document).ready(function () {
                 addressid: selectAddr
             },
             success: function () {
-                swal("购买成功", "", "success");
+                swal("Successful Purchase", "", "success");
                 location.href = "/info/list"
             },
             error: function () {
-                swal("购买失败，无法连接到服务器！");
+                swal("Buy failed, unable to connect to server!");
             }
         });
     });

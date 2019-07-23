@@ -55,18 +55,18 @@ public class UserServiceImpl implements UserService {
             //read redis
             re = (User) redisu.hget(classname, userid.toString());
             redisu.hincr(classname+"pageid", pageId.toString(), 1);
-         }else {
+        }else {
             if(!cacheService.IsLocal(url)){
                 cacheService.RemoteRefresh("/userpage", pageId);
             }else{
                 RefreshDBD(pageId, true);
             }
 
-            Object o = redisu.hget(classname, userid.toString());
-            if(o != null){
-                re = (User) o;
+            if(redisu.hHasKey(classname+"pageid", pageId.toString())) {
+                //read redis
+                re = (User) redisu.hget(classname, userid.toString());
                 redisu.hincr(classname+"pageid", pageId.toString(), 1);
-            }     
+            }  
         }
         return re;
     }
@@ -232,10 +232,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void TickBack() {
+    public void Clean(Boolean all) {
         BDBEnvironmentManager.getInstance();
         UserDA userDA=new UserDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname);
+        List<Integer> listid = all?cacheService.PageGetAll(classname):cacheService.PageOut(classname);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){

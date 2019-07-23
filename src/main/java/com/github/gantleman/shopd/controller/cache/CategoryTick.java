@@ -14,7 +14,7 @@ public class CategoryTick {
 
     @RequestMapping("/categorytick")
     public Msg categorytick(){
-        categoryservice.TickBack();
+        categoryservice.Clean(false) ;
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class CategoryTick {
     @RequestMapping("/catepagename")
     public Msg catepagename(String name){
         categoryservice.RefreshDBD(name, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/cateclean")
+    public Msg cateclean(){
+        categoryservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

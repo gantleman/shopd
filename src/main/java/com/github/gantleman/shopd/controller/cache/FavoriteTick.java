@@ -14,7 +14,7 @@ public class FavoriteTick {
 
     @RequestMapping("/favoritetick")
     public Msg activitytick(){
-        favoriteservice.TickBack();     
+        favoriteservice.Clean(false) ;     
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class FavoriteTick {
     @RequestMapping("/favoriteuserpage")
     public Msg favoriteuserpage(Integer id){
         favoriteservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/favoriteclean")
+    public Msg favoriteclean(){
+        favoriteservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

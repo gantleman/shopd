@@ -15,7 +15,7 @@ public class CommentTick {
     @RequestMapping("/commnettick")
     public Msg activitytick(){
 
-        commentservice.TickBack();
+        commentservice.Clean(false) ;
         
         return Msg.success("successful");
     }
@@ -29,6 +29,12 @@ public class CommentTick {
     @RequestMapping("/commentgoodspage")
     public Msg commentgoodspage(Integer id){
         commentservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/commentclean")
+    public Msg commentclean(){
+        commentservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

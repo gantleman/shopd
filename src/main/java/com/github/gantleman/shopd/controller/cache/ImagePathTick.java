@@ -14,7 +14,7 @@ public class ImagePathTick {
 
     @RequestMapping("/imagepathtick")
     public Msg goodstick(){
-        imagepathservice.TickBack();
+        imagepathservice.Clean(false) ;
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class ImagePathTick {
     @RequestMapping("/imagepathuserpage")
     public Msg imagepathuserpage(Integer id){
         imagepathservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/imagepathclean")
+    public Msg imagepathclean(){
+        imagepathservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

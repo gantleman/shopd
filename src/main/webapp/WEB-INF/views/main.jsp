@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 文辉
-  Date: 2017/7/18
-  Time: 14:21
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -12,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>淘一淘</title>
+    <title>shopd</title>
     <script src="${pageContext.request.contextPath}/js/jquery.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/css/bootstrap.min.css">
@@ -64,7 +57,7 @@
 
                 <ul class="nav nav-pills">
 
-                    <li><a href="./login.jsp" style="color: #F22E00">请登录</a></li>
+                    <li><a href="./login.jsp" style="color: #F22E00">Please login</a></li>
 
 
                     <li><a href="./register.jsp">注册</a></li>
@@ -73,14 +66,14 @@
             <div class="col-md-8">
                 <ul class="nav nav-pills pull-right">
                     <li><a href="./login.jsp"> <span
-                            class="glyphicon glyphicon-comment"></span> 消息
+                            class="glyphicon glyphicon-comment"></span> news
                     </a></li>
                     <li><a href="./login.jsp"> <span
                             class="glyphicon glyphicon-shopping-cart" style="color: #F22E00"></span>
-                        购物车
+                        Shopping Cart
                     </a></li>
                     <li><a href="./login.jsp"> <span
-                            class="glyphicon glyphicon-star"></span> 收藏夹
+                            class="glyphicon glyphicon-star"></span> Collector
                     </a></li>
                 </ul>
             </div>
@@ -105,17 +98,17 @@
                     <div class="collapse navbar-collapse"
                          id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav">
-                            <li><a class="a-color" href="./index.jsp">首页</a></li>
-                            <li><a class="a-color" href="./login.jsp">发布闲置</a></li>
+                            <li><a class="a-color" href="./index.jsp">home page</a></li>
+                            <li><a class="a-color" href="./login.jsp">Publish idle</a></li>
                             <li class="dropdown"><a class="a-color" href="./login.jsp"
                                                     class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                                    aria-haspopup="true" aria-expanded="false">我的闲置 <span
+                                                    aria-haspopup="true" aria-expanded="false">My idleness <span
                                     class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="login.jsp">出售中</a></li>
-                                    <li><a href="login.jsp">交易中</a></li>
+                                    <li><a href="login.jsp">On sale</a></li>
+                                    <li><a href="login.jsp">In Transaction</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="./login.jsp">新消息</a></li>
+                                    <li><a href="./login.jsp">news</a></li>
                                 </ul></li>
                         </ul>
 
@@ -144,25 +137,25 @@
                     <li class="info-a"><a href="./info.jsp"
                                           style="color: #F22E00"><%=username%><span class="glyphicon glyphicon-triangle-bottom" style="font-size: 5px;margin-left: 7px;" aria-hidden="true"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="./info.jsp">账户管理</a></li>
+                            <li><a href="./info.jsp">Account Management</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="./login.jsp" class="login-out">退出登录</a></li>
+                            <li><a href="./login.jsp" class="login-out">Logout</a></li>
 
                         </ul></li>
-                    <li><a href="register.jsp">注册</a></li>
+                    <li><a href="register.jsp">register</a></li>
                 </ul>
             </div>
             <div class="col-md-8">
                 <ul class="nav nav-pills pull-right">
                     <li><a href="./chat.jsp"> <span
-                            class="glyphicon glyphicon-comment"></span> 消息
+                            class="glyphicon glyphicon-comment"></span> message
                     </a></li>
                     <li><a href="./shopcart.jsp"> <span
                             class="glyphicon glyphicon-shopping-cart" style="color: #F22E00"></span>
-                        购物车
+                        ShoppingCart
                     </a></li>
                     <li><a href="./favorite.jsp"> <span
-                            class="glyphicon glyphicon-star"></span> 收藏夹
+                            class="glyphicon glyphicon-star"></span> Collector
                     </a></li>
                 </ul>
             </div>
@@ -180,24 +173,24 @@
                                 class="icon-bar"></span> <span class="icon-bar"></span> <span
                                 class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="./index.jsp"><span class="logo-word">淘身边</span></a>
+                        <a class="navbar-brand" href="./index.jsp"><span class="logo-word">shopd</span></a>
                     </div>
 
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse"
                          &lt;%&ndash;id="bs-example-navbar-collapse-1"&ndash;%&gt;>
                         <ul class="nav navbar-nav">
-                            <li><a class="a-color" href="./index.jsp">首页</a></li>
-                            <li><a class="a-color" href="./release.jsp">发布闲置</a></li>
+                            <li><a class="a-color" href="./index.jsp">home page</a></li>
+                            <li><a class="a-color" href="./release.jsp">Publish idle</a></li>
                             <li class="dropdown"><a class="a-color" href="./info.jsp"
                                                     class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                                    aria-haspopup="true" aria-expanded="false">我的闲置 <span
+                                                    aria-haspopup="true" aria-expanded="false">My idleness <span
                                     class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="info.jsp">出售中</a></li>
-                                    <li><a href="info.jsp">交易中</a></li>
+                                    <li><a href="info.jsp">On sale</a></li>
+                                    <li><a href="info.jsp">In Transaction</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="./chat.jsp">新消息</a></li>
+                                    <li><a href="./chat.jsp">news</a></li>
                                 </ul></li>
                         </ul>
 
@@ -206,7 +199,7 @@
                                 <input type="text" class="form-control" placeholder="Search" name="keyword">
                             </div>
                             <button type="submit" class="btn btn-default">
-                                <span class="glyphicon glyphicon-search" aria-label="搜索"></span>
+                                <span class="glyphicon glyphicon-search" aria-label="search"></span>
                             </button>
                         </form>
                     </div>
@@ -742,7 +735,7 @@
         <c:if test="${!empty bookGoods}">
             <div class="module">
                 <div class="hd">
-                    <h2>书籍</h2>
+                    <h2>book</h2>
                     <hr>
                 </div>
 

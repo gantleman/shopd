@@ -18,9 +18,9 @@ public interface ChatService {
     //have write
     public void insertChatSelective(Chat chat);
 
-    public void TickBack_extra();
+    public void Clean_extra(Boolean all);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 

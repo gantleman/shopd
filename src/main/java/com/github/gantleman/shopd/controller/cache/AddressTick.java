@@ -14,7 +14,7 @@ public class AddressTick {
 
     @RequestMapping("/addresstick")
     public Msg addresstick(){
-        addressservice.TickBack();     
+        addressservice.Clean(false) ;     
         return Msg.success("successful");
     }
 
@@ -27,6 +27,12 @@ public class AddressTick {
     @RequestMapping("/addressuserpage")
     public Msg addressuserpage(Integer id){
         addressservice.RefreshUserDBD(id, true, true);
+        return Msg.success("successful");
+    }
+
+    @RequestMapping("/addressclean")
+    public Msg addressclean(){
+        addressservice.Clean(true) ;   
         return Msg.success("successful");
     }
 }

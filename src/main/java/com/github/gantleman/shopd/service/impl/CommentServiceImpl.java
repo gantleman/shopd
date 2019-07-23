@@ -172,10 +172,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void TickBack_extra() {
+    public void Clean_extra(Boolean all) {
         BDBEnvironmentManager.getInstance();
         CommentGoodsDA commentGoodsDA=new CommentGoodsDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname_extra);
+        List<Integer> listid = all?cacheService.PageGetAll(classname_extra):cacheService.PageOut(classname_extra);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
@@ -207,10 +207,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void TickBack() {
+    public void Clean(Boolean all) {
         BDBEnvironmentManager.getInstance();
         CommentDA commentDA=new CommentDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname);
+        List<Integer> listid = all?cacheService.PageGetAll(classname):cacheService.PageOut(classname);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
@@ -240,7 +240,7 @@ public class CommentServiceImpl implements CommentService {
             cacheService.Archive(classname);
         }
 
-        TickBack_extra();
+        Clean_extra(all);
     }
 
     @Override

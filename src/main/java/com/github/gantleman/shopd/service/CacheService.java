@@ -41,4 +41,6 @@ public interface CacheService {
     public boolean EventCteateLocalCache(String tablename);
 
     public void ArchiveLocalCache(String tablename);
+
+    public List<Integer> PageGetAll(String tablename);
 }

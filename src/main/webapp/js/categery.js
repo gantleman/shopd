@@ -20,7 +20,7 @@ $(document).ready(function (){
            data:category,
            dataType:"json",
            success:function (result){
-               if (result.msg=="名字已经存在")
+               if (result.msg=="Names already exist")
                {
                    swal(result.msg);
                }
@@ -32,7 +32,7 @@ $(document).ready(function (){
                }
            },
            error:function (){
-               alert("更新失败");
+               alert("Update failed");
            }
        });
    })
@@ -52,7 +52,7 @@ $(document).ready(function (){
                 });
             },
             error:function (){
-                alert("更新失败");
+                alert("Update failed");
             }
         });
     })

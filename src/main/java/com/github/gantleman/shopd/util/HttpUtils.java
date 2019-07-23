@@ -31,6 +31,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +42,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpUtils {
 
-    @Value("${srping.nginx.host}")
-    private String NginxHost;
-    
+    @Autowired
+    private ServerConfig serverConfig;
+
     //设置编码格式
     //String Content-Type= "application/x-www-form-urlencoded; charset=UTF-8"
     /**
@@ -74,7 +75,7 @@ public class HttpUtils {
         Map<String, String> headers = new HashMap(); 
         Map<String, String> querys = new HashMap();
         
-        return this.doGet(NginxHost, path, headers, querys);
+        return this.doGet(serverConfig.getUrl(), path, headers, querys);
     }
 
     public HttpResponse doGet(String host, String path) throws Exception {

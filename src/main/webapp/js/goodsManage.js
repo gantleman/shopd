@@ -106,12 +106,12 @@ $(document).on("click",".templatemo-delete-btn",function () {
     var goodsname = $(this).parents("tr").find("td:eq(1)").text();
     var goodsid = $(this).parents("tr").find("td:eq(0)").text();
     swal({
-            title: "确定删除" + goodsname + "吗？",
+            title: "Determine deletion " + goodsname + " ？",
             type: "warning",
             showCancelButton: true,
-            cancelButtonText:"取消",
+            cancelButtonText:"cancel",
             confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定删除！",
+            confirmButtonText: "Determine deletion！",
             closeOnConfirm: false,
         },
         function () {
@@ -162,7 +162,7 @@ function getActivity() {
                 });
                 showActInfo(1);
             } else {
-                alert("获取活动信息失败");
+                alert("Failure to obtain activity information");
             }
         }
     });
@@ -224,19 +224,19 @@ function build_goods_table(path,result) {
         var activityid = $("<td></td>").append(item.activityid);
 
         // var detailA = $('<a tabindex="0" class="btn btn-sm description" role="button" placement="top" data-toggle="popover" data-trigger="focus" title="描述" ></a>').append("描述");
-        var detailBtn = $('<button type="button" class="description" data-container="body" data-toggle="popover" data-placement="top"></button>').append("描述");
+        var detailBtn = $('<button type="button" class="description" data-container="body" data-toggle="popover" data-placement="top"></button>').append("describe");
 
         detailBtn = detailBtn.attr("data-content",item.description);
 
-        var detailA = $("<a></a>").addClass("templatemo-link").attr("href","/detail?goodsid="+item.goodsid).append("详情");
+        var detailA = $("<a></a>").addClass("templatemo-link").attr("href","/detail?goodsid="+item.goodsid).append("details");
 
-        var editBtn = $("<button></button>").addClass("templatemo-edit-btn").append("编辑");
-        var deleteBtn = $("<button></button>").addClass("templatemo-delete-btn").append("删除");
+        var editBtn = $("<button></button>").addClass("templatemo-edit-btn").append("edit");
+        var deleteBtn = $("<button></button>").addClass("templatemo-delete-btn").append("delete");
 
         var desTd = $("<td hidden></td>").append(detailBtn);
 
         //活动按钮
-        var actBtn = $("<button></button>").addClass("templatemo-activity-btn").attr("data-actGoodsid",item.goodsid).append("添加");
+        var actBtn = $("<button></button>").addClass("templatemo-activity-btn").attr("data-actGoodsid",item.goodsid).append("Add to");
         actBtn.click(function () {
             $("#activity-goods").modal({
                 backdrop:'static'
@@ -257,7 +257,7 @@ function build_goods_table(path,result) {
 
 function build_page_info(path,result) {
     $("#page-info-area").empty();
-    $("#page-info-area").append("当前第"+ result.info.pageInfo.pageNum +"页，总共"+ result.info.pageInfo.pages +"页，总共"+ result.info.pageInfo.total +"记录")
+    $("#page-info-area").append("Current "+ result.info.pageInfo.pageNum +" Page, Total "+ result.info.pageInfo.pages +" Pages, Total "+ result.info.pageInfo.total +" Record")
 }
 
 function build_page_nav(path,result) {

@@ -75,10 +75,10 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void TickBack() {
+    public void Clean(Boolean all) {
         BDBEnvironmentManager.getInstance();
         AdminDA adminDA=new AdminDA(BDBEnvironmentManager.getMyEntityStore());
-        List<Integer> listid = cacheService.PageOut(classname);
+        List<Integer> listid = all?cacheService.PageGetAll(classname):cacheService.PageOut(classname);
         for(Integer pageid : listid){
             int l = cacheService.PageEnd(pageid);
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){

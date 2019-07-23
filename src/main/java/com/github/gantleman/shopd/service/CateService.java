@@ -24,7 +24,7 @@ public interface CateService {
 
     public void deleteByPrimaryKey(Integer cateid);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 

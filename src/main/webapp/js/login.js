@@ -15,12 +15,12 @@ $(document).ready(function() {
 			confirmlogo: "required",
 		},
 		messages: {
-			username: "用户名输入不能为空",
+			username: "User name input cannot be empty",
 			
 			password: {
-				required: "密码输入不能为空",
+				required: "Password input cannot be empty",
 			},
-			confirmlogo: "验证码输入不能为空",
+			confirmlogo: "Validation code input cannot be empty",
 		}
 	});
 });

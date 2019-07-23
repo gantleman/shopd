@@ -26,20 +26,20 @@ $(document).ready(function() {
 			}
 		},
 		messages: {
-            username: "用户名不能为空",
-            telephone: "联系电话不能为空",
+            username: "User name cannot be empty",
+            telephone: "Contact calls cannot be empty",
             email: {
-				required: "邮箱输入不能为空",
-				email: "请输入一个正确的邮箱",
+				required: "Mailbox input cannot be empty",
+				email: "Please enter a correct mailbox",
 			},
             password: {
-				required: "密码输入不能为空",
-				minlength: "密码长度不能小于8位",
+				required: "Password input cannot be empty",
+				minlength: "Password length should not be less than 8 bits",
 			},
 			confirmPassword: {
-				required: "输入不能为空",
-				minlength: "密码长度不能小于8位",
-				equalTo: "两次密码输入不一致",
+				required: "Input cannot be empty",
+				minlength: "Password length should not be less than 8 bits",
+				equalTo: "Two inconsistent password input",
 			}
 		}
 	});

@@ -6,7 +6,7 @@ public interface AdminService {
     ///have write
     public Admin selectByName(Admin admin);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 }

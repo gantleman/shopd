@@ -22,7 +22,7 @@ public interface UserService {
 
     public void updateByPrimaryKeySelective(User user);
 
-    public void TickBack();
+    public void Clean(Boolean all) ;
 
     public void RefreshDBD(Integer pageID, boolean refresRedis);
 }
