@@ -9,6 +9,8 @@ micro-service splitting.
 Development environment:Ubuntu 16.04.4, vscode 1.25.1, mysql Ver 14.14
 Distrib 5.7.26, redis 3.0.6, maven 3.6.0, java 1.8.0\_201, git 2.7.4
 
+The software framework is Springboot, JE.
+
 After installing the above environment, execute in the installation
 directory
 
