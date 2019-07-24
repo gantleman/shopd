@@ -92,6 +92,27 @@ CREATE TABLE `cache` (
 
 /*Table structure for table `category` */
 
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('1','Activity','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('2','Address','0','http://127.0.1.1:8081',NULL,'1563709565',NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('3','Admin','0','http://127.0.1.1:8080','http://127.0.1.1:8080','1561396854','1561396718');
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('4','Category','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('5','Chat','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('6','Comment','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('7','Deliver','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('8','Favorite','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('9','Goods','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('10','ImagePath','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('11','Order','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('12','ShopCart','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('13','User','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('14','Address_User','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('15','Chat_User','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('16','Comment_Goods','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('17','Imagepath_Goods','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('18','Orderitem_Order','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('19','Order_User','0',NULL,NULL,NULL,NULL);
+insert into `cache` (`c_id`, `c_name`, `c_index`, `c_host`, `c_host2`, `c_stamp`, `c_stamp2`) values('20','Shopcart_User','0',NULL,NULL,NULL,NULL);
+
 DROP TABLE IF EXISTS `category`;
 
 CREATE TABLE `category` (
