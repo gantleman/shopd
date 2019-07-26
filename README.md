@@ -74,8 +74,8 @@ relevant articles.
 
 [ITDSD-2. Practice of Splitting in MicroserviceArchitecture](https://www.codeproject.com/Articles/4051345/Introduction-to-Distributed-System-Design-2-Practi)
 
-[ITDSD- 3. Overview of Distributed SoftwareEngineering](https://www.codeproject.com/Articles/4406321/ITDSD-3-Overview-of-Distributed-Software-Engineeri)
+[ITDSD-3. Overview of Distributed SoftwareEngineering](https://www.codeproject.com/Articles/4406321/ITDSD-3-Overview-of-Distributed-Software-Engineeri)
 
-[ITDSD - 4. Quantitative Analysis of DistributedSoftware](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quantitative-Analysis-of-Distributed-Softw)
+[ITDSD-4. Quantitative Analysis of DistributedSoftware](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quantitative-Analysis-of-Distributed-Softw)
 
-[ITDSD - 5. Lock-free Programming for Micro-service Splitting](https://www.codeproject.com/Articles/5163058/ITDSD-5-Lock-free-Programming-for-Micro-service-Sp)
+[ITDSD-5. Lock-free Programming for Micro-service Splitting](https://www.codeproject.com/Articles/5163058/ITDSD-5-Lock-free-Programming-for-Micro-service-Sp)
