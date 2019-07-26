@@ -77,3 +77,5 @@ relevant articles.
 [ITDSD- 3. Overview of Distributed SoftwareEngineering](https://www.codeproject.com/Articles/4406321/ITDSD-3-Overview-of-Distributed-Software-Engineeri)
 
 [ITDSD - 4. Quantitative Analysis of DistributedSoftware](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quantitative-Analysis-of-Distributed-Softw)
+
+[ITDSD - 5. Lock-free Programming for Micro-service Splitting](https://www.codeproject.com/Articles/5163058/ITDSD-5-Lock-free-Programming-for-Micro-service-Sp)
