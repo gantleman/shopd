@@ -1,10 +1,6 @@
 # shopd
 
-This is a distributed system of online shopping mall, which supports all
-functions from single machine to cluster. Can help you quickly build a
-distributed online mall. It is also an example engineering for learning
-the concepts of distributed system, lock-free programming and
-micro-service splitting.
+The article <ITDSD - 5. Lock-free Programming for Micro-service Splitting>'s sample project. It is based on the reconstruction of online shop malls.It is used to demonstrate the development of distributed system based on AP&RP theory, the separation of micro-services, and finally the advanced software development technology of lock-free programming in distributed system. This is a distributed system of online shopping mall, which supports all functions from single machine to cluster. Can help you quickly build a distributed online mall. It is also an example engineering for learning the concepts of distributed system, lock-free programming and micro-service splitting.
 
 Development environment:Ubuntu 16.04.4, vscode 1.25.1, mysql Ver 14.14
 Distrib 5.7.26, redis 3.0.6, maven 3.6.0, java 1.8.0\_201, git 2.7.4
@@ -74,8 +70,8 @@ relevant articles.
 
 [ITDSD-2. Practice of Splitting in MicroserviceArchitecture](https://www.codeproject.com/Articles/4051345/Introduction-to-Distributed-System-Design-2-Practi)
 
-[ITDSD- 3. Overview of Distributed SoftwareEngineering](https://www.codeproject.com/Articles/4406321/ITDSD-3-Overview-of-Distributed-Software-Engineeri)
+[ITDSD-3. Overview of Distributed SoftwareEngineering](https://www.codeproject.com/Articles/4406321/ITDSD-3-Overview-of-Distributed-Software-Engineeri)
 
-[ITDSD - 4. Quantitative Analysis of DistributedSoftware](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quantitative-Analysis-of-Distributed-Softw)
+[ITDSD-4. Quantitative Analysis of DistributedSoftware](https://www.codeproject.com/Articles/5114968/ITDSD-4-Quantitative-Analysis-of-Distributed-Softw)
 
-[ITDSD - 5. Lock-free Programming for Micro-service Splitting](https://www.codeproject.com/Articles/5163058/ITDSD-5-Lock-free-Programming-for-Micro-service-Sp)
+[ITDSD-5. Lock-free Programming for Micro-service Splitting](https://www.codeproject.com/Articles/5163058/ITDSD-5-Lock-free-Programming-for-Micro-service-Sp)
