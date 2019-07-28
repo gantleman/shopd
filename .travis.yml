@@ -5,18 +5,3 @@ script: mvn test
 
 jdk:
   - oraclejdk8
-  - oraclejdk9
-  - openjdk8
-
-addons:
-
-apt:
-
-packages:
-- oracle-java8-installer
-
-jdk:
-  - oraclejdk8
-  - oraclejdk11
-  - openjdk10
-  - openjdk11
