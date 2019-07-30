@@ -12,7 +12,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>淘一淘-聊天</title>
+    <title>Tao Yitao-聊天</title>
     <script src="${pageContext.request.contextPath}/js/jquery.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/mqttws31.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat.css">

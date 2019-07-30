@@ -266,7 +266,7 @@ function build_page_nav(path,result) {
 
     var firstPage = $("<li></li>").append($("<a aria-label=\"Next\"></a>")
         .append($("<span aria-hidden=\"true\"></span>")
-            .append("首页")));
+            .append("home page")));
 
     var prePage = $("<li></li>").append($("<a aria-label=\"Next\"></a>")
         .append($("<span aria-hidden=\"true\"><i class=\"fa fa-backward\"></i></span>")));

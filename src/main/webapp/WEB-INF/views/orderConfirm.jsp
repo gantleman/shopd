@@ -12,7 +12,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>淘一淘</title>
+    <title>Tao Yitao</title>
     <script src="${pageContext.request.contextPath}/js/jquery.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/css/bootstrap.min.css">
@@ -109,7 +109,7 @@
                                                 <input id="coupon_code" class="input-text" type="text" placeholder="Coupon code" value="" name="coupon_code"> -->
                                             <a
                                                     class="button_act button_act_3 button_act_333 button_act_tp "
-                                                    href="./shopcart.jsp">更新购物车</a>
+                                                    href="./shopcart.jsp">更新Shopping Cart</a>
                                             <!-- <a class="button_act btn-tip " href="#">Update cart</a> -->
                                         </div>
                                     </td>

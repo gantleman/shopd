@@ -195,7 +195,7 @@
         <header class="demo-drawer-header">
             <%-- <img src="images/user.jpg" class="demo-avatar">--%>
             <div class="demo-avatar-dropdown">
-                <h1>淘一淘</h1>
+                <h1>Tao Yitao</h1>
                 <%-- <span>hello@example.com</span>--%>
                 <div class="mdl-layout-spacer"></div>
                 <%--<button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
@@ -211,9 +211,9 @@
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/main"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>主页</a>
-            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/information"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>个人信息</a>
+            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/information"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Personal information</a>
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/list"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>订单管理</a>
-            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/address"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>地址管理</a>
+            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/address"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Address Management</a>
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/favorite"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>我的收藏</a>
         </nav>
     </div>
@@ -225,7 +225,7 @@
                     <table class="table" cellpadding="6" cellspacing="1" address-id="${item.addressid}" id="table">
                         <thead>
                         <th style="border: 0px solid transparent">
-                            <%--<h1>个人信息</h1>--%>
+                            <%--<h1>Personal information</h1>--%>
                         </th>
                         </thead>
                         <tbody >

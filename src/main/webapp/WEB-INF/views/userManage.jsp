@@ -61,7 +61,7 @@
                         <thead>
                         <tr>
                             <td><a href="" class="white-text templatemo-sort-by">id<span class="caret"></span></a></td>
-                            <td><a href="" class="white-text templatemo-sort-by">用户名<span class="caret"></span></a></td>
+                            <td><a href="" class="white-text templatemo-sort-by">User name<span class="caret"></span></a></td>
                             <td><a href="" class="white-text templatemo-sort-by">Email<span class="caret"></span></a></td>
                             <td><a href="" class="white-text templatemo-sort-by">联系电话<span class="caret"></span></a></td>
                             <td>删除</td>

@@ -14,7 +14,7 @@ $(document).ready(function() {
     client.onConnectionLost = function(){
         alert("connection dropped");
     };
-    //收到消息
+    //收到message
     client.onMessageArrived = function(message){
 
         var userid = $("#receiveId").text();
@@ -73,7 +73,7 @@ $(document).ready(function() {
                     msgcontent: msg.body
                 },
                 error: function(request) {
-                    alert("保存消息失败");
+                    alert("保存message失败");
                 },
                 success: function(data) {
                     // alert("success!"); //Display the returned results in ajaxDiv
@@ -99,7 +99,7 @@ $(document).ready(function() {
         $("#receive").text(username);
         $("#receiveId").text(userid);
 
-        //发异步请求查聊天消息
+        //发异步请求查聊天message
         $.ajax({
             url: "/shop/getMessage/", //Send form data to ajax.jsp
             type: "POST",
@@ -108,7 +108,7 @@ $(document).ready(function() {
                 receiveuser: userid,
             },
             error: function(request) {
-                alert("保存消息失败");
+                alert("保存message失败");
             },
             success: function(result) {
                 $('.chat-content-body').empty();
@@ -236,7 +236,7 @@ $(document).ready(function () {
                     msgcontent: msg.body
                 },
                 error: function (request) {
-                    alert("保存消息失败");
+                    alert("保存message失败");
                 },
                 success: function (data) {
                     // alert("success!"); //Display the returned results in ajaxDiv
@@ -286,7 +286,7 @@ $(document).ready(function () {
                 receiveuser: userid,
             },
             error: function (request) {
-                alert("保存消息失败");
+                alert("保存message失败");
             },
             success: function (result) {
                 $('.chat-content-body').empty();
@@ -325,7 +325,7 @@ function userListClick() {
             receiveuser: $("#receiveId").text(),
         },
         error: function (request) {
-            alert("保存消息失败");
+            alert("保存message失败");
         },
         success: function (result) {
             $('.chat-content-body').empty();

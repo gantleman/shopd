@@ -14,7 +14,7 @@ $(document).ready(function () {
     client.onConnectionLost = function () {
         alert("connection dropped");
     };
-    //收到消息
+    //收到message
     client.onMessageArrived = function (message) {
         clientID = $('#sendId').text();
         var userid = $("#receiveId").text();
@@ -124,7 +124,7 @@ $(document).ready(function () {
         $("#receive").text(username);
         $("#receiveId").text(userid);
 
-        //发异步请求查聊天消息
+        //发异步请求查聊天message
         $.ajax({
             url: "/getMessage/", //Send form data to ajax.jsp
             type: "POST",
@@ -163,7 +163,7 @@ $(document).ready(function () {
 
 function userListClick() {
 
-    //发异步请求查聊天消息
+    //发异步请求查聊天message
     $.ajax({
         url: "/getMessage/", //Send form data to ajax.jsp
         type: "POST",

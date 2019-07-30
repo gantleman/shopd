@@ -6,7 +6,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>淘一淘-欢迎登录</title>
+<title>Tao Yitao-欢迎登录</title>
 <script src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
@@ -60,29 +60,29 @@
 				</div>
 				<div class="col-md-5 form-login">
 					<div>
-						<!-- <h2 class="login-h2">登录</h2> -->
+						<!-- <h2 class="login-h2">login</h2> -->
 						<form class="form-horizontal" id="form2" action="${pageContext.request.contextPath}/loginconfirm" method="post">
 							<div class="form-group">
-								<label for="username" class="col-sm-2 control-label">用户名</label>
+								<label for="username" class="col-sm-2 control-label">User name</label>
 								<div class="col-sm-10">
 									<input type="text" class="form-control" id="username"
-										name="username" placeholder="用户名">
+										name="username" placeholder="User name">
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="password" class="col-sm-2 control-label">密码</label>
+								<label for="password" class="col-sm-2 control-label">Password</label>
 								<div class="col-sm-10">
 									<input type="password" class="form-control" id="password"
-										name="password" placeholder="密码">
+										name="password" placeholder="Password">
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="confirmlogo" class="col-sm-2 control-label">验证码</label>
+								<label for="confirmlogo" class="col-sm-2 control-label">Verification</label>
 								<img src="${pageContext.request.contextPath}/verificationcodeimg" id="code" onclick="reloadcode()"
 									style="cursor: pointer;" alt="看不清楚,换一张" width="100px">
 								<div class="col-sm-10" style="width: 160px">
 									<input type="text" class="form-control" id="confirmlogo"
-										name="confirmlogo" placeholder="验证码">
+										name="confirmlogo" placeholder="Verification">
 								</div>
 							</div>
 							<div style="margin-left:80px;color:red;">
@@ -90,9 +90,9 @@
 							
 							<div class="form-group">
 								<div class="col-sm-offset-2 col-sm-10">
-									<input type="submit" class="btn btn-primary login-input" value="登录"
+									<input type="submit" class="btn btn-primary login-input" value="login"
 										name="submit">
-									<a href="" style="margin-left:10px;">忘记密码?</a>
+									<a href="" style="margin-left:10px;">Forget the password?</a>
 									<div class="error">
 										${errorMsg}
 									</div>

@@ -28,24 +28,24 @@
         <div class="form-group">
             <div class="input-group">
                 <div class="input-group-addon"><i class="fa fa-user fa-fw"></i></div>
-                <input type="text" class="form-control" placeholder="用户名" name="adminname">
+                <input type="text" class="form-control" placeholder="User name" name="adminname">
             </div>
         </div>
         <div class="form-group">
             <div class="input-group">
                 <div class="input-group-addon"><i class="fa fa-key fa-fw"></i></div>
-                <input type="password" class="form-control" placeholder="密码" name="password">
+                <input type="password" class="form-control" placeholder="password" name="password">
             </div>
         </div>
         <div class="form-group">
             <div class="checkbox squaredTwo">
                 <input type="checkbox" id="c1" name="cc" />
-                <%--<label for="c1"><span></span>记住密码</label>--%>
+                <%--<label for="c1"><span></span>Keep passwords in mind</label>--%>
                 <span class="error-msg">${errorMsg}</span>
             </div>
         </div>
         <div class="form-group">
-            <button type="submit" class="templatemo-blue-button width-100">登录</button>
+            <button type="submit" class="templatemo-blue-button width-100">login</button>
         </div>
     </form>
 </div>

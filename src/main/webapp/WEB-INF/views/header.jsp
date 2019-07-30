@@ -14,7 +14,7 @@
 
         <ul class="nav nav-pills">
             <c:if test="${empty sessionScope.user}">
-                <li><a href="${pageContext.request.contextPath}/login" style="color: #F22E00">请登录</a></li>
+                <li><a href="${pageContext.request.contextPath}/login" style="color: #F22E00">Please login</a></li>
             </c:if>
             <c:if test="${!empty sessionScope.user}">
                 <li class="info-a">
@@ -31,20 +31,20 @@
                 </li>
             </c:if>
 
-            <li><a href="${pageContext.request.contextPath}/register">注册</a></li>
+            <li><a href="${pageContext.request.contextPath}/register">register</a></li>
         </ul>
     </div>
     <div class="col-md-8">
         <ul class="nav nav-pills pull-right">
             <li><a href="${pageContext.request.contextPath}/chat"> <i
-                    class="fa fa-comment"></i> 消息
+                    class="fa fa-comment"></i> message
             </a></li>
             <li><a href="${pageContext.request.contextPath}/showcart"> <i
                     class="fa fa-shopping-cart" style="color: #F22E00"></i>
-                购物车
+                Shopping Cart
             </a></li>
             <li><a href="${pageContext.request.contextPath}/info/favorite"> <i
-                    class="fa fa-star"></i> 收藏夹
+                    class="fa fa-star"></i> Collector
             </a></li>
         </ul>
     </div>
@@ -62,24 +62,24 @@
                         class="icon-bar"></span> <span class="icon-bar"></span> <span
                         class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/main"><!-- <img alt="Brand" style="display: inline-block;" src="./image/tao.jpg" width="20" height="20"> --><span class="logo-word">淘身边</span></a>
+                <a class="navbar-brand" href="${pageContext.request.contextPath}/main"><!-- <img alt="Brand" style="display: inline-block;" src="./image/tao.jpg" width="20" height="20"> --><span class="logo-word">pocket flea market</span></a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse"
                  id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a class="a-color" href="${pageContext.request.contextPath}/main">首页</a></li>
-                    <li><a class="a-color" href="${pageContext.request.contextPath}/information">个人信息</a></li>
+                    <li><a class="a-color" href="${pageContext.request.contextPath}/main">home page</a></li>
+                    <li><a class="a-color" href="${pageContext.request.contextPath}/information">Personal information</a></li>
                     <li class="dropdown"><a class="a-color" href="${pageContext.request.contextPath}/info/list"
                                             class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                            aria-haspopup="true" aria-expanded="false">我的订单 <span
+                                            aria-haspopup="true" aria-expanded="false">My order <span
                             class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="${pageContext.request.contextPath}/info/address">地址管理</a></li>
-                            <li><a href="${pageContext.request.contextPath}/order">交易中</a></li>
+                            <li><a href="${pageContext.request.contextPath}/info/address">Address Management</a></li>
+                            <li><a href="${pageContext.request.contextPath}/order">Transaction</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="${pageContext.request.contextPath}/chatrobot">小淘</a></li>
+                            <li><a href="${pageContext.request.contextPath}/chatrobot">Xiao Tao</a></li>
                         </ul></li>
                 </ul>
 

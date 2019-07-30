@@ -79,7 +79,7 @@ $(document).ready(function(){
 		/*$.post("servlet/CollectServlet", {
 			goodsId: goodsId,
 			});
-		// alert("商品已加入购物车！");*/
+		// alert("商品已加入Shopping Cart！");*/
 
 		if(isChangeBtn) {
             $(this).toggleClass("glyphicon-heart glyphicon-heart-empty");

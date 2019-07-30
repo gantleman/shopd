@@ -106,7 +106,7 @@
                 <ul class="pagination">
                     <li>
                         <a href="${pageContext.request.contextPath}/admin/goods/show?page=1" aria-label="Next">
-                            <span aria-hidden="true">首页</span>
+                            <span aria-hidden="true">home page</span>
                         </a>
                     </li>
                     <c:if test="${pageInfo.hasPreviousPage}">

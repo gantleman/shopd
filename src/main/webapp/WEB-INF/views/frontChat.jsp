@@ -28,7 +28,7 @@
             client.onConnectionLost = function(){
                 $('#message').append('connection dropped');
             };
-            //收到消息
+            //收到message
             client.onMessageArrived = function(message){
                 var msgObj=jQuery.parseJSON(message.payloadString);
                 $('#toID').val(msgObj.from);

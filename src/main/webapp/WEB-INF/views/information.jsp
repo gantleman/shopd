@@ -29,7 +29,7 @@ limitations under the License
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>个人信息</title>
+    <title>Personal information</title>
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -88,7 +88,7 @@ limitations under the License
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">修改个人信息</h4>
+                <h4 class="modal-title" id="myModalLabel">修改Personal information</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="update-form" name="update-form" method="post">
@@ -169,7 +169,7 @@ limitations under the License
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
     <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
         <div class="mdl-layout__header-row">
-            <span class="mdl-layout-title">个人信息</span>
+            <span class="mdl-layout-title">Personal information</span>
             <div class="mdl-layout-spacer"></div>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
                <%-- <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
@@ -194,7 +194,7 @@ limitations under the License
         <header class="demo-drawer-header">
            <%-- <img src="images/user.jpg" class="demo-avatar">--%>
             <div class="demo-avatar-dropdown">
-                <h1>淘一淘</h1>
+                <h1>Tao Yitao</h1>
                <%-- <span>hello@example.com</span>--%>
                 <div class="mdl-layout-spacer">
                 </div>
@@ -211,9 +211,9 @@ limitations under the License
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/main"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>主页</a>
-            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/information"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>个人信息</a>
+            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/information"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Personal information</a>
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/list"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>订单管理</a>
-            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/address"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>地址管理</a>
+            <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/address"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Address Management</a>
             <a class="mdl-navigation__link" href="${pageContext.request.contextPath}/info/favorite"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>我的收藏</a>
         </nav>
     </div>
@@ -224,7 +224,7 @@ limitations under the License
                         <table class="table" cellpadding="6" cellspacing="1">
                             <thead>
                             <th style="border: 0px solid transparent">
-                                <%--<h1>个人信息</h1>--%>
+                                <%--<h1>Personal information</h1>--%>
                             </th>
                             </thead>
                             <tbody >
@@ -233,11 +233,11 @@ limitations under the License
                                 <td style="border: 0px solid transparent" class="tr" id="userIdVal">${user.getUserid()}</td>
                             </tr>
                             <tr>
-                                <th style="border: 0px solid transparent" class="tl">用户名</th>
+                                <th style="border: 0px solid transparent" class="tl">User name</th>
                                 <td style="border: 0px solid transparent" class="tr" id="nameVal">${user.getUsername()}</td>
                             </tr>
                             <tr>
-                                <th style="border: 0px solid transparent" class="tl">注册时间</th>
+                                <th style="border: 0px solid transparent" class="tl">register time</th>
                                 <td style="border: 0px solid transparent" class="tr" id="regTimeVal">
                                     ${user.regtime.year+1900} 年
                                     ${user.regtime.month+1} 月

@@ -62,7 +62,7 @@ function deleteCartGoods(goodsid) {
     })
 }
 
-//改变商品数量更新购物车
+//改变商品数量更新Shopping Cart
 function updateCart(goodsid, newNum) {
     //获取当前数量
     // var newNum = $(".num").val();
@@ -88,7 +88,7 @@ function showcart() {
         url: "/shop" + "/cartjson",
         type: "post",
         success: function (result) {
-            //显示购物车
+            //显示Shopping Cart
             build_cart_table(result);
         },
         error: function (result) {

@@ -13,7 +13,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>淘一淘-${goodsInfo['goods'].goodsname}</title>
+    <title>Tao Yitao-${goodsInfo['goods'].goodsname}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -140,7 +140,7 @@
                 /*$.post("servlet/CollectServlet", {
                  goodsId: goodsId,
                  });
-                 // alert("商品已加入购物车！");*/
+                 // alert("商品已加入Shopping Cart！");*/
 
                 if(isChangeBtn) {
                     $(this).children("i").toggleClass("fa-heart fa-heart-o");
@@ -175,7 +175,7 @@
         <jsp:include page="header.jsp"/>
         <div class="shop_menu shop_menu_2 main-detail-div">
             <ul class="cramb_area cramb_area_5 main-detail-nav">
-                <li><a href="index.html">首页 /</a></li>
+                <li><a href="index.html">home page /</a></li>
                 <%--<li><a href="index.html">Shop /</a></li>
                 <li><a href="index.html">Headlight/</a></li>
                 <li><a href="index.html">Hats /</a></li>--%>
@@ -283,7 +283,7 @@
                         <form class="cart-btn-area new_meta" action="${pageContext.request.contextPath}/addCart" method="post">
                             <input type="hidden" value="${goodsInfo['goods'].goodsid}" name="goodsid"/>
                             <input type="number" value="1" name="goodsnum">
-                            <button class="add-tocart cart_zpf" type="submit">加入购物车</button>
+                            <button class="add-tocart cart_zpf" type="submit">加入Shopping Cart</button>
                         </form>
                         <div class="add_defi new_meta">
                             <a data-original-title="Add to Wishlist" data-toggle="tooltip" class="fav-button big-font" data-id="${goodsInfo['goods'].goodsid}">
