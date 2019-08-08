@@ -1,6 +1,8 @@
 package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
@@ -10,30 +12,12 @@ public class AddressUser implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer userid;
 
-    private Integer addressSize;
-
-    private String addressList;
+    private ArrayList<Integer> addressList;
 
     private static final long serialVersionUID = 1L;
 
-    private Integer status;
-
     public Integer getUserid() {
         return userid;
-    }
-
-    /**
-     * @return the status
-     */
-    public Integer getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public void setUserid(Integer userid) {
@@ -41,18 +25,18 @@ public class AddressUser implements Serializable {
     }
 
     public Integer getAddressSize() {
-        return addressSize;
+        return addressList.size();
     }
 
-    public void setAddressSize(Integer addressSize) {
-        this.addressSize = addressSize;
+    public void removeAddressList(Integer addressID) {
+        this.addressList.remove(addressID);
     }
 
-    public String getAddressList() {
-        return addressList;
+    public void addAddressList(Integer addressID) {
+        this.addressList.add(addressID);
     }
 
-    public void setAddressList(String addressList) {
-        this.addressList = addressList == null ? null : addressList.trim();
+    public List<Integer> getAddressList() {
+        return this.addressList;
     }
 }

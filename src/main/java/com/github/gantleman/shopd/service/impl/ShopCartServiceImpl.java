@@ -9,11 +9,11 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.ShopCartDA;
 import com.github.gantleman.shopd.da.ShopcartUserDA;
 import com.github.gantleman.shopd.dao.ShopCartMapper;
-import com.github.gantleman.shopd.dao.ShopcartUserMapper;
+
 import com.github.gantleman.shopd.entity.ShopCart;
 import com.github.gantleman.shopd.entity.ShopCartExample;
 import com.github.gantleman.shopd.entity.ShopcartUser;
-import com.github.gantleman.shopd.entity.ShopcartUserExample;
+
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.ShopCartService;
 import com.github.gantleman.shopd.service.jobs.ShopCartJob;
@@ -31,9 +31,6 @@ public class ShopCartServiceImpl implements ShopCartService {
 
     @Autowired(required = false)
     ShopCartMapper shopCartMapper;
-
-    @Autowired(required = false)
-    private ShopcartUserMapper shopcartUserMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -127,25 +124,9 @@ public class ShopCartServiceImpl implements ShopCartService {
         ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
         ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(shopcart.getUserid());
         if(shopcartUser == null){
-            List<Integer> shopcartIdList = new ArrayList<>();
-            shopcartIdList.add(shopcart.getShopcartid());
-            JSONArray jsonArray = JSONArray.fromObject(shopcartIdList);
-
             shopcartUser = new ShopcartUser();
-            shopcartUser.setShopcartSize(1); 
-            shopcartUser.setShopcartList(jsonArray.toString());
-            shopcartUser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> shopcartIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(shopcartUser.getShopcartList());
-            shopcartIdList = JSONArray.toList(jsonArray,Integer.class);
-            shopcartIdList.add(shopcart.getShopcartid());
-
-            shopcartUser.setShopcartSize(shopcartUser.getShopcartSize() + 1); 
-            shopcartUser.setShopcartList(jsonArray.toString());
-            if(shopcartUser.getStatus() == null || shopcartUser.getStatus() == CacheService.STATUS_DELETE)
-                shopcartUser.setStatus(CacheService.STATUS_UPDATE);
         }
+        shopcartUser.addShopcartList(shopcart.getShopcartid());
         shopcartUserDA.saveShopcartUser(shopcartUser);
 
         //Re-publish to redis
@@ -180,25 +161,14 @@ public class ShopCartServiceImpl implements ShopCartService {
         ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(shopcart.getUserid());
 
         if(shopcartUser != null){
-            List<Integer> shopcartList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(shopcartUser.getShopcartList());
-            shopcartList = JSONArray.toList(jsonArray, Integer.class);
 
-            shopcartList.remove(shopcart.getShopcartid());
-            JSONArray jsonarray = JSONArray.fromObject(shopcartList);
-            shopcartUser.setShopcartList(jsonarray.toString());
-
+            shopcartUser.removeShopcartList(shopcart.getGoodsid());
             if(shopcartUser.getShopcartSize() >= 1){
-                shopcartUser.setShopcartSize(shopcartUser.getShopcartSize() - 1);
                 //Re-publish to redis
                  redisu.setRemove("shopcart_u" + shopcart.getUserid().toString(), shopcart.getShopcartid());
             } else if(shopcartUser.getShopcartSize() == 0){
                 //list empty
-                if(shopcartUser.getStatus() == CacheService.STATUS_INSERT){
-                    shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
-                }else{
-                    shopcartUser.setStatus(CacheService.STATUS_DELETE);
-                }
+                shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
                 //Re-publish to redis
                 redisu.del("shopcart_u" + shopcart.getUserid().toString());
             }
@@ -292,21 +262,7 @@ public class ShopCartServiceImpl implements ShopCartService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 ShopcartUser shopcartUser = shopcartUserDA.findShopcartUserById(i);
                 if(shopcartUser != null){
-                    if(null ==  shopcartUser.getStatus()) {
-                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  shopcartUser.getStatus() && 1 == shopcartUserMapper.deleteByPrimaryKey(shopcartUser.getUserid())) {
-                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  shopcartUser.getStatus()  && 1 == shopcartUserMapper.insert(shopcartUser)) {
-                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  shopcartUser.getStatus() && 1 == shopcartUserMapper.updateByPrimaryKey(shopcartUser)) {
-                        shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
-                    }
+                    shopcartUserDA.removedShopcartUserById(shopcartUser.getUserid());
                     redisu.del("shopcart_u"+shopcartUser.getUserid().toString());
                 }
             }
@@ -362,8 +318,8 @@ public class ShopCartServiceImpl implements ShopCartService {
             ///init
             List<ShopCart> re = new ArrayList<ShopCart>();          
             ShopCartExample shopcartExample = new ShopCartExample();
-            shopcartExample.or().andShopcartidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            shopcartExample.or().andShopcartidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            shopcartExample.or().andShopcartidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andShopcartidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = shopCartMapper.selectByExample(shopcartExample);
             for (ShopCart value : re) {
@@ -397,28 +353,25 @@ public class ShopCartServiceImpl implements ShopCartService {
         ShopcartUserDA shopcartUserDA=new ShopcartUserDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<ShopcartUser> re = new ArrayList<ShopcartUser>();          
-            ShopcartUserExample shopcartUserExample = new ShopcartUserExample();
-            shopcartUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            shopcartUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<ShopCart> re = new ArrayList<ShopCart>();          
+            ShopCartExample shopCartExample = new ShopCartExample();
+            shopCartExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = shopcartUserMapper.selectByExample(shopcartUserExample);
-            for (ShopcartUser value : re) {
-                shopcartUserDA.saveShopcartUser(value);
+            re = shopCartMapper.selectByExample(shopCartExample);
+            for (ShopCart value : re) {
+                ShopcartUser shopcart  = shopcartUserDA.findShopcartUserById(value.getUserid());
+                if(shopcart == null){
+                    shopcart = new ShopcartUser();
+                }
+                
+                redisu.sAdd("shopcart_u"+value.getUserid().toString(), (Object)value.getShopcartid());
 
-                List<Integer> shopcartIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getShopcartList());
-                shopcartIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer shopcartId: shopcartIdList){
-                    redisu.sAdd("shopcart_u"+value.getUserid().toString(), (Object)shopcartId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getShopcartid()), refresRedis);
                 }
 
-                if(andAll && userID == value.getUserid() && value.getShopcartSize() != 0){  
-                    for(Integer shopcartId: shopcartIdList){
-                        RefreshDBD(cacheService.PageID(shopcartId), refresRedis);
-                    }
-                }
+                shopcartUserDA.saveShopcartUser(shopcart);
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
@@ -427,8 +380,11 @@ public class ShopCartServiceImpl implements ShopCartService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     ShopcartUser r = shopcartUserDA.findShopcartUserById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("shopcart_u"+r.getUserid().toString(), (Object)r.getShopcartList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getShopcartList();
+                        for(Integer id: li){
+                            redisu.sAdd("shopcart_u"+r.getUserid().toString(), (Object)id);
+                        }
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);

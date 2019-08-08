@@ -271,8 +271,8 @@ public class CateServiceImpl implements CateService {
             ///init
             List<Category> re = new ArrayList<Category>();          
             CategoryExample categoryExample = new CategoryExample();
-            categoryExample.or().andCateidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            categoryExample.or().andCateidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            categoryExample.or().andCateidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andCateidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = categoryMapper.selectByExample(categoryExample);
             for (Category value : re) {

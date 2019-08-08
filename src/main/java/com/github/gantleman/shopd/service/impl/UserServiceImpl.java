@@ -142,8 +142,8 @@ public class UserServiceImpl implements UserService {
         List<User> user = userDA.findAllUserByUserNameAndPassword(name, Passwrod);
         if(user.isEmpty()){
             UserExample userExample = new UserExample();
-            userExample.or().andUsernameEqualTo(name);
-            userExample.or().andPasswordEqualTo(Passwrod);
+            userExample.or().andUsernameEqualTo(name)
+            .andPasswordEqualTo(Passwrod);
             user = userMapper.selectByExample(userExample);
             
             for(User u : user){
@@ -275,8 +275,8 @@ public class UserServiceImpl implements UserService {
             ///init
             List<User> re = new ArrayList<User>();          
             UserExample userExample = new UserExample();
-            userExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            userExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            userExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andUseridLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = userMapper.selectByExample(userExample);
             for (User value : re) {

@@ -9,11 +9,9 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.OrderItemDA;
 import com.github.gantleman.shopd.da.OrderitemOrderDA;
 import com.github.gantleman.shopd.dao.OrderItemMapper;
-import com.github.gantleman.shopd.dao.OrderitemOrderMapper;
 import com.github.gantleman.shopd.entity.OrderItem;
 import com.github.gantleman.shopd.entity.OrderItemExample;
 import com.github.gantleman.shopd.entity.OrderitemOrder;
-import com.github.gantleman.shopd.entity.OrderitemOrderExample;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.OrderItemService;
 import com.github.gantleman.shopd.service.jobs.OrderItemJob;
@@ -24,16 +22,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("orderitemService")
 public class OrderItemServiceImpl implements OrderItemService {
 
     @Autowired(required = false)
     private OrderItemMapper orderItemMapper;
-
-    @Autowired(required = false)
-    private  OrderitemOrderMapper orderitemOrderMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -126,28 +119,12 @@ public class OrderItemServiceImpl implements OrderItemService {
         RefreshUserDBD(orderitem.getOrderid(), false, false);
         BDBEnvironmentManager.getInstance();
         OrderitemOrderDA orderitemUserDA=new OrderitemOrderDA(BDBEnvironmentManager.getMyEntityStore());
-        OrderitemOrder orderitemUser = orderitemUserDA.findOrderitemOrderById(orderitem.getOrderid());
-        if(orderitemUser == null){
-            List<Integer> orderitemIdList = new ArrayList<>();
-            orderitemIdList.add(orderitem.getItemid());
-            JSONArray jsonArray = JSONArray.fromObject(orderitemIdList);
-
-            orderitemUser = new OrderitemOrder();
-            orderitemUser.setOrderitemSize(1); 
-            orderitemUser.setOrderitemList(jsonArray.toString());
-            orderitemUser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> orderitemIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(orderitemUser.getOrderitemList());
-            orderitemIdList = JSONArray.toList(jsonArray,Integer.class);
-            orderitemIdList.add(orderitem.getItemid());
-
-            orderitemUser.setOrderitemSize(orderitemUser.getOrderitemSize() + 1); 
-            orderitemUser.setOrderitemList(jsonArray.toString());
-            if(orderitemUser.getStatus() == null || orderitemUser.getStatus() == CacheService.STATUS_DELETE)
-                orderitemUser.setStatus(CacheService.STATUS_UPDATE);
+        OrderitemOrder orderitemOrder = orderitemUserDA.findOrderitemOrderById(orderitem.getOrderid());
+        if(orderitemOrder == null){
+            orderitemOrder = new OrderitemOrder();
         }
-        orderitemUserDA.saveOrderitemOrder(orderitemUser);
+        orderitemOrder.addOrderitemList(orderitem.getItemid());
+        orderitemUserDA.saveOrderitemOrder(orderitemOrder);
 
         //Re-publish to redis
         redisu.sAdd("orderitem_u" + orderitem.getOrderid().toString(), orderitem.getItemid()); 
@@ -183,21 +160,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 OrderitemOrder orderitemUser = orderitemUserDA.findOrderitemOrderById(i);
                 if(orderitemUser != null){
-                    if(null ==  orderitemUser.getStatus()) {
-                        orderitemUserDA.removedOrderitemOrderById(orderitemUser.getOrderid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  orderitemUser.getStatus() && 1 == orderitemOrderMapper.deleteByPrimaryKey(orderitemUser.getOrderid())) {
-                        orderitemUserDA.removedOrderitemOrderById(orderitemUser.getOrderid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  orderitemUser.getStatus()  && 1 == orderitemOrderMapper.insert(orderitemUser)) {
-                        orderitemUserDA.removedOrderitemOrderById(orderitemUser.getOrderid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  orderitemUser.getStatus() && 1 == orderitemOrderMapper.updateByPrimaryKey(orderitemUser)) {
-                        orderitemUserDA.removedOrderitemOrderById(orderitemUser.getOrderid());
-                    }
+                    orderitemUserDA.removedOrderitemOrderById(orderitemUser.getOrderid());
                     redisu.del("orderitem_u"+orderitemUser.getOrderid().toString());
                 }
             }
@@ -253,8 +216,8 @@ public class OrderItemServiceImpl implements OrderItemService {
             ///init
             List<OrderItem> re = new ArrayList<OrderItem>();          
             OrderItemExample orderitemExample = new OrderItemExample();
-            orderitemExample.or().andItemidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            orderitemExample.or().andItemidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            orderitemExample.or().andItemidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andItemidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = orderItemMapper.selectByExample(orderitemExample);
             for (OrderItem value : re) {
@@ -288,28 +251,25 @@ public class OrderItemServiceImpl implements OrderItemService {
         OrderitemOrderDA orderitemUserDA=new OrderitemOrderDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(orderid))) {
             /// init
-            List<OrderitemOrder> re = new ArrayList<OrderitemOrder>();          
-            OrderitemOrderExample orderitemOrderExample = new OrderitemOrderExample();
-            orderitemOrderExample.or().andOrderidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(orderid)));
-            orderitemOrderExample.or().andOrderidLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(orderid)));
+            List<OrderItem> re = new ArrayList<OrderItem>();          
+            OrderItemExample orderItemExample = new OrderItemExample();
+            orderItemExample.or().andOrderidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(orderid)))
+            .andOrderidLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(orderid)));
 
-            re = orderitemOrderMapper.selectByExample(orderitemOrderExample);
-            for (OrderitemOrder value : re) {
-                orderitemUserDA.saveOrderitemOrder(value);
+            re = orderItemMapper.selectByExample(orderItemExample);
+            for (OrderItem value : re) {
+                OrderitemOrder orderitemOrder  = orderitemUserDA.findOrderitemOrderById(value.getItemid());
+                if(orderitemOrder == null){
+                    orderitemOrder = new OrderitemOrder();
+                }
+                
+                redisu.sAdd("orderitem_u"+value.getOrderid().toString(), (Object)value.getItemid());
 
-                List<Integer> orderitemIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getOrderitemList());
-                orderitemIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer orderitemId: orderitemIdList){
-                    redisu.sAdd("orderitem_u"+value.getOrderid().toString(), (Object)orderitemId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getItemid()), refresRedis);
                 }
 
-                if(andAll && orderid == value.getOrderid() && value.getOrderitemSize() != 0){  
-                    for(Integer orderitemId: orderitemIdList){
-                        RefreshDBD(cacheService.PageID(orderitemId), refresRedis);
-                    }
-                }
+                orderitemUserDA.saveOrderitemOrder(orderitemOrder);
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(orderid).toString(), 1);
         }else if(refresRedis){
@@ -318,8 +278,11 @@ public class OrderItemServiceImpl implements OrderItemService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(orderid));
                 for(;i < l; i++){
                     OrderitemOrder r = orderitemUserDA.findOrderitemOrderById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("orderitem_u"+r.getOrderid().toString(), (Object)r.getOrderitemList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getOrderitemList();
+                        for(Integer id: li){
+                            redisu.sAdd("orderitem_u"+r.getOrderid().toString(), (Object)id);
+                        }
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(orderid).toString(), 1);

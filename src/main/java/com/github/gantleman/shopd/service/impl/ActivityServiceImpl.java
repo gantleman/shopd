@@ -196,8 +196,8 @@ public class ActivityServiceImpl implements ActivityService {
             ///init
             List<Activity> re = new ArrayList<Activity>();          
             ActivityExample activityExample = new ActivityExample();
-            activityExample.or().andActivityidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            activityExample.or().andActivityidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            activityExample.or().andActivityidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andActivityidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = activityMapper.selectByExample(activityExample);
             for (Activity value : re) {

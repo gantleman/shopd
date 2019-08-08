@@ -88,8 +88,8 @@ public class CustomerController {
     @RequestMapping("/loginconfirm")
     public String loginConfirm(User user,Model loginResult,HttpServletRequest request,@RequestParam("confirmlogo") String confirmlogo){
         HttpSession session=request.getSession();
-        String verificationCode = (String) session.getAttribute("certCode");
-       /* if (!confirmlogo.equals(verificationCode))
+        /*String verificationCode = (String) session.getAttribute("certCode");
+        if (!confirmlogo.equals(verificationCode))
         {
             loginResult.addAttribute("errorMsg","验证码错误");
             return "login";

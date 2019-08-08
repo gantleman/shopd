@@ -324,8 +324,8 @@ public class GoodsServiceImpl implements GoodsService {
             ///init
             List<Goods> re = new ArrayList<Goods>();          
             GoodsExample goodsExample = new GoodsExample();
-            goodsExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            goodsExample.or().andGoodsidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            goodsExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andGoodsidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = goodsMapper.selectByExample(goodsExample);
             for (Goods value : re) {

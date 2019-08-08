@@ -9,11 +9,9 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.FavoriteDA;
 import com.github.gantleman.shopd.da.FavoriteUserDA;
 import com.github.gantleman.shopd.dao.FavoriteMapper;
-import com.github.gantleman.shopd.dao.FavoriteUserMapper;
 import com.github.gantleman.shopd.entity.Favorite;
 import com.github.gantleman.shopd.entity.FavoriteExample;
 import com.github.gantleman.shopd.entity.FavoriteUser;
-import com.github.gantleman.shopd.entity.FavoriteUserExample;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.FavoriteService;
 import com.github.gantleman.shopd.service.jobs.FavoriteJob;
@@ -24,16 +22,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("favoriteService")
 public class FavoriteServiceImpl implements FavoriteService {
 
     @Autowired(required = false)
     FavoriteMapper favoriteMapper;
-
-    @Autowired(required = false)
-    private FavoriteUserMapper favoriteUserMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -140,25 +133,9 @@ public class FavoriteServiceImpl implements FavoriteService {
         FavoriteUserDA favoriteUserDA=new FavoriteUserDA(BDBEnvironmentManager.getMyEntityStore());
         FavoriteUser favoriteUser = favoriteUserDA.findFavoriteUserById(favorite.getUserid());
         if(favoriteUser == null){
-            List<Integer> favoriteIdList = new ArrayList<>();
-            favoriteIdList.add(favorite.getFavoriteid());
-            JSONArray jsonArray = JSONArray.fromObject(favoriteIdList);
-
             favoriteUser = new FavoriteUser();
-            favoriteUser.setFavoriteSize(1); 
-            favoriteUser.setFavoriteList(jsonArray.toString());
-            favoriteUser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> favoriteIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(favoriteUser.getFavoriteList());
-            favoriteIdList = JSONArray.toList(jsonArray,Integer.class);
-            favoriteIdList.add(favorite.getFavoriteid());
-
-            favoriteUser.setFavoriteSize(favoriteUser.getFavoriteSize() + 1); 
-            favoriteUser.setFavoriteList(jsonArray.toString());
-            if(favoriteUser.getStatus() == null || favoriteUser.getStatus() == CacheService.STATUS_DELETE)
-                favoriteUser.setStatus(CacheService.STATUS_UPDATE);
         }
+        favoriteUser.addFavoriteList(favorite.getFavoriteid());
         favoriteUserDA.saveFavoriteUser(favoriteUser);
 
         //Re-publish to redis
@@ -191,25 +168,13 @@ public class FavoriteServiceImpl implements FavoriteService {
         FavoriteUser favoriteUser = favoriteUserDA.findFavoriteUserById(favorite.getUserid());
 
         if(favoriteUser != null){
-            List<Integer> favoriteList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(favoriteUser.getFavoriteList());
-            favoriteList = JSONArray.toList(jsonArray, Integer.class);
-
-            favoriteList.remove(favorite.getFavoriteid());
-            jsonArray = JSONArray.fromObject(favoriteList);
-            favoriteUser.setFavoriteList(jsonArray.toString());
-
+            favoriteUser.removeFavoriteList(favorite.getFavoriteid());
             if(favoriteUser.getFavoriteSize() >= 1){
-                favoriteUser.setFavoriteSize(favoriteUser.getFavoriteSize() - 1);
                 //Re-publish to redis
                  redisu.setRemove("favorite_u" + favorite.getUserid().toString(), favorite.getFavoriteid());
             } else if(favoriteUser.getFavoriteSize() == 0){
                 //list empty
-                if(favoriteUser.getStatus() == CacheService.STATUS_INSERT){
-                    favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
-                }else{
-                    favoriteUser.setStatus(CacheService.STATUS_DELETE);
-                }
+                favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
                 //Re-publish to redis
                 redisu.del("favorite_u" + favorite.getUserid().toString());
             }
@@ -227,9 +192,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         FavoriteUser favoriteUser = favoriteUserDA.findFavoriteUserById(userid);
         if(favoriteUser != null){
             List<Integer> favoriteList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(favoriteUser.getFavoriteList());
-            favoriteList = JSONArray.toList(jsonArray, Integer.class);
-
+            favoriteList = favoriteUser.getFavoriteList();
             for(Integer favoriteid: favoriteList){
                 RefreshDBD(cacheService.PageID(favoriteid), false);
 
@@ -262,21 +225,7 @@ public class FavoriteServiceImpl implements FavoriteService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 FavoriteUser favoriteUser = favoriteUserDA.findFavoriteUserById(i);
                 if(favoriteUser != null){
-                    if(null ==  favoriteUser.getStatus()) {
-                        favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  favoriteUser.getStatus() && 1 == favoriteUserMapper.deleteByPrimaryKey(favoriteUser.getUserid())) {
-                        favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  favoriteUser.getStatus()  && 1 == favoriteUserMapper.insert(favoriteUser)) {
-                        favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  favoriteUser.getStatus() && 1 == favoriteUserMapper.updateByPrimaryKey(favoriteUser)) {
-                        favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
-                    }
+                    favoriteUserDA.removedFavoriteUserById(favoriteUser.getUserid());
                     redisu.del("favorite_u"+favoriteUser.getUserid().toString());
                 }
             }
@@ -332,8 +281,8 @@ public class FavoriteServiceImpl implements FavoriteService {
             ///init
             List<Favorite> re = new ArrayList<Favorite>();          
             FavoriteExample favoriteExample = new FavoriteExample();
-            favoriteExample.or().andFavoriteidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            favoriteExample.or().andFavoriteidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            favoriteExample.or().andFavoriteidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andFavoriteidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = favoriteMapper.selectByExample(favoriteExample);
             for (Favorite value : re) {
@@ -367,28 +316,25 @@ public class FavoriteServiceImpl implements FavoriteService {
         FavoriteUserDA favoriteUserDA=new FavoriteUserDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<FavoriteUser> re = new ArrayList<FavoriteUser>();          
-            FavoriteUserExample favoriteUserExample = new FavoriteUserExample();
-            favoriteUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            favoriteUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<Favorite> re = new ArrayList<Favorite>();          
+            FavoriteExample favoriteExample = new FavoriteExample();
+            favoriteExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = favoriteUserMapper.selectByExample(favoriteUserExample);
-            for (FavoriteUser value : re) {
-                favoriteUserDA.saveFavoriteUser(value);
+            re = favoriteMapper.selectByExample(favoriteExample);
+            for (Favorite value : re) {
+                FavoriteUser favorite  = favoriteUserDA.findFavoriteUserById(value.getUserid());
+                if(favorite == null){
+                    favorite = new FavoriteUser();
+                }
+                
+                redisu.sAdd("favorite_g"+value.getGoodsid().toString(), (Object)value.getFavoriteid());
 
-                List<Integer> favoriteIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getFavoriteList());
-                favoriteIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer favoriteId: favoriteIdList){
-                    redisu.sAdd("favorite_u"+value.getUserid().toString(), (Object)favoriteId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getFavoriteid()), refresRedis);
                 }
 
-                if(andAll && userID == value.getUserid() && value.getFavoriteSize() != 0){  
-                    for(Integer favoriteId: favoriteIdList){
-                        RefreshDBD(cacheService.PageID(favoriteId), refresRedis);
-                    }
-                }
+                favoriteUserDA.saveFavoriteUser(favorite);
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
@@ -397,8 +343,11 @@ public class FavoriteServiceImpl implements FavoriteService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     FavoriteUser r = favoriteUserDA.findFavoriteUserById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("favorite_u"+r.getUserid().toString(), (Object)r.getFavoriteList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getFavoriteList();
+                        for(Integer id: li){
+                            redisu.sAdd("favorite_u"+r.getUserid().toString(), (Object)id); 
+                        }
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);

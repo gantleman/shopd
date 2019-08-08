@@ -8,12 +8,10 @@ import javax.annotation.PostConstruct;
 
 import com.github.gantleman.shopd.da.CommentDA;
 import com.github.gantleman.shopd.da.CommentGoodsDA;
-import com.github.gantleman.shopd.dao.CommentGoodsMapper;
 import com.github.gantleman.shopd.dao.CommentMapper;
 import com.github.gantleman.shopd.entity.Comment;
 import com.github.gantleman.shopd.entity.CommentExample;
 import com.github.gantleman.shopd.entity.CommentGoods;
-import com.github.gantleman.shopd.entity.CommentGoodsExample;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.CommentService;
 import com.github.gantleman.shopd.service.jobs.CommentJob;
@@ -24,16 +22,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("commentService")
 public class CommentServiceImpl implements CommentService {
 
     @Autowired(required = false)
     private CommentMapper commentMapper;
-
-    @Autowired(required = false)
-    private CommentGoodsMapper commentGoodsMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -90,25 +83,9 @@ public class CommentServiceImpl implements CommentService {
         CommentGoodsDA commentGoodsDA=new CommentGoodsDA(BDBEnvironmentManager.getMyEntityStore());
         CommentGoods commentGoods = commentGoodsDA.findCommentGoodsById(comment.getGoodsid());
         if(commentGoods == null){
-            List<Integer> commentIdList = new ArrayList<>();
-            commentIdList.add(comment.getCommentid());
-            JSONArray jsonArray = JSONArray.fromObject(commentIdList);
-
             commentGoods = new CommentGoods();
-            commentGoods.setCommentSize(1); 
-            commentGoods.setCommentList(jsonArray.toString());
-            commentGoods.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> commentIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(commentGoods.getCommentList());
-            commentIdList = JSONArray.toList(jsonArray,Integer.class);
-            commentIdList.add(comment.getCommentid());
-
-            commentGoods.setCommentSize(commentGoods.getCommentSize() + 1); 
-            commentGoods.setCommentList(jsonArray.toString());
-            if(commentGoods.getStatus() == null || commentGoods.getStatus() == CacheService.STATUS_DELETE)
-                commentGoods.setStatus(CacheService.STATUS_UPDATE);
         }
+        commentGoods.addCommentList(comment.getCommentid());
         commentGoodsDA.saveCommentGoods(commentGoods);
 
         //Re-publish to redis
@@ -181,21 +158,7 @@ public class CommentServiceImpl implements CommentService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 CommentGoods commentGoods = commentGoodsDA.findCommentGoodsById(i);
                 if(commentGoods != null){
-                    if(null ==  commentGoods.getStatus()) {
-                        commentGoodsDA.removedCommentGoodsById(commentGoods.getGoodsid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  commentGoods.getStatus() && 1 == commentGoodsMapper.deleteByPrimaryKey(commentGoods.getGoodsid())) {
-                        commentGoodsDA.removedCommentGoodsById(commentGoods.getGoodsid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  commentGoods.getStatus()  && 1 == commentGoodsMapper.insert(commentGoods)) {
-                        commentGoodsDA.removedCommentGoodsById(commentGoods.getGoodsid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  commentGoods.getStatus() && 1 == commentGoodsMapper.updateByPrimaryKey(commentGoods)) {
-                        commentGoodsDA.removedCommentGoodsById(commentGoods.getGoodsid());
-                    }
+                    commentGoodsDA.removedCommentGoodsById(commentGoods.getGoodsid());
                     redisu.del("comment_g"+commentGoods.getGoodsid().toString());
                 }
             }
@@ -251,8 +214,8 @@ public class CommentServiceImpl implements CommentService {
             ///init
             List<Comment> re = new ArrayList<Comment>();          
             CommentExample commentExample = new CommentExample();
-            commentExample.or().andCommentidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            commentExample.or().andCommentidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            commentExample.or().andCommentidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andCommentidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = commentMapper.selectByExample(commentExample);
             for (Comment value : re) {
@@ -286,28 +249,25 @@ public class CommentServiceImpl implements CommentService {
         CommentGoodsDA commentGoodsDA=new CommentGoodsDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(goodsID))) {
             /// init
-            List<CommentGoods> re = new ArrayList<CommentGoods>();          
-            CommentGoodsExample commentGoodsExample = new CommentGoodsExample();
-            commentGoodsExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(goodsID)));
-            commentGoodsExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(goodsID)));
+            List<Comment> re = new ArrayList<Comment>();          
+            CommentExample commentExample = new CommentExample();
+            commentExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(goodsID)))
+            .andGoodsidGreaterThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(goodsID)));
 
-            re = commentGoodsMapper.selectByExample(commentGoodsExample);
-            for (CommentGoods value : re) {
-                commentGoodsDA.saveCommentGoods(value);
+            re = commentMapper.selectByExample(commentExample);
+            for (Comment value : re) {
+                CommentGoods commentGoods  = commentGoodsDA.findCommentGoodsById(value.getGoodsid());
+                if(commentGoods == null){
+                    commentGoods = new CommentGoods();
+                }
+                
+                redisu.sAdd("comment_g"+value.getGoodsid().toString(), (Object)value.getCommentid());
 
-                List<Integer> commentIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getCommentList());
-                commentIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer commentId: commentIdList){
-                    redisu.sAdd("comment_g"+value.getGoodsid().toString(), (Object)commentId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getCommentid()), refresRedis);
                 }
 
-                if(andAll && goodsID == value.getGoodsid() && value.getCommentSize() != 0){  
-                    for(Integer commentId: commentIdList){
-                        RefreshDBD(cacheService.PageID(commentId), refresRedis);
-                    }
-                }
+                commentGoodsDA.saveCommentGoods(commentGoods);
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(goodsID).toString(), 1);
         }else if(refresRedis){
@@ -316,9 +276,12 @@ public class CommentServiceImpl implements CommentService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(goodsID));
                 for(;i < l; i++){
                     CommentGoods r = commentGoodsDA.findCommentGoodsById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("comment_g"+r.getGoodsid().toString(), (Object)r.getCommentList()); 
-                    }                
+                    if(r!= null){
+                        List<Integer> li = r.getCommentList();
+                        for(Integer id: li){
+                            redisu.sAdd("comment_g"+r.getGoodsid().toString(), (Object)id); 
+                        }
+                    } 
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(goodsID).toString(), 1);
             }

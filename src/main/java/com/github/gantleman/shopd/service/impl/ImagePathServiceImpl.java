@@ -9,11 +9,9 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.ImagePathDA;
 import com.github.gantleman.shopd.da.ImagepathGoodsDA;
 import com.github.gantleman.shopd.dao.ImagePathMapper;
-import com.github.gantleman.shopd.dao.ImagepathGoodsMapper;
 import com.github.gantleman.shopd.entity.ImagePath;
 import com.github.gantleman.shopd.entity.ImagePathExample;
 import com.github.gantleman.shopd.entity.ImagepathGoods;
-import com.github.gantleman.shopd.entity.ImagepathGoodsExample;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.ImagePathService;
 import com.github.gantleman.shopd.service.jobs.ImagePathJob;
@@ -24,16 +22,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("imagePathService")
 public class ImagePathServiceImpl implements ImagePathService {
 
     @Autowired(required = false)
     ImagePathMapper imagePathMapper;
-
-    @Autowired(required = false)
-    private ImagepathGoodsMapper imagePathGoodsMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -66,25 +59,9 @@ public class ImagePathServiceImpl implements ImagePathService {
         ImagepathGoodsDA imagePathGoodsDA=new ImagepathGoodsDA(BDBEnvironmentManager.getMyEntityStore());
         ImagepathGoods imagePathGoods = imagePathGoodsDA.findImagepathGoodsById(imagePath.getGoodid());
         if(imagePathGoods == null){
-            List<Integer> imagePathIdList = new ArrayList<>();
-            imagePathIdList.add(imagePath.getPathid());
-            JSONArray jsonArray = JSONArray.fromObject(imagePathIdList);
-
             imagePathGoods = new ImagepathGoods();
-            imagePathGoods.setImagepathSize(1); 
-            imagePathGoods.setImagepathList(jsonArray.toString());
-            imagePathGoods.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> imagePathIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(imagePathGoods.getImagepathList());
-            imagePathIdList = JSONArray.toList(jsonArray,Integer.class);
-            imagePathIdList.add(imagePath.getPathid());
-
-            imagePathGoods.setImagepathSize(imagePathGoods.getImagepathSize() + 1); 
-            imagePathGoods.setImagepathList(jsonArray.toString());
-            if(imagePathGoods.getStatus() == null || imagePathGoods.getStatus() == CacheService.STATUS_DELETE)
-                imagePathGoods.setStatus(CacheService.STATUS_UPDATE);
         }
+        imagePathGoods.addImagePathList(imagePath.getPathid());
         imagePathGoodsDA.saveImagepathGoods(imagePathGoods);
 
         //Re-publish to redis
@@ -186,21 +163,7 @@ public class ImagePathServiceImpl implements ImagePathService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 ImagepathGoods imagePathGoods = imagePathGoodsDA.findImagepathGoodsById(i);
                 if(imagePathGoods != null){
-                    if(null ==  imagePathGoods.getStatus()) {
-                        imagePathGoodsDA.removedImagepathGoodsById(imagePathGoods.getGoodsid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  imagePathGoods.getStatus() && 1 == imagePathGoodsMapper.deleteByPrimaryKey(imagePathGoods.getGoodsid())) {
-                        imagePathGoodsDA.removedImagepathGoodsById(imagePathGoods.getGoodsid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  imagePathGoods.getStatus()  && 1 == imagePathGoodsMapper.insert(imagePathGoods)) {
-                        imagePathGoodsDA.removedImagepathGoodsById(imagePathGoods.getGoodsid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  imagePathGoods.getStatus() && 1 == imagePathGoodsMapper.updateByPrimaryKey(imagePathGoods)) {
-                        imagePathGoodsDA.removedImagepathGoodsById(imagePathGoods.getGoodsid());
-                    }
+                    imagePathGoodsDA.removedImagepathGoodsById(imagePathGoods.getGoodsid());
                     redisu.del("imagepath_g"+imagePathGoods.getGoodsid().toString());
                 }
             }
@@ -256,8 +219,8 @@ public class ImagePathServiceImpl implements ImagePathService {
             ///init
             List<ImagePath> re = new ArrayList<ImagePath>();          
             ImagePathExample imagePathExample = new ImagePathExample();
-            imagePathExample.or().andPathidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            imagePathExample.or().andPathidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            imagePathExample.or().andPathidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andPathidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = imagePathMapper.selectByExample(imagePathExample);
             for (ImagePath value : re) {
@@ -291,28 +254,25 @@ public class ImagePathServiceImpl implements ImagePathService {
         ImagepathGoodsDA imagePathGoodsDA=new ImagepathGoodsDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<ImagepathGoods> re = new ArrayList<ImagepathGoods>();          
-            ImagepathGoodsExample imagePathGoodsExample = new ImagepathGoodsExample();
-            imagePathGoodsExample.or().andGoodsidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            imagePathGoodsExample.or().andGoodsidLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<ImagePath> re = new ArrayList<ImagePath>();          
+            ImagePathExample imagePathExample = new ImagePathExample();
+            imagePathExample.or().andGoodidGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andGoodidLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = imagePathGoodsMapper.selectByExample(imagePathGoodsExample);
-            for (ImagepathGoods value : re) {
-                imagePathGoodsDA.saveImagepathGoods(value);
+            re = imagePathMapper.selectByExample(imagePathExample);
+            for (ImagePath value : re) {
+                ImagepathGoods imagepathGoods  = imagePathGoodsDA.findImagepathGoodsById(value.getPathid());
+                if(imagepathGoods == null){
+                    imagepathGoods = new ImagepathGoods();
+                }
+                
+                redisu.sAdd("imagepath_g"+value.getGoodid().toString(), (Object)value.getPathid());
 
-                List<Integer> imagePathIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getImagepathList());
-                imagePathIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer imagePathId: imagePathIdList){
-                    redisu.sAdd("imagepath_g"+value.getGoodsid().toString(), (Object)imagePathId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getPathid()), refresRedis);
                 }
 
-                if(andAll && userID == value.getGoodsid() && value.getImagepathSize() != 0){  
-                    for(Integer imagePathId: imagePathIdList){
-                        RefreshDBD(cacheService.PageID(imagePathId), refresRedis);
-                    }
-                }
+                imagePathGoodsDA.saveImagepathGoods(imagepathGoods);
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
@@ -321,8 +281,11 @@ public class ImagePathServiceImpl implements ImagePathService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     ImagepathGoods r = imagePathGoodsDA.findImagepathGoodsById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("imagepath_g"+r.getGoodsid().toString(), (Object)r.getImagepathList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getImagepathList();
+                        for(Integer id: li){
+                            redisu.sAdd("imagepath_g"+r.getGoodsid().toString(), (Object)id);
+                        }
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);

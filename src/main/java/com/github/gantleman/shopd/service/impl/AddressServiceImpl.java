@@ -9,11 +9,9 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.AddressDA;
 import com.github.gantleman.shopd.da.AddressUserDA;
 import com.github.gantleman.shopd.dao.AddressMapper;
-import com.github.gantleman.shopd.dao.AddressUserMapper;
 import com.github.gantleman.shopd.entity.Address;
 import com.github.gantleman.shopd.entity.AddressExample;
 import com.github.gantleman.shopd.entity.AddressUser;
-import com.github.gantleman.shopd.entity.AddressUserExample;
 import com.github.gantleman.shopd.service.AddressService;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.jobs.AddressJob;
@@ -22,18 +20,13 @@ import com.github.gantleman.shopd.util.QuartzManager;
 import com.github.gantleman.shopd.util.RedisUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import net.sf.json.JSONArray;  
+import org.springframework.stereotype.Service;  
 
 @Service("addressService")
 public class AddressServiceImpl implements AddressService {
 
     @Autowired(required = false)
     private AddressMapper addressMapper;
-
-    @Autowired(required = false)
-    private AddressUserMapper addressUserMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -167,25 +160,14 @@ public class AddressServiceImpl implements AddressService {
         AddressUser addressUser = addressUserDA.findAddressUserById(address.getUserid());
 
         if(addressUser != null){
-            List<Integer> addressList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(addressUser.getAddressList());
-            addressList = JSONArray.toList(jsonArray, Integer.class);
-
-            addressList.remove(address.getAddressid());
-            JSONArray jsonarray = JSONArray.fromObject(addressList);
-            addressUser.setAddressList(jsonarray.toString());
+            addressUser.removeAddressList(address.getAddressid());
 
             if(addressUser.getAddressSize() >= 1){
-                addressUser.setAddressSize(addressUser.getAddressSize() - 1);
                 //Re-publish to redis
                  redisu.setRemove("address_u" + address.getUserid().toString(), address.getAddressid());
             } else if(addressUser.getAddressSize() == 0){
-                //list empty
-                if(addressUser.getStatus() == CacheService.STATUS_INSERT){
-                    addressUserDA.removedAddressUserById(addressUser.getUserid());
-                }else{
-                    addressUser.setStatus(CacheService.STATUS_DELETE);
-                }
+                //list empty}
+                addressUserDA.removedAddressUserById(addressUser.getUserid());
                 //Re-publish to redis
                 redisu.del("address_u" + address.getUserid().toString());
             }
@@ -221,25 +203,9 @@ public class AddressServiceImpl implements AddressService {
         AddressUserDA addressUserDA=new AddressUserDA(BDBEnvironmentManager.getMyEntityStore());
         AddressUser addressUser = addressUserDA.findAddressUserById(address.getUserid());
         if(addressUser == null){
-            List<Integer> addressIdList = new ArrayList<>();
-            addressIdList.add(address.getAddressid());
-            JSONArray jsonArray = JSONArray.fromObject(addressIdList);
-
             addressUser = new AddressUser();
-            addressUser.setAddressSize(1); 
-            addressUser.setAddressList(jsonArray.toString());
-            addressUser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> addressIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(addressUser.getAddressList());
-            addressIdList = JSONArray.toList(jsonArray,Integer.class);
-            addressIdList.add(address.getAddressid());
-
-            addressUser.setAddressSize(addressUser.getAddressSize() + 1); 
-            addressUser.setAddressList(jsonArray.toString());
-            if(addressUser.getStatus() == null || addressUser.getStatus() == CacheService.STATUS_DELETE)
-                addressUser.setStatus(CacheService.STATUS_UPDATE);
         }
+        addressUser.addAddressList(address.getAddressid());
         addressUserDA.saveAddressUser(addressUser);
 
         //Re-publish to redis
@@ -276,21 +242,7 @@ public class AddressServiceImpl implements AddressService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 AddressUser addressUser = addressUserDA.findAddressUserById(i);
                 if(addressUser != null){
-                    if(null ==  addressUser.getStatus()) {
-                        addressUserDA.removedAddressUserById(addressUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  addressUser.getStatus() && 1 == addressUserMapper.deleteByPrimaryKey(addressUser.getUserid())) {
-                        addressUserDA.removedAddressUserById(addressUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  addressUser.getStatus()  && 1 == addressUserMapper.insert(addressUser)) {
-                        addressUserDA.removedAddressUserById(addressUser.getUserid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  addressUser.getStatus() && 1 == addressUserMapper.updateByPrimaryKey(addressUser)) {
-                        addressUserDA.removedAddressUserById(addressUser.getUserid());
-                    }
+                    addressUserDA.removedAddressUserById(addressUser.getUserid());
                     redisu.del("address_u"+addressUser.getUserid().toString());
                 }
             }
@@ -346,8 +298,8 @@ public class AddressServiceImpl implements AddressService {
             ///init
             List<Address> re = new ArrayList<Address>();          
             AddressExample addressExample = new AddressExample();
-            addressExample.or().andAddressidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            addressExample.or().andAddressidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            addressExample.or().andAddressidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andAddressidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = addressMapper.selectByExample(addressExample);
             for (Address value : re) {
@@ -381,29 +333,29 @@ public class AddressServiceImpl implements AddressService {
         AddressUserDA addressUserDA=new AddressUserDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<AddressUser> re = new ArrayList<AddressUser>();          
-            AddressUserExample addressUserExample = new AddressUserExample();
-            addressUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            addressUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<Address> re = new ArrayList<Address>();          
+            AddressExample addressExample = new AddressExample();
+            addressExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = addressUserMapper.selectByExample(addressUserExample);
-            for (AddressUser value : re) {
-                addressUserDA.saveAddressUser(value);
+            re = addressMapper.selectByExample(addressExample);
+            
+            for (Address value : re) {
+                AddressUser addressUser = addressUserDA.findAddressUserById(value.getUserid());
+                if(addressUser == null){
+                    addressUser = new AddressUser();
+                }
+                addressUser.addAddressList(value.getAddressid());
 
-                List<Integer> addressIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getAddressList());
-                addressIdList = JSONArray.toList(jsonArray, Integer.class);
+                redisu.sAdd("address_u"+value.getUserid().toString(), (Object)value.getAddressid());
 
-                for(Integer addressId: addressIdList){
-                    redisu.sAdd("address_u"+value.getUserid().toString(), (Object)addressId);
+                if(andAll && userID == value.getUserid()){
+                    RefreshDBD(cacheService.PageID(value.getAddressid()), refresRedis);
                 }
 
-                if(andAll && userID == value.getUserid() && value.getAddressSize() != 0){  
-                    for(Integer addressId: addressIdList){
-                        RefreshDBD(cacheService.PageID(addressId), refresRedis);
-                    }
-                }
+                addressUserDA.saveAddressUser(addressUser);
             }
+
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
@@ -411,8 +363,11 @@ public class AddressServiceImpl implements AddressService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     AddressUser r = addressUserDA.findAddressUserById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("address_u"+r.getUserid().toString(), (Object)r.getAddressList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getAddressList();
+                        for(Integer addressid: li){
+                          redisu.sAdd("address_u"+r.getUserid().toString(), (Object)addressid);   
+                        }  
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);

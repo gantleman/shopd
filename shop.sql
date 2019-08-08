@@ -49,17 +49,6 @@ CREATE TABLE `address` (
   KEY `userId` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `address_user` */
-
-DROP TABLE IF EXISTS `address_user`;
-
-CREATE TABLE `address_user` (
-  `userID` int(12) NOT NULL,
-  `address_size` int(12) DEFAULT NULL,
-  `address_list` mediumtext,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 /*Table structure for table `admin` */
 
 DROP TABLE IF EXISTS `admin`;
@@ -122,7 +111,6 @@ CREATE TABLE `category` (
   UNIQUE KEY `cateName` (`cateName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 INSERT INTO `category` (`cateId`, `cateName`) VALUES
 (1, 'Digital'),
 (2, 'Clothes'),
@@ -144,17 +132,6 @@ CREATE TABLE `chat` (
   KEY `receiveUser` (`receiveUser`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `chat_user` */
-
-DROP TABLE IF EXISTS `chat_user`;
-
-CREATE TABLE `chat_user` (
-  `userID` int(12) NOT NULL,
-  `chat_size` int(12) DEFAULT NULL,
-  `chat_list` mediumtext,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 /*Table structure for table `comment` */
 
 DROP TABLE IF EXISTS `comment`;
@@ -171,17 +148,6 @@ CREATE TABLE `comment` (
   KEY `goodsId` (`goodsId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `comment_goods` */
-
-DROP TABLE IF EXISTS `comment_goods`;
-
-CREATE TABLE `comment_goods` (
-  `goodsID` int(12) NOT NULL,
-  `comment_size` int(12) DEFAULT NULL,
-  `comment_list` mediumtext,
-  PRIMARY KEY (`goodsID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 /*Table structure for table `favorite` */
 
 DROP TABLE IF EXISTS `favorite`;
@@ -194,17 +160,6 @@ CREATE TABLE `favorite` (
   PRIMARY KEY (`favoriteId`),
   KEY `collection_ibfk_2` (`goodsId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Table structure for table `favorite_user` */
-
-DROP TABLE IF EXISTS `favorite_user`;
-
-CREATE TABLE `favorite_user` (
-  `userID` int(12) NOT NULL,
-  `favorite_size` int(12) DEFAULT NULL,
-  `favorite_list` mediumtext,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Table structure for table `goods` */
 
@@ -238,17 +193,6 @@ CREATE TABLE `imagepath` (
   KEY `goodid` (`goodId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `imagepath_goods` */
-
-DROP TABLE IF EXISTS `imagepath_goods`;
-
-CREATE TABLE `imagepath_goods` (
-  `goodsID` int(12) NOT NULL,
-  `imagepath_size` int(12) DEFAULT NULL,
-  `imagepath_list` mediumtext,
-  PRIMARY KEY (`goodsID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 /*Table structure for table `order` */
 
 DROP TABLE IF EXISTS `order`;
@@ -274,17 +218,6 @@ CREATE TABLE `order` (
   KEY `isComplete` (`isComplete`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `order_user` */
-
-DROP TABLE IF EXISTS `order_user`;
-
-CREATE TABLE `order_user` (
-  `userID` int(12) NOT NULL,
-  `order_size` int(12) DEFAULT NULL,
-  `order_list` mediumtext,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 /*Table structure for table `orderitem` */
 
 DROP TABLE IF EXISTS `orderitem`;
@@ -298,17 +231,6 @@ CREATE TABLE `orderitem` (
   KEY `orderId` (`orderId`),
   KEY `goodsId` (`goodsId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Table structure for table `orderitem_order` */
-
-DROP TABLE IF EXISTS `orderitem_order`;
-
-CREATE TABLE `orderitem_order` (
-  `orderID` int(12) NOT NULL,
-  `orderitem_size` int(12) DEFAULT NULL,
-  `orderitem_list` mediumtext,
-  PRIMARY KEY (`orderID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Table structure for table `shopcart` */
 
@@ -324,17 +246,6 @@ CREATE TABLE `shopcart` (
   KEY `userId` (`userId`),
   KEY `goodsid` (`goodsid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Table structure for table `shopcart_user` */
-
-DROP TABLE IF EXISTS `shopcart_user`;
-
-CREATE TABLE `shopcart_user` (
-  `userID` int(12) NOT NULL,
-  `shopcart_size` int(12) DEFAULT NULL,
-  `shopcart_list` mediumtext,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Table structure for table `user` */
 

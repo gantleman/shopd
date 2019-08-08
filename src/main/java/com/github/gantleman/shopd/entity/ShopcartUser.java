@@ -1,6 +1,8 @@
 package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
@@ -10,30 +12,12 @@ public class ShopcartUser implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer userid;
 
-    private Integer shopcartSize;
-
-    private String shopcartList;
+    private ArrayList<Integer> shopcartList;
 
     private static final long serialVersionUID = 1L;
 
-    private Integer status;
-
     public Integer getUserid() {
         return userid;
-    }
-
-    /**
-     * @return the status
-     */
-    public Integer getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public void setUserid(Integer userid) {
@@ -41,18 +25,19 @@ public class ShopcartUser implements Serializable {
     }
 
     public Integer getShopcartSize() {
-        return shopcartSize;
+        return shopcartList.size();
     }
 
-    public void setShopcartSize(Integer shopcartSize) {
-        this.shopcartSize = shopcartSize;
-    }
-
-    public String getShopcartList() {
+    public List<Integer> getShopcartList() {
         return shopcartList;
     }
 
-    public void setShopcartList(String shopcartList) {
-        this.shopcartList = shopcartList == null ? null : shopcartList.trim();
+    public void removeShopcartList(Integer Shopcartid) {
+        this.shopcartList.remove(Shopcartid);
     }
+
+    public void addShopcartList(Integer Shopcartid) {
+        this.shopcartList.add(Shopcartid);
+    } 
+
 }

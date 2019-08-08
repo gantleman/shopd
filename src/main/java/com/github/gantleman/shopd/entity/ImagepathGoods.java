@@ -1,6 +1,8 @@
 package com.github.gantleman.shopd.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
@@ -10,30 +12,12 @@ public class ImagepathGoods implements Serializable {
     @PrimaryKey(sequence = "ID")
     private Integer goodsid;
 
-    private Integer imagepathSize;
-
-    private String imagepathList;
+    private ArrayList<Integer> imagepathList;
 
     private static final long serialVersionUID = 1L;
 
-    private Integer status;
-
     public Integer getGoodsid() {
         return goodsid;
-    }
-
-    /**
-     * @return the status
-     */
-    public Integer getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public void setGoodsid(Integer goodsid) {
@@ -41,18 +25,18 @@ public class ImagepathGoods implements Serializable {
     }
 
     public Integer getImagepathSize() {
-        return imagepathSize;
+        return imagepathList.size();
     }
 
-    public void setImagepathSize(Integer imagepathSize) {
-        this.imagepathSize = imagepathSize;
-    }
-
-    public String getImagepathList() {
+    public List<Integer> getImagepathList() {
         return imagepathList;
     }
 
-    public void setImagepathList(String imagepathList) {
-        this.imagepathList = imagepathList == null ? null : imagepathList.trim();
+    public void removeImagePathList(Integer imagepathID) {
+        this.imagepathList.remove(imagepathID);
     }
+
+    public void addImagePathList(Integer imagepathID) {
+        this.imagepathList.add(imagepathID);
+    }  
 }

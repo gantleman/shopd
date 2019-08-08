@@ -9,11 +9,9 @@ import javax.annotation.PostConstruct;
 import com.github.gantleman.shopd.da.ChatDA;
 import com.github.gantleman.shopd.da.ChatUserDA;
 import com.github.gantleman.shopd.dao.ChatMapper;
-import com.github.gantleman.shopd.dao.ChatUserMapper;
 import com.github.gantleman.shopd.entity.Chat;
 import com.github.gantleman.shopd.entity.ChatExample;
 import com.github.gantleman.shopd.entity.ChatUser;
-import com.github.gantleman.shopd.entity.ChatUserExample;
 import com.github.gantleman.shopd.service.CacheService;
 import com.github.gantleman.shopd.service.ChatService;
 import com.github.gantleman.shopd.service.jobs.ChatJob;
@@ -24,16 +22,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("chatService")
 public class ChatServiceImpl implements ChatService {
 
     @Autowired(required = false)
     private ChatMapper chatMapper;
-
-    @Autowired(required = false)
-    private ChatUserMapper chatUserMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -183,50 +176,19 @@ public class ChatServiceImpl implements ChatService {
         ChatUser senduser = chatUserDA.findChatUserById(chat.getSenduser());
         ChatUser receiveuser = chatUserDA.findChatUserById(chat.getReceiveuser());
         if(senduser == null) {
-            List<Integer> chatIdList = new ArrayList<>();
-            chatIdList.add(chat.getChatid());
-            JSONArray jsonArray = JSONArray.fromObject(chatIdList);
-
             senduser = new ChatUser();
-            senduser.setChatSize(1); 
-            senduser.setChatList(jsonArray.toString());
-            senduser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> chatIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(senduser.getChatList());
-            chatIdList = JSONArray.toList(jsonArray,Integer.class);
-            chatIdList.add(chat.getChatid());
-
-            senduser.setChatSize(senduser.getChatSize() + 1); 
-            senduser.setChatList(jsonArray.toString());
-            if(senduser.getStatus() == null || senduser.getStatus() == CacheService.STATUS_DELETE)
-            senduser.setStatus(CacheService.STATUS_UPDATE);
         }
+
+        senduser.addChatList(chat.getChatid());
         chatUserDA.saveChatUser(senduser);
 
         //Re-publish to redis
         redisu.sAdd("chat_u" + chat.getSenduser().toString(), chat.getChatid()); 
 
         if(receiveuser == null) {
-            List<Integer> chatIdList = new ArrayList<>();
-            chatIdList.add(chat.getChatid());
-            JSONArray jsonArray = JSONArray.fromObject(chatIdList);
-
             receiveuser = new ChatUser();
-            receiveuser.setChatSize(1); 
-            receiveuser.setChatList(jsonArray.toString());
-            receiveuser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> chatIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(receiveuser.getChatList());
-            chatIdList = JSONArray.toList(jsonArray,Integer.class);
-            chatIdList.add(chat.getChatid());
-
-            receiveuser.setChatSize(receiveuser.getChatSize() + 1); 
-            receiveuser.setChatList(jsonArray.toString());
-            if(receiveuser.getStatus() == null || receiveuser.getStatus() == CacheService.STATUS_DELETE)
-            receiveuser.setStatus(CacheService.STATUS_UPDATE);
         }
+        receiveuser.addChatList(chat.getChatid());
         chatUserDA.saveChatUser(receiveuser);
 
         //Re-publish to redis
@@ -264,21 +226,7 @@ public class ChatServiceImpl implements ChatService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 ChatUser chatUser = chatUserDA.findChatUserById(i);
                 if(chatUser != null){
-                    if(null ==  chatUser.getStatus()) {
-                        chatUserDA.removedChatUserById(chatUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  chatUser.getStatus() && 1 == chatUserMapper.deleteByPrimaryKey(chatUser.getUserid())) {
-                        chatUserDA.removedChatUserById(chatUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  chatUser.getStatus()  && 1 == chatUserMapper.insert(chatUser)) {
-                        chatUserDA.removedChatUserById(chatUser.getUserid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  chatUser.getStatus() && 1 == chatUserMapper.updateByPrimaryKey(chatUser)) {
-                        chatUserDA.removedChatUserById(chatUser.getUserid());
-                    }
+                    chatUserDA.removedChatUserById(chatUser.getUserid());
                     redisu.del("chat_u"+chatUser.getUserid().toString());
                 }
             }
@@ -334,8 +282,8 @@ public class ChatServiceImpl implements ChatService {
             ///init
             List<Chat> re = new ArrayList<Chat>();          
             ChatExample chatExample = new ChatExample();
-            chatExample.or().andChatidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            chatExample.or().andChatidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            chatExample.or().andChatidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andChatidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = chatMapper.selectByExample(chatExample);
             for (Chat value : re) {
@@ -369,29 +317,32 @@ public class ChatServiceImpl implements ChatService {
         ChatUserDA chatUserDA=new ChatUserDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<ChatUser> re = new ArrayList<ChatUser>();          
-            ChatUserExample chatUserExample = new ChatUserExample();
-            chatUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            chatUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<Chat> re = new ArrayList<Chat>();          
+            ChatExample chatExample = new ChatExample();
+            chatExample.or().andSenduserGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andSenduserLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = chatUserMapper.selectByExample(chatUserExample);
-            for (ChatUser value : re) {
-                chatUserDA.saveChatUser(value);
+            chatExample.or().andReceiveuserGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andReceiveuserLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-                List<Integer> chatIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getChatList());
-                chatIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer chatId: chatIdList){
-                    redisu.sAdd("chat_u"+value.getUserid().toString(), (Object)chatId);
+            re = chatMapper.selectByExample(chatExample);
+            for (Chat value : re) {
+                ChatUser chatUser = chatUserDA.findChatUserById(value.getSenduser());
+                if(chatUser == null){
+                    chatUser = new ChatUser();
                 }
 
-                if(andAll && userID == value.getUserid() && value.getChatSize() != 0){  
-                    for(Integer chatId: chatIdList){
-                        RefreshDBD(cacheService.PageID(chatId), refresRedis);
-                    }
+                chatUser.addChatList(value.getChatid());
+
+                redisu.sAdd("chat_u"+value.getSenduser().toString(), (Object)value.getChatid());
+
+                if(andAll && userID == value.getSenduser()){
+                    RefreshDBD(cacheService.PageID(value.getChatid()), refresRedis);
                 }
+
+                chatUserDA.saveChatUser(chatUser);
             }
+
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
             if(!redisu.hHasKey(classname_extra+"pageid", cacheService.PageID(userID).toString())) {
@@ -399,8 +350,11 @@ public class ChatServiceImpl implements ChatService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     ChatUser r = chatUserDA.findChatUserById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("chat_u"+r.getUserid().toString(), (Object)r.getChatList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getChatList();
+                        for(Integer chatid: li){
+                          redisu.sAdd("chat_u"+r.getUserid().toString(), (Object)chatid);   
+                        }  
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);

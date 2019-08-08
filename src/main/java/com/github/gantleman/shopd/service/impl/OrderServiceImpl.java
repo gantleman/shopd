@@ -11,11 +11,9 @@ import com.github.gantleman.shopd.da.OrderUserDA;
 import com.github.gantleman.shopd.da.OrderisreceiveDA;
 import com.github.gantleman.shopd.da.OrderissendDA;
 import com.github.gantleman.shopd.dao.OrderMapper;
-import com.github.gantleman.shopd.dao.OrderUserMapper;
 import com.github.gantleman.shopd.entity.Order;
 import com.github.gantleman.shopd.entity.OrderExample;
 import com.github.gantleman.shopd.entity.OrderUser;
-import com.github.gantleman.shopd.entity.OrderUserExample;
 import com.github.gantleman.shopd.entity.Orderisreceive;
 import com.github.gantleman.shopd.entity.Orderissend;
 import com.github.gantleman.shopd.service.CacheService;
@@ -28,16 +26,11 @@ import com.github.gantleman.shopd.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.sf.json.JSONArray;
-
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 
     @Autowired(required = false)
     private OrderMapper orderMapper;
-
-    @Autowired(required = false)
-    private OrderUserMapper orderUserMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -216,25 +209,9 @@ public class OrderServiceImpl implements OrderService {
         OrderUserDA orderUserDA=new OrderUserDA(BDBEnvironmentManager.getMyEntityStore());
         OrderUser orderUser = orderUserDA.findOrderUserById(order.getUserid());
         if(orderUser == null){
-            List<Integer> orderIdList = new ArrayList<>();
-            orderIdList.add(order.getOrderid());
-            JSONArray jsonArray = JSONArray.fromObject(orderIdList);
-
             orderUser = new OrderUser();
-            orderUser.setOrderSize(1); 
-            orderUser.setOrderList(jsonArray.toString());
-            orderUser.setStatus(CacheService.STATUS_INSERT);
-        }else{
-            List<Integer> orderIdList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(orderUser.getOrderList());
-            orderIdList = JSONArray.toList(jsonArray,Integer.class);
-            orderIdList.add(order.getOrderid());
-
-            orderUser.setOrderSize(orderUser.getOrderSize() + 1); 
-            orderUser.setOrderList(jsonArray.toString());
-            if(orderUser.getStatus() == null || orderUser.getStatus() == CacheService.STATUS_DELETE)
-                orderUser.setStatus(CacheService.STATUS_UPDATE);
         }
+        orderUser.addOrderList(order.getOrderid());
         orderUserDA.saveOrderUser(orderUser);
 
         //Re-publish to redis
@@ -270,25 +247,13 @@ public class OrderServiceImpl implements OrderService {
         OrderUser orderUser = orderUserDA.findOrderUserById(order.getUserid());
 
         if(orderUser != null){
-            List<Integer> orderList = new ArrayList<>();
-            JSONArray jsonArray = JSONArray.fromObject(orderUser.getOrderList());
-            orderList = JSONArray.toList(jsonArray, Integer.class);
-
-            orderList.remove(order.getOrderid());
-            JSONArray jsonarray = JSONArray.fromObject(orderList);
-            orderUser.setOrderList(jsonarray.toString());
-
+            orderUser.removeOrderList(order.getOrderid());
             if(orderUser.getOrderSize() >= 1){
-                orderUser.setOrderSize(orderUser.getOrderSize() - 1);
                 //Re-publish to redis
                  redisu.setRemove("order_u" + order.getUserid().toString(), order.getOrderid());
             } else if(orderUser.getOrderSize() == 0){
                 //list empty
-                if(orderUser.getStatus() == CacheService.STATUS_INSERT){
-                    orderUserDA.removedOrderUserById(orderUser.getUserid());
-                }else{
-                    orderUser.setStatus(CacheService.STATUS_DELETE);
-                }
+                orderUserDA.removedOrderUserById(orderUser.getUserid());
                 //Re-publish to redis
                 redisu.del("order_u" + order.getUserid().toString());
             }
@@ -400,21 +365,7 @@ public class OrderServiceImpl implements OrderService {
             for(int i=cacheService.PageBegin(pageid); i<l; i++ ){
                 OrderUser orderUser = orderUserDA.findOrderUserById(i);
                 if(orderUser != null){
-                    if(null ==  orderUser.getStatus()) {
-                        orderUserDA.removedOrderUserById(orderUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_DELETE ==  orderUser.getStatus() && 1 == orderUserMapper.deleteByPrimaryKey(orderUser.getUserid())) {
-                        orderUserDA.removedOrderUserById(orderUser.getUserid());
-                    }
-        
-                    if(CacheService.STATUS_INSERT ==  orderUser.getStatus()  && 1 == orderUserMapper.insert(orderUser)) {
-                        orderUserDA.removedOrderUserById(orderUser.getUserid());
-                    } 
-
-                    if(CacheService.STATUS_UPDATE ==  orderUser.getStatus() && 1 == orderUserMapper.updateByPrimaryKey(orderUser)) {
-                        orderUserDA.removedOrderUserById(orderUser.getUserid());
-                    }
+                    orderUserDA.removedOrderUserById(orderUser.getUserid());
                     redisu.del("order_u"+orderUser.getUserid().toString());
                 }
             }
@@ -470,8 +421,8 @@ public class OrderServiceImpl implements OrderService {
             ///init
             List<Order> re = new ArrayList<Order>();          
             OrderExample orderExample = new OrderExample();
-            orderExample.or().andOrderidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            orderExample.or().andOrderidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            orderExample.or().andOrderidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andOrderidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = orderMapper.selectByExample(orderExample);
             for (Order value : re) {
@@ -505,28 +456,25 @@ public class OrderServiceImpl implements OrderService {
         OrderUserDA orderUserDA=new OrderUserDA(BDBEnvironmentManager.getMyEntityStore());
         if (!cacheService.IsCache(classname_extra,cacheService.PageID(userID))) {
             /// init
-            List<OrderUser> re = new ArrayList<OrderUser>();          
-            OrderUserExample orderUserExample = new OrderUserExample();
-            orderUserExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)));
-            orderUserExample.or().andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
+            List<Order> re = new ArrayList<Order>();          
+            OrderExample orderExample = new OrderExample();
+            orderExample.or().andUseridGreaterThanOrEqualTo(cacheService.PageBegin(cacheService.PageID(userID)))
+            .andUseridLessThanOrEqualTo(cacheService.PageEnd(cacheService.PageID(userID)));
 
-            re = orderUserMapper.selectByExample(orderUserExample);
-            for (OrderUser value : re) {
-                orderUserDA.saveOrderUser(value);
+            re = orderMapper.selectByExample(orderExample);
+            for (Order value : re) {
+                OrderUser orderUser  = orderUserDA.findOrderUserById(value.getUserid());
+                if(orderUser == null){
+                    orderUser = new OrderUser();
+                }
+                
+                redisu.sAdd("order_u"+value.getUserid().toString(), (Object)value.getOrderid());
 
-                List<Integer> orderIdList = new ArrayList<>();
-                JSONArray jsonArray = JSONArray.fromObject(value.getOrderList());
-                orderIdList = JSONArray.toList(jsonArray, Integer.class);
-
-                for(Integer orderId: orderIdList){
-                    redisu.sAdd("order_u"+value.getUserid().toString(), (Object)orderId);
+                if(andAll){ 
+                    RefreshDBD(cacheService.PageID(value.getOrderid()), refresRedis);
                 }
 
-                if(andAll && userID == value.getUserid() && value.getOrderSize() != 0){  
-                    for(Integer orderId: orderIdList){
-                        RefreshDBD(cacheService.PageID(orderId), refresRedis);
-                    }
-                }
+                orderUserDA.saveOrderUser(orderUser);               
             }
             redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
         }else if(refresRedis){
@@ -535,8 +483,11 @@ public class OrderServiceImpl implements OrderService {
                 Integer l = cacheService.PageEnd(cacheService.PageID(userID));
                 for(;i < l; i++){
                     OrderUser r = orderUserDA.findOrderUserById(i);
-                    if(r!= null && r.getStatus() != CacheService.STATUS_DELETE){
-                        redisu.sAdd("order_u"+r.getUserid().toString(), (Object)r.getOrderList()); 
+                    if(r!= null){
+                        List<Integer> li = r.getOrderList();
+                        for(Integer id: li){
+                            redisu.sAdd("order_u"+r.getUserid().toString(), (Object)id);
+                        }
                     }                
                 }
                 redisu.hincr(classname_extra+"pageid", cacheService.PageID(userID).toString(), 1);
@@ -551,8 +502,8 @@ public class OrderServiceImpl implements OrderService {
             OrderissendDA orderissendDA=new OrderissendDA(BDBEnvironmentManager.getMyEntityStore());
            
             OrderExample orderExample = new OrderExample();
-            orderExample.or().andIspayEqualTo(true);
-            orderExample.or().andIssendEqualTo(false);
+            orderExample.or().andIspayEqualTo(true)
+            .andIssendEqualTo(false);
 
             List<Order> re = orderMapper.selectByExample(orderExample);
 
@@ -582,8 +533,8 @@ public class OrderServiceImpl implements OrderService {
             OrderisreceiveDA orderisreceiveDA=new OrderisreceiveDA(BDBEnvironmentManager.getMyEntityStore());
            
             OrderExample orderExample = new OrderExample();
-            orderExample.or().andIssendEqualTo(true);
-            orderExample.or().andIsreceiveEqualTo(false);
+            orderExample.or().andIssendEqualTo(true)
+            .andIsreceiveEqualTo(false);
 
             List<Order> re = orderMapper.selectByExample(orderExample);
 

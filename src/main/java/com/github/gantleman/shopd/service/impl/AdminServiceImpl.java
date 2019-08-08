@@ -103,8 +103,8 @@ public class AdminServiceImpl implements AdminService {
             ///init
             List<Admin> re = new ArrayList<Admin>();          
             AdminExample adminExample = new AdminExample();
-            adminExample.or().andAdminidGreaterThanOrEqualTo(cacheService.PageBegin(pageID));
-            adminExample.or().andAdminidLessThanOrEqualTo(cacheService.PageEnd(pageID));
+            adminExample.or().andAdminidGreaterThanOrEqualTo(cacheService.PageBegin(pageID))
+            .andAdminidLessThanOrEqualTo(cacheService.PageEnd(pageID));
 
             re = adminMapper.selectByExample(adminExample);
             for (Admin value : re) {
